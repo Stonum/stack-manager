@@ -1,18 +1,24 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import Home from "../views/Home.vue";
+import Main from "../views/MainPage.vue";
+import Settings from "../views/SettingsPage.vue";
 
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
   {
     path: "/",
-    name: "Home",
-    component: Home,
+    name: "Главная",
+    component: Main,
+  },
+  {
+    path: "/settings",
+    name: "Настройки",
+    component: Settings,
   },
   {
     path: "/about",
-    name: "About",
+    name: "О программе",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
@@ -22,7 +28,7 @@ const routes: Array<RouteConfig> = [
 ];
 
 const router = new VueRouter({
-  mode: "history",
+  mode: "hash",
   base: process.env.BASE_URL,
   routes,
 });
