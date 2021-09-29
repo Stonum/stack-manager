@@ -1,6 +1,6 @@
 "use strict";
 
-import { app, protocol, ipcMain, BrowserWindow, Menu } from "electron";
+import { app, protocol, BrowserWindow, Menu } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 
@@ -34,22 +34,7 @@ async function createWindow() {
     win.loadURL("app://./index.html");
   }
 
-  // routeTo(win, "");
-
-  const menu = Menu.buildFromTemplate([
-    // {
-    //   label: "Настройки",
-    //   click: function () {
-    //     routeTo(win, "/settings");
-    //   },
-    // },
-    // {
-    //   label: "О программе",
-    //   click: function () {
-    //     routeTo(win, "/about");
-    //   },
-    // },
-  ]);
+  const menu = Menu.buildFromTemplate([]);
   Menu.setApplicationMenu(menu);
 }
 
@@ -97,7 +82,3 @@ if (isDevelopment) {
     });
   }
 }
-
-// function routeTo(win: BrowserWindow, to: string) {
-//   win.webContents.send("SET_ROUTE", to);
-// }
