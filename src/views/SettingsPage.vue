@@ -15,19 +15,43 @@
         <v-text-field v-model="nginx" label="Каталог nginx" />
       </v-col>
     </v-row>
+    <v-row>
+      <v-spacer />
+      <v-col cols="2">
+        <v-btn @click="onClick">Сохранить настройки</v-btn>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { mapGetters } from "vuex";
 
 export default Vue.extend({
+  computed: {
+    ...mapGetters(["getNginx", "getDisp", "getStackVersion"]),
+  },
   data() {
     return {
-      disp_url: "http://localhost:8090",
-      stack_version: "e:\\stack.version",
-      nginx: "e:\\back_end\\nginx",
+      disp_url: "",
+      stack_version: "",
+      nginx: "",
     };
+  },
+  methods: {
+    onClick() {
+      this.$store.dispatch("saveConfig", {
+        disp: this.disp_url,
+        nginx: this.nginx,
+        stackversion: this.stack_version,
+      });
+    },
+  },
+  mounted() {
+    this.nginx = this.getNginx;
+    this.disp_url = this.getDisp;
+    this.stack_version = this.getStackVersion;
   },
 });
 </script>
