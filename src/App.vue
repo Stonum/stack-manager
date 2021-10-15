@@ -20,16 +20,16 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "App",
+  name: 'App',
   data: () => ({
     //
   }),
   computed: {
     pageName(): string {
-      return this.$route.name || "";
+      return this.$route.name || '';
     },
   },
 });

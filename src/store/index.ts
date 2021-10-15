@@ -1,14 +1,14 @@
-import Vue from "vue";
-import Vuex from "vuex";
-import { ipcRenderer } from "electron";
+import Vue from 'vue';
+import Vuex from 'vuex';
+import { ipcRenderer } from 'electron';
 
 Vue.use(Vuex);
 
 const setData = (message: string, data?: any) => {
-  ipcRenderer.send("main", { message, data });
+  ipcRenderer.send('main', { message, data });
 };
 const getData = async (message: string) => {
-  ipcRenderer.send("main", { message });
+  ipcRenderer.send('main', { message });
   return new Promise((resolve) => {
     ipcRenderer.on(message, (event, payload) => {
       resolve(payload);
@@ -44,12 +44,12 @@ export default new Vuex.Store({
   },
   actions: {
     async fillStore({ commit }) {
-      const config = await getData("getConfig");
-      commit("set_config", config);
+      const config = await getData('getConfig');
+      commit('set_config', config);
     },
     saveConfig({ commit }, config) {
-      commit("set_config", config);
-      setData("saveConfig", config);
+      commit('set_config', config);
+      setData('saveConfig', config);
     },
   },
   // modules: {},
