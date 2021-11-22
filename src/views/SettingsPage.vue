@@ -13,7 +13,7 @@
     </v-row>
     <v-row>
       <v-spacer />
-      <v-col cols="2">
+      <v-col align-self="end" cols="3">
         <v-btn @click="onClick">Сохранить настройки</v-btn>
       </v-col>
     </v-row>
@@ -22,12 +22,9 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { mapGetters } from 'vuex';
+import { getBackendData, setBackendData } from '@/middleware/index';
 
 export default Vue.extend({
-  computed: {
-    ...mapGetters(['getNginx', 'getDisp', 'getStackVersion']),
-  },
   data() {
     return {
       disp_url: '',
@@ -37,17 +34,20 @@ export default Vue.extend({
   },
   methods: {
     onClick() {
-      this.$store.dispatch('saveConfig', {
+      setBackendData('saveConfig', {
         disp: this.disp_url,
         nginx: this.nginx,
         stackversion: this.stack_version,
       });
     },
   },
-  mounted() {
-    this.nginx = this.getNginx;
-    this.disp_url = this.getDisp;
-    this.stack_version = this.getStackVersion;
+  async created() {
+    const config = await getBackendData('getConfig');
+    if (config) {
+      this.nginx = config.nginx;
+      this.disp_url = config.disp;
+      this.stack_version = config.stackversion;
+    }
   },
 });
 </script>

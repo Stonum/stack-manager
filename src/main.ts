@@ -1,14 +1,14 @@
 import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
-import store from './store';
+// import store from './middleware';
 import vuetify from './plugins/vuetify';
 
 Vue.config.productionTip = false;
 
 new Vue({
   router,
-  store,
+  // store,
   vuetify,
   render: (h) => h(App),
   created() {
@@ -16,6 +16,6 @@ new Vue({
     if (process.env.NODE_ENV === 'production') {
       this.$router.push('/');
     }
-    this.$store.dispatch('fillStore');
+    // this.$store.dispatch('fillStore');
   },
 }).$mount('#app');

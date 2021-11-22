@@ -1,6 +1,10 @@
 {
   "name": "stack-manager",
   "version": "0.1.0",
+  "author": {
+    "name": "stonum",
+    "email": "lexxarsh@gmail.com"
+  },
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -11,7 +15,7 @@
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps"
   },
-  "main": "background/background.js",
+  "main": "background.js",
   "dependencies": {
     "@mdi/font": "5.9.55",
     "core-js": "^3.6.5",

@@ -21,7 +21,7 @@ ipcMain.on('main', (event, payload) => {
       if (payload.data) {
         for (const key in payload.data) {
           if (key !== 'message') {
-            config.set(key, payload.data[key]);
+            config.set(key, payload.data[key].toString());
           }
         }
       }
