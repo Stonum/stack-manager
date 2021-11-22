@@ -1,11 +1,13 @@
-import { ipcMain } from 'electron';
-import { app } from 'electron';
+import { app, ipcMain, dialog } from 'electron';
 import Store from 'electron-store';
+
+import window from '../window';
+
 Store.initRenderer();
 
 const config = new Store({ cwd: app.getAppPath() });
 
-ipcMain.on('main', (event, payload) => {
+ipcMain.on('main', async (event, payload) => {
   let data = null;
 
   switch (payload.message) {
@@ -26,6 +28,43 @@ ipcMain.on('main', (event, payload) => {
         }
       }
       break;
+
+    case 'getProjects': // пока возвращаем моковые данные
+      data = [
+        {
+          name: 'Магнитогорск',
+          tasks: [
+            { name: 'ЮЛ', status: 0 },
+            { name: 'ФЛ', status: 2 },
+            { name: 'Админ', status: 1 },
+          ],
+        },
+        {
+          name: 'Норильск',
+          tasks: [
+            { name: 'ЮЛ', status: 0 },
+            { name: 'ФЛ', status: 2 },
+            { name: 'Коммун', status: 0 },
+            { name: 'Админ', status: 0 },
+          ],
+        },
+      ];
+      break;
+
+    case 'selectDir':
+      data = await dialog.showOpenDialog(window.current, {
+        properties: ['openDirectory'],
+      });
+      if (data && !data.canceled) {
+        data = data.filePaths[0];
+      } else {
+        data = null;
+      }
+
+      break;
+
+    default:
+      console.log('Unknown message - ', payload.message);
   }
 
   if (data) {

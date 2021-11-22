@@ -2,13 +2,13 @@
   <v-container>
     <v-row no-gutters>
       <v-col cols="12">
-        <v-text-field v-model="disp_url" label="Диспетчер ( адрес : порт )" placeholder="http://<url>:<port>" />
+        <v-text-field v-model="disp_url" label="Диспетчер ( адрес : порт )" placeholder="http://<url>:<port>" prepend-icon="mdi-web" clearable />
       </v-col>
       <v-col cols="12">
-        <v-text-field v-model="stack_version" label="Каталог Stack_Version" />
+        <select-folder v-model="stack_version" label="Каталог Stack_Version" clearable />
       </v-col>
       <v-col cols="12">
-        <v-text-field v-model="nginx" label="Каталог nginx" />
+        <select-folder v-model="nginx" label="Каталог nginx" clearable />
       </v-col>
     </v-row>
     <v-row>
@@ -22,9 +22,12 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import SelectFolder from '@/components/SelectFolder.vue';
+
 import { getBackendData, setBackendData } from '@/middleware/index';
 
 export default Vue.extend({
+  components: { SelectFolder },
   data() {
     return {
       disp_url: '',
