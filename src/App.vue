@@ -1,15 +1,18 @@
 <template>
   <v-app>
     <v-app-bar elevate-on-scroll dense app color="primary" dark>
-      <v-btn icon to="/">
+      <v-btn v-if="!hideHomeBtn" plain icon to="/">
         <v-icon>mdi-home</v-icon>
+      </v-btn>
+      <v-btn v-if="!hideAddBtn" plain icon to="/new">
+        <v-icon>mdi-plus</v-icon>
       </v-btn>
 
       <v-app-bar-title>{{ pageName }}</v-app-bar-title>
 
       <v-spacer></v-spacer>
 
-      <v-btn icon to="/settings">
+      <v-btn plain icon to="/settings">
         <v-icon>mdi-cog-outline</v-icon>
       </v-btn>
     </v-app-bar>
@@ -22,6 +25,10 @@
 <script lang="ts">
 import Vue from 'vue';
 
+import SelectFolder from '@/components/SelectFolder.vue';
+
+Vue.component('SelectFolder', SelectFolder);
+
 export default Vue.extend({
   name: 'App',
   data: () => ({
@@ -30,6 +37,12 @@ export default Vue.extend({
   computed: {
     pageName(): string {
       return this.$route.name || '';
+    },
+    hideHomeBtn(): boolean {
+      return this.$route.path === '/';
+    },
+    hideAddBtn(): boolean {
+      return this.$route.path !== '/';
     },
   },
 });

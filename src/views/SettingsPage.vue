@@ -13,7 +13,7 @@
     </v-row>
     <v-row>
       <v-spacer />
-      <v-col align-self="end" cols="3">
+      <v-col cols="3" class="d-flex justify-end align-self-center">
         <v-btn @click="onClick">Сохранить настройки</v-btn>
       </v-col>
     </v-row>
@@ -22,12 +22,10 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import SelectFolder from '@/components/SelectFolder.vue';
 
 import { getBackendData, setBackendData } from '@/middleware/index';
 
 export default Vue.extend({
-  components: { SelectFolder },
   data() {
     return {
       disp_url: '',
