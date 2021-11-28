@@ -29,9 +29,10 @@ async function create() {
     // Load the index.html when not in development
     current.loadURL('app://./index.html');
   }
-
-  const menu = Menu.buildFromTemplate([]);
-  Menu.setApplicationMenu(menu);
+  if (process.env.NODE_ENV === 'production') {
+    const menu = Menu.buildFromTemplate([]);
+    Menu.setApplicationMenu(menu);
+  }
 }
 
 export default {

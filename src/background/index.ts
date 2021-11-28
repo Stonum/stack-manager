@@ -31,7 +31,6 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
-  console.log(path.join(__dirname, '../publick/img/icons/favicon16x16.png'));
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {

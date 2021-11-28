@@ -22,8 +22,8 @@ export default Vue.extend({
       items: [],
     };
   },
-  async created() {
-    this.items = await getBackendData('getProjects');
+  async mounted() {
+    this.items = (await getBackendData('getProjects')) as any;
   },
 });
 </script>

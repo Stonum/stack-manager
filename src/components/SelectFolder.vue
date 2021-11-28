@@ -16,7 +16,7 @@ export default Vue.extend({
   },
   methods: {
     async onChangeFolder() {
-      const result = (await getBackendData('selectDir')) as string;
+      const result = (await getBackendData('selectDir', { path: this.value })) as string;
       if (result) {
         this.$emit('change', result);
       }

@@ -10,6 +10,9 @@
       <v-col cols="12">
         <select-folder v-model="nginx" label="Каталог nginx" clearable />
       </v-col>
+      <v-col cols="12">
+        <select-folder v-model="bin" label="Каталог bin" clearable />
+      </v-col>
     </v-row>
     <v-row>
       <v-spacer />
@@ -31,6 +34,7 @@ export default Vue.extend({
       disp_url: '',
       stack_version: '',
       nginx: '',
+      bin: '',
     };
   },
   methods: {
@@ -39,15 +43,17 @@ export default Vue.extend({
         disp: this.disp_url,
         nginx: this.nginx,
         stackversion: this.stack_version,
+        bin: this.bin,
       });
     },
   },
   async created() {
-    const config = await getBackendData('getConfig');
+    const config = (await getBackendData('getConfig')) as any;
     if (config) {
       this.nginx = config.nginx;
       this.disp_url = config.disp;
       this.stack_version = config.stackversion;
+      this.bin = config.bin;
     }
   },
 });
