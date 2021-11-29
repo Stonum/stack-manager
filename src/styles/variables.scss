@@ -1,0 +1,16 @@
+$font-size-root: 14px; // 16px !default
+$input-font-size: 14px;
+
+$grid-gutter: 12px; // $spacer * 6 !default;
+
+// Кнопки
+$btn-letter-spacing: normal;
+$btn-text-transform: none;
+$btn-font-weight: 400;
+$btn-font-sizes: (
+  "x-small": .75rem,
+  "small": .875rem,
+  "default": 1rem,
+  "large": 1rem,
+  "x-large": 1.125rem
+);
