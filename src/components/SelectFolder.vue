@@ -1,10 +1,10 @@
 <template>
-  <v-text-field :value="value" v-bind="$attrs" prepend-icon="$file" readonly @click:prepend="onChangeFolder" />
+  <v-text-field :value="value" v-bind="$attrs" prepend-icon="$file" readonly @click:prepend="onChangeFolder" v-on="$listeners" />
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { getBackendData } from '@/middleware/index';
+import { selectDir } from '@/middleware/index';
 
 export default Vue.extend({
   model: {
@@ -16,7 +16,7 @@ export default Vue.extend({
   },
   methods: {
     async onChangeFolder() {
-      const result = (await getBackendData('selectDir', { path: this.value })) as string;
+      const result = await selectDir(this.value);
       if (result) {
         this.$emit('change', result);
       }

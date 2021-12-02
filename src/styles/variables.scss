@@ -1,7 +1,6 @@
 $font-size-root: 14px; // 16px !default
-$input-font-size: 14px;
 
-$grid-gutter: 12px; // $spacer * 6 !default;
+$grid-gutter: 10px; // $spacer * 6 !default;
 
 // Кнопки
 $btn-letter-spacing: normal;
@@ -14,3 +13,6 @@ $btn-font-sizes: (
   "large": 1rem,
   "x-large": 1.125rem
 );
+
+// Инпуты
+$input-font-size: 14px;

@@ -2,10 +2,10 @@
   <v-container>
     <v-row no-gutters>
       <v-col cols="12">
-        <v-text-field v-model="disp_url" label="Диспетчер ( адрес : порт )" placeholder="http://<url>:<port>" prepend-icon="mdi-web" clearable />
+        <v-text-field v-model="dispatcher" label="Диспетчер ( адрес : порт )" placeholder="http://<url>:<port>" prepend-icon="mdi-web" clearable />
       </v-col>
       <v-col cols="12">
-        <select-folder v-model="stack_version" label="Каталог Stack_Version" clearable />
+        <select-folder v-model="stackversion" label="Каталог Stack_Version" clearable />
       </v-col>
       <v-col cols="12">
         <select-folder v-model="nginx" label="Каталог nginx" clearable />
@@ -26,35 +26,30 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { getBackendData, setBackendData } from '@/middleware/index';
+import { setSettings, getSettings } from '@/middleware/index';
 
 export default Vue.extend({
   data() {
     return {
-      disp_url: '',
-      stack_version: '',
+      dispatcher: '',
+      stackversion: '',
       nginx: '',
       bin: '',
     };
   },
   methods: {
     onClick() {
-      setBackendData('saveConfig', {
-        disp: this.disp_url,
-        nginx: this.nginx,
-        stackversion: this.stack_version,
-        bin: this.bin,
-      });
+      setSettings('dispatcher', this.dispatcher);
+      setSettings('stackversion', this.stackversion);
+      setSettings('nginx', this.nginx);
+      setSettings('bin', this.bin);
     },
   },
   async created() {
-    const config = (await getBackendData('getConfig')) as any;
-    if (config) {
-      this.nginx = config.nginx;
-      this.disp_url = config.disp;
-      this.stack_version = config.stackversion;
-      this.bin = config.bin;
-    }
+    this.dispatcher = await getSettings('dispatcher');
+    this.stackversion = await getSettings('stackversion');
+    this.nginx = await getSettings('nginx');
+    this.bin = await getSettings('bin');
   },
 });
 </script>

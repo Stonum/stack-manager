@@ -1,6 +1,5 @@
 import { app, protocol, BrowserWindow } from 'electron';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
-import path from 'path';
 
 import window from './window';
 import './middleware/index';
@@ -39,6 +38,7 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString());
     }
   }
+
   window.create();
 });
 

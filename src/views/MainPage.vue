@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <v-row>
       <v-col>
         <project-list :items="items" />
@@ -12,7 +12,7 @@
 import Vue from 'vue';
 import ProjectList from '@/components/ProjectList.vue';
 
-import { getBackendData } from '@/middleware/index';
+import { getProjects } from '@/middleware/index';
 
 export default Vue.extend({
   name: 'Main',
@@ -23,7 +23,7 @@ export default Vue.extend({
     };
   },
   async mounted() {
-    this.items = (await getBackendData('getProjects')) as any;
+    this.items = await getProjects();
   },
 });
 </script>
