@@ -47,7 +47,7 @@ export default Vue.extend({
       stackversion: '',
       nginx: '',
       bin: '',
-      tasks: [] as any[],
+      tasks: [] as Task[],
     };
   },
   methods: {

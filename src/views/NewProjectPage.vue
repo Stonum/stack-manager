@@ -70,7 +70,7 @@ export default Vue.extend({
         login: '',
         password: '',
         version: '',
-        tasks: [] as any[],
+        tasks: [] as Task[],
       },
       valid: false,
       inspectport: 0,
@@ -85,11 +85,11 @@ export default Vue.extend({
   },
   methods: {
     async onChangePort(payload: number) {
-      const tasks = (await getSettings('tasks')) as any[];
+      const tasks = (await getSettings('tasks')) as Task[];
       if (this.params.tasks) {
-        this.params.tasks.forEach((task: any, idx: number) => {
+        this.params.tasks.forEach((task: Task, idx: number) => {
           if (task.selected && tasks[idx].port !== null) {
-            task.port = +payload + +tasks[idx].port;
+            task.port = +payload + +(tasks[idx].port || 0);
           } else {
             task.port = null;
           }
@@ -120,7 +120,7 @@ export default Vue.extend({
   },
   async created() {
     this.params.tasks = await getSettings('tasks');
-    this.params.tasks.forEach((task: any) => {
+    this.params.tasks.forEach((task: Task) => {
       task.port = null;
     });
   },

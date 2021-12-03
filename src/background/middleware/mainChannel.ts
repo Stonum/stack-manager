@@ -41,7 +41,7 @@ ipcMain.on('main', async (event, payload) => {
   }
 });
 
-const tasks = [
+const tasks: Task[] = [
   { title: 'АРМ администратора', prefix: 'admin', id: 11075, selected: true, port: 0 },
   { title: 'Расчеты с абонентами - физическими лицами', prefix: 'fl', id: 252, selected: true, port: 1 },
   { title: 'Расчеты с абонентами - юридическими лицами', prefix: 'ul', id: 11058, selected: true, port: 2 },

@@ -31,19 +31,19 @@ export const projectAdd = async (params: any): Promise<any> => {
   });
 };
 
-export const getProjects = async (): Promise<any> => {
+export const getProjects = async (): Promise<Project[]> => {
   ipcRenderer.send('project', { message: 'getAll' });
   return new Promise((resolve) => {
-    ipcRenderer.on('getAll', (event, payload: any) => {
+    ipcRenderer.on('getAll', (event, payload: Project[]) => {
       resolve(payload);
     });
   });
 };
 
-export const getProject = async (projectId: number): Promise<any> => {
+export const getProject = async (projectId: number): Promise<Project> => {
   ipcRenderer.send('project', { message: 'get', projectId });
   return new Promise((resolve) => {
-    ipcRenderer.on('get', (event, payload: any) => {
+    ipcRenderer.on('get', (event, payload: Project) => {
       resolve(payload);
     });
   });

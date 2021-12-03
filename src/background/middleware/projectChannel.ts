@@ -101,7 +101,7 @@ function getDataFromIni(pathFile: string) {
 async function addProject(params: any) {
   console.log(params);
 
-  const project = {} as any;
+  const project = {} as Project;
   project.name = params.name;
 
   const bindir = settings.get('bin') as string;
@@ -190,7 +190,7 @@ async function addProject(params: any) {
       return { id: task.id, port: task.port };
     });
 
-  const allProjects = projects.get('projects', []) as any;
+  const allProjects = projects.get('projects', []) as Project[];
   allProjects.push(project);
   projects.set('projects', allProjects);
 
