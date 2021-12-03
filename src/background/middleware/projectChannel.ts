@@ -1,4 +1,5 @@
-import { ipcMain, dialog } from 'electron';
+import { ipcMain } from 'electron';
+import window from '../window';
 
 import path from 'path';
 import fs from 'fs';
@@ -9,38 +10,47 @@ import { getFiles, copyFiles, readIniFile, writeIniFile } from '../utils';
 ipcMain.on('project', async (event, payload) => {
   console.log(payload);
 
-  switch (payload.message) {
-    case 'getAll': {
-      const data = (projects.get('projects', []) as any).map((project: any) => {
-        return { name: project.name, tasks: [] };
-      });
+  try {
+    switch (payload.message) {
+      case 'getAll': {
+        const data = (projects.get('projects', []) as any).map((project: any) => {
+          return { name: project.name, tasks: [] };
+        });
 
-      event.sender.send(payload.message, data);
-      break;
+        event.sender.send(payload.message, data);
+        break;
+      }
+
+      case 'get': {
+        break;
+      }
+
+      case 'add':
+        event.sender.send(payload.message, await addProject(payload.params));
+        break;
+
+      case 'readFolder':
+        event.sender.send(payload.message, await readProjectFolder(payload.path));
+        break;
+
+      case 'readIniFile':
+        event.sender.send(payload.message, await getDataFromIni(payload.path));
+        break;
+
+      default:
+        console.log('Unknown message - ', payload.message);
     }
-
-    case 'get': {
-      break;
-    }
-
-    case 'add':
-      event.sender.send(payload.message, await addProject(payload.params));
-      break;
-
-    case 'readFolder':
-      event.sender.send(payload.message, await readProjectFolder(payload.path));
-      break;
-
-    case 'readIniFile':
-      event.sender.send(payload.message, await getDataFromIni(payload.path));
-      break;
-
-    default:
-      console.log('Unknown message - ', payload.message);
+  } catch (e: AnyException) {
+    console.log(e);
+    window.get().webContents.send('error', e.message || e);
   }
 });
 
 async function readProjectFolder(pathDir: string) {
+  if (!pathDir) {
+    throw 'Не указан каталог для чтения';
+  }
+
   const result = {
     front: '',
     ini: [] as any[],
@@ -65,6 +75,10 @@ async function readProjectFolder(pathDir: string) {
 const verpattern = /.+(\\\d\d\.\d\d.+?(\\|$))/i;
 
 function getDataFromIni(pathFile: string) {
+  if (!pathFile) {
+    throw 'Не указан файл';
+  }
+
   const result = {} as any;
 
   const data = readIniFile(pathFile);
@@ -75,7 +89,6 @@ function getDataFromIni(pathFile: string) {
   if (data.AppPath.DB.length) {
     for (const path of data.AppPath.DB) {
       const res = path.match(verpattern);
-      console.log(res);
       if (res) {
         result.version = res[0];
       }

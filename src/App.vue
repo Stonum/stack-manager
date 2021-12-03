@@ -19,6 +19,7 @@
     <v-main>
       <router-view />
     </v-main>
+    <toast />
   </v-app>
 </template>
 
@@ -26,11 +27,13 @@
 import Vue from 'vue';
 
 import SelectFolder from '@/components/SelectFolder.vue';
+import Toast from '@/components/Toast.vue';
 
 Vue.component('SelectFolder', SelectFolder);
 
 export default Vue.extend({
   name: 'App',
+  components: { Toast },
   data: () => ({
     //
   }),

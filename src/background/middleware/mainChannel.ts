@@ -24,7 +24,7 @@ ipcMain.on('main', async (event, payload) => {
       break;
 
     case 'selectDir': {
-      const res = await dialog.showOpenDialog(window.current, {
+      const res = await dialog.showOpenDialog(window.get(), {
         defaultPath: payload.path,
         properties: ['openDirectory'],
       });

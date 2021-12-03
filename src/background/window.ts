@@ -32,7 +32,11 @@ async function create() {
   }
 }
 
+function get() {
+  return current;
+}
+
 export default {
-  current,
   create,
+  get,
 };
