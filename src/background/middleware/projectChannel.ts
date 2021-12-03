@@ -97,15 +97,25 @@ async function addProject(params: any) {
   const ver = params.version.match(verpattern)[1].replaceAll('//', '');
   const verdir = path.join(settings.get('stackversion') as string, ver);
 
+  project.path = {
+    version: verdir,
+    bin: pathbin_new,
+    git: params.path,
+  };
+
+  // копируем каталог версии если его нет
   if (!fs.existsSync(verdir)) {
     await copyFiles(params.version, verdir);
   }
 
+  // копируем exe и прочие файлы в бин каталог
+  const pathbin_ver = path.join(verdir, 'Stack.srv', 'Bin', '0');
   if (!fs.existsSync(pathbin_new)) {
-    await copyFiles(pathbin_old, pathbin_new);
+    await copyFiles(pathbin_ver, pathbin_new);
   }
 
-  const pathini = path.join(pathbin_new, 'stack.ini');
+  // редактируем stack.ini и создаем в целевом каталоге
+  const pathini = path.join(pathbin_old, 'stack.ini');
   if (fs.existsSync(pathini)) {
     const data = readIniFile(pathini);
     data['SQL-mode'].Server = params.server;
@@ -149,8 +159,23 @@ async function addProject(params: any) {
     } else if (jsupath.startsWith(params.version)) {
       data['JavaClient'].JRUpdatePath = jsupath.replace(params.version, verdir);
     }
-    writeIniFile(pathini, data);
+    writeIniFile(path.join(pathbin_new, 'stack.ini'), data);
   }
+
+  project.sql = {
+    server: params.server,
+    base: params.base,
+    login: params.login,
+    password: params.password,
+  };
+
+  project.tasks = params.tasks
+    .filter((task: any) => {
+      return task.selected;
+    })
+    .map((task: any) => {
+      return { id: task.id, port: task.port };
+    });
 
   const allProjects = projects.get('projects', []) as any;
   allProjects.push(project);

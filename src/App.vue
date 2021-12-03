@@ -12,7 +12,7 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn plain icon to="/settings">
+      <v-btn v-if="!hideSettingsBtn" plain icon to="/settings">
         <v-icon>mdi-cog-outline</v-icon>
       </v-btn>
     </v-app-bar>
@@ -42,6 +42,9 @@ export default Vue.extend({
       return this.$route.path === '/';
     },
     hideAddBtn(): boolean {
+      return this.$route.path !== '/';
+    },
+    hideSettingsBtn(): boolean {
       return this.$route.path !== '/';
     },
   },

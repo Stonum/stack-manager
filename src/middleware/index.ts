@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron';
 
-export const setSettings = (key: string, payload: any) => {
-  ipcRenderer.send('main', { message: 'setSettings', key, payload });
+export const setSettings = (key: string, data: any) => {
+  ipcRenderer.send('main', { message: 'setSettings', key, data });
 };
 
 export const getSettings = async (key: string): Promise<any> => {

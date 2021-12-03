@@ -15,6 +15,18 @@
       </v-col>
     </v-row>
     <v-row>
+      <v-col cols="4"> Список задач </v-col>
+      <v-col cols="1"> Порт </v-col>
+    </v-row>
+    <v-row v-for="task in tasks" :key="task.id" no-gutters>
+      <v-col cols="4" :key="task.id">
+        <v-checkbox :key="task.id" v-model="task.selected" :label="task.title" dense hide-details />
+      </v-col>
+      <v-col cols="1">
+        <v-text-field v-model="task.port" type="number" dense hide-details clearable />
+      </v-col>
+    </v-row>
+    <v-row>
       <v-spacer />
       <v-col cols="3" class="d-flex justify-end align-self-center">
         <v-btn @click="onClick">Сохранить настройки</v-btn>
@@ -35,6 +47,7 @@ export default Vue.extend({
       stackversion: '',
       nginx: '',
       bin: '',
+      tasks: [] as any[],
     };
   },
   methods: {
@@ -43,6 +56,9 @@ export default Vue.extend({
       setSettings('stackversion', this.stackversion);
       setSettings('nginx', this.nginx);
       setSettings('bin', this.bin);
+      setSettings('tasks', this.tasks);
+
+      this.$router.push('/');
     },
   },
   async created() {
@@ -50,6 +66,7 @@ export default Vue.extend({
     this.stackversion = await getSettings('stackversion');
     this.nginx = await getSettings('nginx');
     this.bin = await getSettings('bin');
+    this.tasks = await getSettings('tasks');
   },
 });
 </script>
