@@ -49,8 +49,8 @@ export const getProject = async (projectId: number): Promise<Project> => {
   });
 };
 
-export const projectSendJob = async (jobName: string, projectId: number): Promise<any> => {
-  ipcRenderer.send('project', { message: jobName, projectId });
+export const projectSendJob = async (jobName: string, projectId: number, params: any): Promise<any> => {
+  ipcRenderer.send('project', { message: jobName, projectId, params });
   return new Promise((resolve) => {
     ipcRenderer.on(jobName, (event, payload: any) => {
       resolve(payload);

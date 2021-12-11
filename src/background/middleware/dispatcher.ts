@@ -43,9 +43,9 @@ export default class Dispatcher {
   }
 
   _send(body: object): Promise<any> {
-    console.log('request', JSON.stringify(body));
     return new Promise((resolve, reject) => {
       const json = JSON.stringify(body);
+      console.log('_send', json);
       const data = Buffer.from(json, 'utf-8');
       // @ts-ignore
       const request = http
@@ -85,7 +85,7 @@ export default class Dispatcher {
 }
 
 class DispatcherElement {
-  private connection: Dispatcher;
+  public connection: Dispatcher;
 
   constructor(connection: Dispatcher) {
     this.connection = connection;
@@ -134,7 +134,10 @@ class DispatcherContainer extends DispatcherElement {
 }
 
 class DispatcherContainerItem extends DispatcherElement {
-  constructor(container, name) {
+  public container: DispatcherElement;
+  private name: string;
+
+  constructor(container: DispatcherElement, name: string) {
     super(container.connection);
     this.container = container;
     this.name = name;
@@ -145,11 +148,19 @@ class DispatcherContainerItem extends DispatcherElement {
   }
 
   async setParams(params: any) {
-    return this._call((b) => {
+    return this._call((b: QueryBuilder) => {
       for (const [key, value] of Object.entries(params)) {
         b.property('Parameter', key).method('SetValue', value);
       }
     });
+  }
+
+  async getState(param: string) {
+    const res = await this._call((b: QueryBuilder) => {
+      b.root.push({ State: [] });
+    });
+    // TODO - все бы это дело надо привести в нормальный вид
+    return +res[0].WebServer[0].Item[0].State.result;
   }
 
   async restart() {
@@ -210,7 +221,7 @@ class AutoApp extends DispatcherContainerItem {
   }
 
   async start() {
-    return this._call((b) => b.method('Start'));
+    return this._call((b: QueryBuilder) => b.method('Start'));
   }
 
   async restart() {

@@ -15,9 +15,20 @@ ipcMain.on('project', async (event, payload) => {
   try {
     switch (payload.message) {
       case 'getAll': {
-        const data = (projects.get('projects', []) as any).map((project: any) => {
-          return { name: project.name, tasks: [] };
+        const webServer = getWebServer();
+
+        const data = (projects.get('projects', []) as Project[]).map((project: Project) => {
+          return { name: project.name, apps: project.apps };
         });
+
+        for (const project of data) {
+          if (project.apps) {
+            for (const app of project.apps) {
+              const wsapp = webServer.item(app.name);
+              app.status = await wsapp.getState();
+            }
+          }
+        }
 
         event.sender.send(payload.message, data);
         break;
@@ -38,6 +49,20 @@ ipcMain.on('project', async (event, payload) => {
       case 'readIniFile':
         event.sender.send(payload.message, await getDataFromIni(payload.path));
         break;
+
+      case 'appStart': {
+        const webServer = getWebServer();
+        const wsapp = webServer.item(payload.params);
+        event.sender.send(payload.message, await wsapp.restart());
+        break;
+      }
+
+      case 'appStop': {
+        const webServer = getWebServer();
+        const wsapp = webServer.item(payload.params);
+        event.sender.send(payload.message, await wsapp.stop());
+        break;
+      }
 
       default:
         console.log('Unknown message - ', payload.message);
@@ -177,11 +202,6 @@ async function addProject(params: any) {
     writeIniFile(path.join(pathbin_new, 'stack.ini'), data);
   }
 
-  const address = settings.get('dispatcher_url') as string;
-  const secret = settings.get('dispatcher_password') as string;
-  const setupDispatcher = new Dispatcher(address, secret);
-  const webServer = setupDispatcher.webServer;
-
   project.sql = {
     server: params.server,
     base: params.base,
@@ -189,33 +209,32 @@ async function addProject(params: any) {
     password: params.password,
   };
 
-  project.tasks = params.tasks
-    .filter((task: any) => {
-      return task.selected;
-    })
-    .map((task: any) => {
-      return { id: task.id, port: task.port, prefix: task.prefix };
-    });
+  project.apps = [];
 
-  for (const task of project.tasks) {
-    const taskname = `api_${project.name}_${task.prefix}`;
-    const pathname = `/api/${project.name}/${task.prefix}`;
-    await webServer.add(taskname);
-    const app = webServer.item(taskname);
-    await app.setParams({
-      UrlPathPrefix: pathname,
-      StackProgramDir: project.path.bin,
-      StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${task.id} -LOADRES -nc`,
-      IsActive: 1,
-      FunctionName: 'StackAPI_kvplata_v1',
-      ResultContentType: 'application/json;charset=utf-8',
-      UseComStack: 1,
-      ShareStaticContent: 0,
-      UploadStaticContent: 0,
-      FallbackEnabled: 0,
-      AllowServiceCommands: 0,
-    });
-    await app.restart();
+  const webServer = getWebServer();
+
+  for (const task of params.tasks) {
+    if (task.selected) {
+      const taskname = `api_${project.name}_${task.prefix}`;
+      const pathname = `/api/${project.name}/${task.prefix}`;
+      await webServer.add(taskname);
+      const app = webServer.item(taskname);
+      await app.setParams({
+        UrlPathPrefix: pathname,
+        StackProgramDir: project.path.bin,
+        StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${task.id} -LOADRES -nc`,
+        IsActive: 1,
+        FunctionName: 'StackAPI_kvplata_v1',
+        ResultContentType: 'application/json;charset=utf-8',
+        UseComStack: 1,
+        ShareStaticContent: 0,
+        UploadStaticContent: 0,
+        FallbackEnabled: 0,
+        AllowServiceCommands: 0,
+      });
+      await app.restart();
+      project.apps.push({ id: task.id, port: task.port, name: taskname });
+    }
   }
 
   const allProjects = projects.get('projects', []) as Project[];
@@ -223,4 +242,12 @@ async function addProject(params: any) {
   projects.set('projects', allProjects);
 
   return {};
+}
+
+function getWebServer() {
+  const address = settings.get('dispatcher_url') as string;
+  const secret = settings.get('dispatcher_password') as string;
+  const setupDispatcher = new Dispatcher(address, secret);
+  const webServer = setupDispatcher.webServer;
+  return webServer;
 }

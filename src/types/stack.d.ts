@@ -8,6 +8,13 @@ interface Task {
   port: number | null;
 }
 
+interface App {
+  name: string;
+  id: number;
+  port: number | null;
+  status?: number;
+}
+
 interface Project {
   name: string;
   path: {
@@ -21,5 +28,5 @@ interface Project {
     login: string;
     password: string;
   };
-  tasks: Task[];
+  apps: App[];
 }

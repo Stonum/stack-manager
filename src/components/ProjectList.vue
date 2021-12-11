@@ -1,60 +1,40 @@
 <template>
   <v-expansion-panels>
-    <v-expansion-panel v-for="(item, idx) in items" :key="idx">
-      <v-expansion-panel-header style="padding: 0">
-        <v-app-bar flat color="rgba(0, 0, 0, 0)">
-          <v-toolbar-title>
-            {{ item.name }}
-          </v-toolbar-title>
-
-          <v-spacer />
-
-          <v-icon v-for="(task, idxtask) in item.tasks" :key="idxtask" small :color="taskColor(task.status)"> mdi-circle </v-icon>
-        </v-app-bar>
-      </v-expansion-panel-header>
-
-      <v-expansion-panel-content>
-        <v-list-item v-for="(task, idxtask) in item.tasks" :key="idxtask" dense>
-          <v-list-item-icon>
-            <v-icon small :color="taskColor(task.status)"> mdi-circle </v-icon>
-          </v-list-item-icon>
-
-          <v-list-item-subtitle>{{ task.name }}</v-list-item-subtitle>
-
-          <v-list-item-subtitle class="text-right">
-            <v-btn icon>
-              <v-icon color="primary"> mdi-play </v-icon>
-            </v-btn>
-            <v-btn icon>
-              <v-icon color="primary"> mdi-stop </v-icon>
-            </v-btn>
-          </v-list-item-subtitle>
-        </v-list-item>
-      </v-expansion-panel-content>
-    </v-expansion-panel>
+    <template v-for="(item, idx) in items">
+      <project-item :item="item" :key="idx" @stop="onStop(idx, $event)" @start="onStart(idx, $event)" @delete="onDelete(idx, $event)" />
+    </template>
   </v-expansion-panels>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import ProjectItem from './ProjectItem.vue';
+
+import { getProjects, projectSendJob } from '@/middleware/index';
 
 export default Vue.extend({
   name: 'ProjectList',
-  props: {
-    items: { type: Array, required: true },
+  components: { ProjectItem },
+  data() {
+    return {
+      items: [] as Project[],
+    };
   },
   methods: {
-    taskColor(status: number) {
-      switch (status) {
-        case 0:
-          return 'green';
-        case 1:
-          return 'warning';
-
-        default:
-          return 'error';
-      }
+    async onStop(id: number, appname: string) {
+      await projectSendJob('appStop', id, appname);
+      this.items = await getProjects();
     },
+    async onStart(id: number, appname: string) {
+      await projectSendJob('appStart', id, appname);
+      this.items = await getProjects();
+    },
+    onDelete(id: number, payload: any) {
+      //
+    },
+  },
+  async mounted() {
+    this.items = await getProjects();
   },
 });
 </script>

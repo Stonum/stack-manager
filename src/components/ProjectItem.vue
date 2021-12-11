@@ -1,0 +1,62 @@
+<template>
+  <v-expansion-panel>
+    <v-expansion-panel-header style="padding: 0">
+      <v-app-bar flat color="rgba(0, 0, 0, 0)">
+        <v-toolbar-title>
+          {{ item.name }}
+        </v-toolbar-title>
+
+        <v-spacer />
+
+        <v-icon v-for="(app, idxtask) in item.apps" :key="idxtask" small :color="appColor(app.status)"> mdi-circle </v-icon>
+      </v-app-bar>
+    </v-expansion-panel-header>
+
+    <v-expansion-panel-content>
+      <v-list-item v-for="(app, idxtask) in item.apps" :key="idxtask" dense>
+        <v-list-item-icon>
+          <v-icon small :color="appColor(app.status)"> mdi-circle </v-icon>
+        </v-list-item-icon>
+
+        <v-list-item-subtitle>{{ app.name }}</v-list-item-subtitle>
+
+        <v-list-item-subtitle class="text-right">
+          <v-btn icon>
+            <v-icon color="primary" @click="$emit('start', app.name)"> mdi-refresh </v-icon>
+          </v-btn>
+          <v-btn icon v-if="app.status === 2" @click="$emit('start', app.name)">
+            <v-icon color="primary"> mdi-play </v-icon>
+          </v-btn>
+          <v-btn icon v-if="app.status !== 2" @click="$emit('stop', app.name)">
+            <v-icon color="primary"> mdi-stop </v-icon>
+          </v-btn>
+        </v-list-item-subtitle>
+      </v-list-item>
+    </v-expansion-panel-content>
+  </v-expansion-panel>
+</template>
+
+<script lang="ts">
+import Vue, { PropType } from 'vue';
+
+export default Vue.extend({
+  name: 'ProjectItem',
+  model: { prop: 'item' },
+  props: {
+    item: { type: Object as PropType<Project>, required: true },
+  },
+  methods: {
+    appColor(status: number | undefined) {
+      switch (status) {
+        case 0:
+          return 'green';
+        case 1:
+          return 'warning';
+
+        default:
+          return 'error';
+      }
+    },
+  },
+});
+</script>
