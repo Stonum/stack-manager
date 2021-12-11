@@ -9,7 +9,7 @@ interface Task {
 }
 
 interface Project {
-  name: String;
+  name: string;
   path: {
     version: string;
     bin: string;

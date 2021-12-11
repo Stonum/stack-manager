@@ -4,8 +4,6 @@ import window from '../window';
 import { settings } from '../store';
 
 ipcMain.on('main', async (event, payload) => {
-  console.log(payload);
-
   switch (payload.message) {
     case 'getSettings':
       if (payload.key) {

@@ -1,8 +1,12 @@
 <template>
   <v-container>
     <v-row no-gutters>
-      <v-col cols="12">
-        <v-text-field v-model="dispatcher" label="Диспетчер ( адрес : порт )" placeholder="http://<url>:<port>" prepend-icon="mdi-web" clearable />
+      <v-col cols="8">
+        <v-text-field v-model="dispatcher_url" label="Диспетчер ( адрес : порт )" placeholder="http://<url>:<port>" prepend-icon="mdi-web" clearable />
+      </v-col>
+      <v-spacer />
+      <v-col cols="3">
+        <v-text-field v-model="dispatcher_password" label="Пароль" type="password" clearable />
       </v-col>
       <v-col cols="12">
         <select-folder v-model="stackversion" label="Каталог Stack_Version" clearable />
@@ -43,7 +47,8 @@ import { setSettings, getSettings } from '@/middleware/index';
 export default Vue.extend({
   data() {
     return {
-      dispatcher: '',
+      dispatcher_url: '',
+      dispatcher_password: '',
       stackversion: '',
       nginx: '',
       bin: '',
@@ -52,7 +57,8 @@ export default Vue.extend({
   },
   methods: {
     onClick() {
-      setSettings('dispatcher', this.dispatcher);
+      setSettings('dispatcher_url', this.dispatcher_url);
+      setSettings('dispatcher_password', this.dispatcher_password);
       setSettings('stackversion', this.stackversion);
       setSettings('nginx', this.nginx);
       setSettings('bin', this.bin);
@@ -62,7 +68,8 @@ export default Vue.extend({
     },
   },
   async created() {
-    this.dispatcher = await getSettings('dispatcher');
+    this.dispatcher_url = await getSettings('dispatcher_url');
+    this.dispatcher_password = await getSettings('dispatcher_password');
     this.stackversion = await getSettings('stackversion');
     this.nginx = await getSettings('nginx');
     this.bin = await getSettings('bin');

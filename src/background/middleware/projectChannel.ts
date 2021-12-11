@@ -7,6 +7,8 @@ import fs from 'fs';
 import { projects, settings } from '../store';
 import { getFiles, copyFiles, readIniFile, writeIniFile } from '../utils';
 
+import Dispatcher from './dispatcher';
+
 ipcMain.on('project', async (event, payload) => {
   console.log(payload);
 
@@ -175,6 +177,11 @@ async function addProject(params: any) {
     writeIniFile(path.join(pathbin_new, 'stack.ini'), data);
   }
 
+  const address = settings.get('dispatcher_url') as string;
+  const secret = settings.get('dispatcher_password') as string;
+  const setupDispatcher = new Dispatcher(address, secret);
+  const webServer = setupDispatcher.webServer;
+
   project.sql = {
     server: params.server,
     base: params.base,
@@ -187,8 +194,29 @@ async function addProject(params: any) {
       return task.selected;
     })
     .map((task: any) => {
-      return { id: task.id, port: task.port };
+      return { id: task.id, port: task.port, prefix: task.prefix };
     });
+
+  for (const task of project.tasks) {
+    const taskname = `api_${project.name}_${task.prefix}`;
+    const pathname = `/api/${project.name}/${task.prefix}`;
+    await webServer.add(taskname);
+    const app = webServer.item(taskname);
+    await app.setParams({
+      UrlPathPrefix: pathname,
+      StackProgramDir: project.path.bin,
+      StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${task.id} -LOADRES -nc`,
+      IsActive: 1,
+      FunctionName: 'StackAPI_kvplata_v1',
+      ResultContentType: 'application/json;charset=utf-8',
+      UseComStack: 1,
+      ShareStaticContent: 0,
+      UploadStaticContent: 0,
+      FallbackEnabled: 0,
+      AllowServiceCommands: 0,
+    });
+    await app.restart();
+  }
 
   const allProjects = projects.get('projects', []) as Project[];
   allProjects.push(project);
