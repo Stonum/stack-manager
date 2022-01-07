@@ -113,10 +113,11 @@ class DispatcherContainer extends DispatcherElement {
   }
 
   item(name: string) {
+    // @ts-ignore
     return this._createItem(name);
   }
 
-  async restartItems(...names) {
+  async restartItems(...names: any) {
     return this._call((b: QueryBuilder) => {
       for (const name of names) {
         b.method('Item', name).method('Restart');
@@ -124,8 +125,8 @@ class DispatcherContainer extends DispatcherElement {
     });
   }
 
-  async stopItems(...names) {
-    return this._call((b) => {
+  async stopItems(...names: any) {
+    return this._call((b: QueryBuilder) => {
       for (const name of names) {
         b.method('Item', name).method('Stop');
       }
@@ -186,6 +187,7 @@ class WebServer extends DispatcherContainer {
   }
 
   _createItem(name: string) {
+    // @ts-ignore
     return new WebApp(this, name);
   }
 }
@@ -200,6 +202,7 @@ class AppLauncher extends DispatcherContainer {
   }
 
   _createItem(name: string) {
+    // @ts-ignore
     return new AutoApp(this, name);
   }
 
@@ -215,12 +218,14 @@ class AppLauncher extends DispatcherContainer {
 
 class WebApp extends DispatcherContainerItem {
   constructor(container: Dispatcher, name: string) {
+    // @ts-ignore
     super(container, name);
   }
 }
 
 class AutoApp extends DispatcherContainerItem {
   constructor(container: Dispatcher, name: string) {
+    // @ts-ignore
     super(container, name);
   }
 
