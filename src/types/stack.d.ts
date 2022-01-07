@@ -11,6 +11,7 @@ interface Task {
 interface App {
   name: string;
   id: number;
+  path: string;
   port: number | null;
   status?: number;
 }
@@ -21,6 +22,8 @@ interface Project {
     version: string;
     bin: string;
     git: string;
+    ini: string;
+    front: string;
   };
   sql: {
     server: string;

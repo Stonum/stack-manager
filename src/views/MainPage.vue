@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row>
       <v-col>
-        <project-list :items="items" />
+        <project-list />
       </v-col>
     </v-row>
   </v-container>

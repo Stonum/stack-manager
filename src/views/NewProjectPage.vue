@@ -3,39 +3,39 @@
     <v-form v-model="valid" @submit.prevent="$event = {}">
       <v-row no-gutters>
         <v-col cols="3">
-          <v-text-field v-model="params.name" label="Краткое название проекта*" :rules="[rules.required]" />
+          <v-text-field v-model="project.name" label="Краткое название проекта*" :rules="[rules.required]" />
         </v-col>
         <v-col cols="1" class="ml-2">
           <v-text-field v-model="inspectport" label="Порт" type="number" @change="onChangePort" />
         </v-col>
         <v-col cols="12">
-          <select-folder v-model="params.path" label="Каталог проекта в git*" append-icon="mdi-book-open" :rules="[rules.required]" @click:append="onReadFolder" />
+          <select-folder v-model="project.path.git" label="Каталог проекта в git*" append-icon="mdi-book-open" :rules="[rules.required]" @click:append="onReadFolder" />
         </v-col>
         <v-col cols="12">
-          <select-folder v-model="params.front" label="Каталог Stack.Front*" :rules="[rules.required]" />
+          <select-folder v-model="project.path.front" label="Каталог Stack.Front*" :rules="[rules.required]" />
         </v-col>
         <v-col cols="12">
-          <v-combobox v-model="params.inifile" :items="inifiles" label="Путь к stack.ini*" @change="onReadIni" :rules="[rules.required]" />
+          <v-combobox v-model="project.path.ini" :items="inifiles" label="Путь к stack.ini*" @change="onReadIni" :rules="[rules.required]" />
         </v-col>
         <v-col cols="3">
-          <v-text-field v-model="params.server" label="SQL сервер*" :rules="[rules.required]" />
+          <v-text-field v-model="project.sql.server" label="SQL сервер*" :rules="[rules.required]" />
         </v-col>
         <v-col cols="3" class="ml-2">
-          <v-text-field v-model="params.base" label="База данных*" :rules="[rules.required]" />
+          <v-text-field v-model="project.sql.base" label="База данных*" :rules="[rules.required]" />
         </v-col>
         <v-spacer />
         <v-col cols="2">
-          <v-text-field v-model="params.login" label="Логин*" :rules="[rules.required]" />
+          <v-text-field v-model="project.sql.login" label="Логин*" :rules="[rules.required]" />
         </v-col>
         <v-col cols="2" class="ml-2">
-          <v-text-field v-model="params.password" label="Пароль*" type="password" :rules="[rules.required]" />
+          <v-text-field v-model="project.sql.password" label="Пароль*" type="password" :rules="[rules.required]" />
         </v-col>
         <v-col cols="12">
-          <select-folder v-model="params.version" label="Каталог версии*" :rules="[rules.required]" />
+          <select-folder v-model="project.path.version" label="Каталог версии*" :rules="[rules.required]" />
         </v-col>
       </v-row>
     </v-form>
-    <v-row v-for="task in params.tasks" :key="task.id" no-gutters>
+    <v-row v-for="task in tasks" :key="task.id" no-gutters>
       <v-col cols="4" :key="task.id">
         <v-checkbox :key="task.id" v-model="task.selected" :label="task.title" dense hide-details />
       </v-col>
@@ -60,22 +60,28 @@ export default Vue.extend({
   name: 'NewProject',
   data() {
     return {
-      params: {
+      project: {
         name: '',
-        path: '',
-        front: '',
-        inifile: '',
-        server: '',
-        base: '',
-        login: '',
-        password: '',
-        version: '',
-        tasks: [] as Task[],
+        path: {
+          version: '',
+          bin: '',
+          git: '',
+          ini: '',
+          front: '',
+        },
+        sql: {
+          server: '',
+          base: '',
+          login: '',
+          password: '',
+        },
+        apps: [] as App[],
       },
       valid: false,
       inspectport: 0,
       inifiles: [],
       loading: false,
+      tasks: [] as Task[],
       rules: {
         required: (value: string): boolean | string => {
           return !!value || 'Поле не может быть пустым';
@@ -86,8 +92,8 @@ export default Vue.extend({
   methods: {
     async onChangePort(payload: number) {
       const tasks = (await getSettings('tasks')) as Task[];
-      if (this.params.tasks) {
-        this.params.tasks.forEach((task: Task, idx: number) => {
+      if (this.tasks) {
+        this.tasks.forEach((task: Task, idx: number) => {
           if (task.selected && tasks[idx].port !== null) {
             task.port = +payload + +(tasks[idx].port || 0);
           } else {
@@ -97,30 +103,40 @@ export default Vue.extend({
       }
     },
     async onReadFolder() {
-      const data = await readProjectFolder(this.params.path);
+      const data = await readProjectFolder(this.project.path.git);
       if (data) {
         this.inifiles = data.ini;
-        this.params.front = data.front;
-        this.params.inifile = this.inifiles[0];
+        this.project.path.front = data.front;
+        this.project.path.ini = this.inifiles[0];
         this.onReadIni();
       }
     },
     async onReadIni() {
-      const data = await readIniFile(this.params.inifile);
+      const data = await readIniFile(this.project.path.ini);
       if (data) {
-        this.params.server = data.server;
-        this.params.base = data.base;
-        this.params.version = data.version;
+        this.project.sql.server = data.server;
+        this.project.sql.base = data.base;
+        this.project.path.version = data.version;
       }
     },
     async onAddProject() {
-      await projectAdd(this.params);
+      this.project.apps = [];
+
+      for (const task of this.tasks) {
+        if (task.selected) {
+          const taskname = `api_${this.project.name}_${task.prefix}`;
+          const pathname = `/api/${this.project.name}/${task.prefix}`;
+          this.project.apps.push({ id: task.id, port: task.port, name: taskname, path: pathname });
+        }
+      }
+
+      await projectAdd(this.project);
       this.$router.push('/');
     },
   },
   async created() {
-    this.params.tasks = await getSettings('tasks');
-    this.params.tasks.forEach((task: Task) => {
+    this.tasks = await getSettings('tasks');
+    this.tasks.forEach((task: Task) => {
       task.port = null;
     });
   },

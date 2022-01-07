@@ -131,41 +131,47 @@ function getDataFromIni(pathFile: string) {
   return result;
 }
 
-async function addProject(params: any) {
-  console.log(params);
+async function addProject(payload: Project) {
+  console.log(payload);
 
   const project = {} as Project;
-  project.name = params.name;
+  project.name = payload.name;
 
   const bindir = settings.get('bin') as string;
-  const pathbin_old = path.dirname(params.inifile);
-  const pathbin_new = path.join(bindir, '0_' + params.name);
-  const ver = params.version.match(verpattern)[1].replaceAll('//', '');
-  const verdir = path.join(settings.get('stackversion') as string, ver);
+  const pathbin_old = path.dirname(payload.path.ini);
+  const pathbin_new = path.join(bindir, '0_' + payload.name);
+  const mathed = payload.path.version.match(verpattern);
+  let verdir = '';
+  if (mathed && mathed[1]) {
+    const ver = mathed[1].replaceAll('//', '');
+    verdir = path.join(settings.get('stackversion') as string, ver);
+  }
 
   project.path = {
     version: verdir,
     bin: pathbin_new,
-    git: params.path,
+    git: payload.path.git,
+    ini: payload.path.ini,
+    front: payload.path.front,
   };
 
   // копируем каталог версии если его нет
   if (!fs.existsSync(verdir)) {
-    await copyFiles(params.version, verdir);
+    await copyFiles(payload.path.version, verdir);
   }
 
   // копируем exe и прочие файлы в бин каталог
   const pathbin_ver = path.join(verdir, 'Stack.srv', 'Bin', '0');
-  if (!fs.existsSync(pathbin_new)) {
-    await copyFiles(pathbin_ver, pathbin_new);
-  }
+  // if (!fs.existsSync(pathbin_new)) {
+  await copyFiles(pathbin_ver, pathbin_new);
+  // }
 
   // редактируем stack.ini и создаем в целевом каталоге
   const pathini = path.join(pathbin_old, 'stack.ini');
   if (fs.existsSync(pathini)) {
     const data = readIniFile(pathini);
-    data['SQL-mode'].Server = params.server;
-    data['SQL-mode'].Base = params.base;
+    data['SQL-mode'].Server = payload.sql.server;
+    data['SQL-mode'].Base = payload.sql.base;
 
     // correct path of resources
     for (const key of Object.keys(data['AppPath'])) {
@@ -173,74 +179,70 @@ async function addProject(params: any) {
         const respath = data['AppPath'][key][idx];
         if (respath.startsWith('..')) {
           data['AppPath'][key][idx] = path.join(pathbin_old, respath);
-        } else if (respath.startsWith(params.version)) {
-          data['AppPath'][key][idx] = respath.replace(params.version, verdir);
+        } else if (respath.startsWith(payload.path.version)) {
+          data['AppPath'][key][idx] = respath.replace(payload.path.version, verdir);
         }
       }
     }
     const libpath = data['LibPath'].Path || '';
     if (libpath.startsWith('..')) {
       data['LibPath'].Path = path.join(pathbin_old, libpath);
-    } else if (libpath.startsWith(params.version)) {
-      data['LibPath'].Path = libpath.replace(params.version, verdir);
+    } else if (libpath.startsWith(payload.path.version)) {
+      data['LibPath'].Path = libpath.replace(payload.path.version, verdir);
     }
 
     const jspath = data['JavaClient'].JCPath || '';
     if (jspath.startsWith('..')) {
       data['JavaClient'].JCPath = path.join(pathbin_old, jspath);
-    } else if (jspath.startsWith(params.version)) {
-      data['JavaClient'].JCPath = jspath.replace(params.version, verdir);
+    } else if (jspath.startsWith(payload.path.version)) {
+      data['JavaClient'].JCPath = jspath.replace(payload.path.version, verdir);
     }
 
     const jrepath = data['JavaClient'].JREPath || '';
     if (jrepath.startsWith('..')) {
       data['JavaClient'].JREPath = path.join(pathbin_old, jrepath);
-    } else if (jrepath.startsWith(params.version)) {
-      data['JavaClient'].JREPath = jrepath.replace(params.version, verdir);
+    } else if (jrepath.startsWith(payload.path.version)) {
+      data['JavaClient'].JREPath = jrepath.replace(payload.path.version, verdir);
     }
 
     const jsupath = data['JavaClient'].JRUpdatePath || '';
     if (jsupath.startsWith('..')) {
       data['JavaClient'].JRUpdatePath = path.join(pathbin_old, jsupath);
-    } else if (jsupath.startsWith(params.version)) {
-      data['JavaClient'].JRUpdatePath = jsupath.replace(params.version, verdir);
+    } else if (jsupath.startsWith(payload.path.version)) {
+      data['JavaClient'].JRUpdatePath = jsupath.replace(payload.path.version, verdir);
     }
     writeIniFile(path.join(pathbin_new, 'stack.ini'), data);
   }
 
   project.sql = {
-    server: params.server,
-    base: params.base,
-    login: params.login,
-    password: params.password,
+    server: payload.sql.server,
+    base: payload.sql.base,
+    login: payload.sql.login,
+    password: payload.sql.password,
   };
 
   project.apps = [];
 
   const webServer = getWebServer();
 
-  for (const task of params.tasks) {
-    if (task.selected) {
-      const taskname = `api_${project.name}_${task.prefix}`;
-      const pathname = `/api/${project.name}/${task.prefix}`;
-      await webServer.add(taskname);
-      const app = webServer.item(taskname);
-      await app.setParams({
-        UrlPathPrefix: pathname,
-        StackProgramDir: project.path.bin,
-        StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${task.id} -LOADRES -nc`,
-        IsActive: 1,
-        FunctionName: 'StackAPI_kvplata_v1',
-        ResultContentType: 'application/json;charset=utf-8',
-        UseComStack: 1,
-        ShareStaticContent: 0,
-        UploadStaticContent: 0,
-        FallbackEnabled: 0,
-        AllowServiceCommands: 0,
-      });
-      await app.restart();
-      project.apps.push({ id: task.id, port: task.port, name: taskname });
-    }
+  for (const app of payload.apps) {
+    await webServer.add(app.name);
+    const _app = webServer.item(app.name);
+    await _app.setParams({
+      UrlPathPrefix: app.path,
+      StackProgramDir: project.path.bin,
+      StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${app.id} -LOADRES -nc`,
+      IsActive: 1,
+      FunctionName: 'StackAPI_kvplata_v1',
+      ResultContentType: 'application/json;charset=utf-8',
+      UseComStack: 1,
+      ShareStaticContent: 0,
+      UploadStaticContent: 0,
+      FallbackEnabled: 0,
+      AllowServiceCommands: 0,
+    });
+    await _app.restart();
+    project.apps.push({ id: app.id, port: app.port, name: app.name, path: app.path });
   }
 
   const allProjects = projects.get('projects', []) as Project[];

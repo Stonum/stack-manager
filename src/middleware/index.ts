@@ -22,7 +22,7 @@ export const selectDir = async (path?: string): Promise<string> => {
   });
 };
 
-export const projectAdd = async (params: any): Promise<any> => {
+export const projectAdd = async (params: Project): Promise<any> => {
   ipcRenderer.send('project', { message: 'add', params });
   return new Promise((resolve) => {
     ipcRenderer.on('add', (event, payload: any) => {
