@@ -1,7 +1,7 @@
 <template>
   <v-expansion-panels>
     <template v-for="(item, idx) in items">
-      <project-item :item="item" :key="idx" @stop="onStop(idx, $event)" @start="onStart(idx, $event)" @delete="onDelete(idx, $event)" />
+      <project-item :item="item" :key="idx" :id="idx" @stop="onStop(idx, $event)" @start="onStart(idx, $event)" @delete="onDelete(idx)" @edit="onEdit(idx)" />
     </template>
   </v-expansion-panels>
 </template>
@@ -10,7 +10,7 @@
 import Vue from 'vue';
 import ProjectItem from './ProjectItem.vue';
 
-import { getProjects, projectSendJob } from '@/middleware/index';
+import { getProjects, projectSendJob, projectDelete } from '@/middleware/index';
 
 export default Vue.extend({
   name: 'ProjectList',
@@ -21,16 +21,21 @@ export default Vue.extend({
     };
   },
   methods: {
-    async onStop(id: number, appname: string) {
+    async onStop(id: number, appname?: string) {
       await projectSendJob('appStop', id, appname);
       this.items = await getProjects();
     },
-    async onStart(id: number, appname: string) {
+    async onStart(id: number, appname?: string) {
       await projectSendJob('appStart', id, appname);
       this.items = await getProjects();
     },
-    onDelete(id: number, payload: any) {
-      //
+    async onDelete(id: number) {
+      await projectDelete(id);
+      this.items = await getProjects();
+    },
+    async onEdit(id: number) {
+      // this.$router.push({ name: '/project', params: { projectid: id.toString() } });
+      this.$router.push(`/project/${id}`);
     },
   },
   async mounted() {

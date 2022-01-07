@@ -31,6 +31,24 @@ export const projectAdd = async (params: Project): Promise<any> => {
   });
 };
 
+export const projectDelete = async (projectId: number): Promise<any> => {
+  ipcRenderer.send('project', { message: 'delete', projectId });
+  return new Promise((resolve) => {
+    ipcRenderer.on('delete', (event, payload: any) => {
+      resolve(payload);
+    });
+  });
+};
+
+export const projectRebuild = async (projectId: number, params: Project): Promise<any> => {
+  ipcRenderer.send('project', { message: 'rebuild', projectId, params });
+  return new Promise((resolve) => {
+    ipcRenderer.on('rebuild', (event, payload: any) => {
+      resolve(payload);
+    });
+  });
+};
+
 export const getProjects = async (): Promise<Project[]> => {
   ipcRenderer.send('project', { message: 'getAll' });
   return new Promise((resolve) => {

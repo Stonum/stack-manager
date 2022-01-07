@@ -170,6 +170,10 @@ class DispatcherContainerItem extends DispatcherElement {
   async stop() {
     return this._call((b: QueryBuilder) => b.method('Stop'));
   }
+
+  async delete() {
+    return this._call((b: QueryBuilder) => b.method('Delete'));
+  }
 }
 
 class WebServer extends DispatcherContainer {

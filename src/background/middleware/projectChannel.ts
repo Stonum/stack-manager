@@ -41,12 +41,61 @@ ipcMain.on('project', async (event, payload) => {
       }
 
       case 'get': {
+        const id = payload.projectId;
+
+        const data = projects.get('projects', []) as Project[];
+        if (data && data[id]) {
+          event.sender.send(payload.message, data[id]);
+        } else {
+          throw new Error(`Не найден проект с указанным id - ${id}`);
+        }
+
         break;
       }
 
-      case 'add':
-        event.sender.send(payload.message, await addProject(payload.params));
+      case 'add': {
+        const allProjects = projects.get('projects', []) as Project[];
+        const project = await addProject(payload.params);
+        allProjects.push(project);
+        projects.set('projects', allProjects);
+        event.sender.send(payload.message, project);
         break;
+      }
+
+      case 'delete': {
+        const id = payload.projectId;
+        const allProjects = projects.get('projects', []) as Project[];
+        let project = null;
+        if (allProjects && allProjects[id]) {
+          project = allProjects[id];
+          allProjects.splice(id, 1);
+        }
+
+        if (!project) {
+          throw new Error(`Не найден проект с указанным id - ${id}`);
+        }
+
+        await deleteProject(project);
+        projects.set('projects', allProjects);
+
+        event.sender.send(payload.message, {});
+        break;
+      }
+
+      case 'rebuild': {
+        const id = payload.projectId;
+        const project = payload.params as Project;
+
+        const data = projects.get('projects', []) as Project[];
+        if (data && data[id]) {
+          await deleteProject(data[id]);
+          data[id] = await addProject(project);
+          projects.set('projects', data);
+        } else {
+          throw new Error(`Не найден проект с указанным id - ${id}`);
+        }
+        break;
+      }
 
       case 'readFolder':
         event.sender.send(payload.message, await readProjectFolder(payload.path));
@@ -245,9 +294,26 @@ async function addProject(payload: Project) {
     project.apps.push({ id: app.id, port: app.port, name: app.name, path: app.path });
   }
 
-  const allProjects = projects.get('projects', []) as Project[];
-  allProjects.push(project);
-  projects.set('projects', allProjects);
+  return project;
+}
+
+async function deleteProject(project: Project) {
+  // удаляем веб серверы
+  const webServer = getWebServer();
+  for (const app of project.apps) {
+    try {
+      const _app = webServer.item(app.name);
+      await _app.stop();
+      await _app.delete();
+    } catch (e: AnyException) {
+      console.log(e);
+    }
+  }
+
+  // удаляем созоданный каталог в бин
+  if (fs.existsSync(project.path.bin)) {
+    fs.rmSync(project.path.bin, { recursive: true, force: true });
+  }
 
   return {};
 }

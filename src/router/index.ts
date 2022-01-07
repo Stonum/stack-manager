@@ -3,6 +3,7 @@ import VueRouter, { RouteConfig } from 'vue-router';
 import Main from '@/views/MainPage.vue';
 import Settings from '@/views/SettingsPage.vue';
 import NewProject from '@/views/NewProjectPage.vue';
+import Project from '@/views/ProjectPage.vue';
 
 Vue.use(VueRouter);
 
@@ -18,17 +19,15 @@ const routes: Array<RouteConfig> = [
     component: NewProject,
   },
   {
+    path: '/project/:projectid',
+    name: 'Редактирвоание проекта',
+    component: Project,
+    props: true,
+  },
+  {
     path: '/settings',
     name: 'Настройки',
     component: Settings,
-  },
-  {
-    path: '/about',
-    name: 'О программе',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '@/views/About.vue'),
   },
 ];
 
