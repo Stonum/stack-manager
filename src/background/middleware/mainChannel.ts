@@ -1,6 +1,6 @@
 import { ipcMain, dialog } from 'electron';
 
-import window from '../window';
+import Window from '../window';
 import { settings } from '../store';
 
 ipcMain.on('main', async (event, payload) => {
@@ -22,7 +22,8 @@ ipcMain.on('main', async (event, payload) => {
       break;
 
     case 'selectDir': {
-      const res = await dialog.showOpenDialog(window.get(), {
+      const window = new Window();
+      const res = await dialog.showOpenDialog(window, {
         defaultPath: payload.path,
         properties: ['openDirectory'],
       });

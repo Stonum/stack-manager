@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import window from '../window';
+import Window from '../window';
 
 import path from 'path';
 import fs from 'fs';
@@ -11,6 +11,8 @@ import Dispatcher from './dispatcher';
 
 ipcMain.on('project', async (event, payload) => {
   console.log(payload);
+
+  const window = new Window();
 
   try {
     switch (payload.message) {
@@ -25,7 +27,11 @@ ipcMain.on('project', async (event, payload) => {
           if (project.apps) {
             for (const app of project.apps) {
               const wsapp = webServer.item(app.name);
-              app.status = await wsapp.getState();
+              try {
+                app.status = await wsapp.getState();
+              } catch (e: AnyException) {
+                window.webContents.send('error', e.message || e);
+              }
             }
           }
         }
@@ -69,7 +75,7 @@ ipcMain.on('project', async (event, payload) => {
     }
   } catch (e: AnyException) {
     console.log(e);
-    window.get().webContents.send('error', e.message || e);
+    window.webContents.send('error', e.message || e);
   }
 });
 

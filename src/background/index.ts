@@ -1,7 +1,7 @@
 import { app, protocol, BrowserWindow } from 'electron';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 
-import window from './window';
+import Window from './window';
 import './middleware/index';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -22,7 +22,7 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    window.create();
+    new Window();
   }
 });
 
@@ -39,7 +39,7 @@ app.on('ready', async () => {
     }
   }
 
-  window.create();
+  new Window();
 });
 
 // Exit cleanly on request from parent process in development mode.
