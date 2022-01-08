@@ -54,7 +54,7 @@ import { getProject, readIniFile, getSettings, projectRebuild } from '@/middlewa
 
 export default Vue.extend({
   name: 'Project',
-  props: { projectid: Number },
+  props: { projectid: String },
   data() {
     return {
       project: {} as Project,
@@ -90,13 +90,13 @@ export default Vue.extend({
         }
       }
 
-      await projectRebuild(this.projectid, this.project);
+      await projectRebuild(+this.projectid, this.project);
       this.$router.push('/');
     },
   },
 
   async created() {
-    this.project = await getProject(this.projectid);
+    this.project = await getProject(+this.projectid);
 
     this.tasks = await getSettings('tasks');
     this.tasks.forEach((task: Task) => {

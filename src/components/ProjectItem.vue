@@ -10,10 +10,10 @@
 
         <v-icon v-for="(app, idxtask) in item.apps" :key="idxtask" small :color="appColor(app.status)"> mdi-circle </v-icon>
 
-        <v-btn icon tile small class="ml-5" @click="$emit('edit')">
+        <v-btn icon tile small class="ml-5" @click.stop="$emit('edit')">
           <v-icon color="primary"> mdi-pencil </v-icon>
         </v-btn>
-        <v-btn icon tile small @click="$emit('delete')">
+        <v-btn icon tile small @click.stop="$emit('delete')">
           <v-icon color="error"> mdi-delete </v-icon>
         </v-btn>
       </v-app-bar>
