@@ -1,5 +1,6 @@
-import { app, protocol, BrowserWindow } from 'electron';
+import { app, protocol, BrowserWindow, Tray, Menu } from 'electron';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
+import path from 'path';
 
 import Window from './window';
 import './middleware/index';
@@ -26,6 +27,7 @@ app.on('activate', () => {
   }
 });
 
+let appTray = null;
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -39,7 +41,30 @@ app.on('ready', async () => {
     }
   }
 
-  new Window();
+  const window = new Window();
+
+  appTray = new Tray(path.join(__dirname, '../build/icon.png'));
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Выход',
+      click() {
+        window.close();
+      },
+    },
+  ]);
+  appTray.setToolTip('Electron.js App');
+  appTray.setContextMenu(contextMenu);
+
+  appTray.on('double-click', function (event: any) {
+    window.show();
+  });
+
+  window.on('minimize', function (event: any) {
+    event.preventDefault();
+    window.hide();
+
+    return false;
+  });
 });
 
 // Exit cleanly on request from parent process in development mode.
