@@ -1,5 +1,9 @@
 <template>
   <v-container>
+    <app-bar>
+      <v-btn plain @click="onClick">Сохранить настройки</v-btn>
+    </app-bar>
+
     <v-row no-gutters>
       <v-col cols="8">
         <v-text-field v-model="dispatcher_url" label="Диспетчер ( адрес : порт )" placeholder="http://<url>:<port>" prepend-icon="mdi-web" clearable />
@@ -28,12 +32,6 @@
       </v-col>
       <v-col cols="1">
         <v-text-field v-model="task.port" type="number" dense hide-details clearable />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-spacer />
-      <v-col cols="3" class="d-flex justify-end align-self-center">
-        <v-btn @click="onClick">Сохранить настройки</v-btn>
       </v-col>
     </v-row>
   </v-container>

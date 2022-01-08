@@ -1,5 +1,6 @@
 <template>
   <v-container fluid>
+    <app-bar />
     <v-row>
       <v-col>
         <project-list />

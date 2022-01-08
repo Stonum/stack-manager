@@ -1,5 +1,9 @@
 <template>
   <v-container>
+    <app-bar>
+      <v-btn plain :disabled="!valid || loading" @click="onRebuildProject">Пересобрать</v-btn>
+    </app-bar>
+
     <v-form v-model="valid" @submit.prevent="$event = {}">
       <v-row no-gutters>
         <v-col cols="3">
@@ -25,7 +29,7 @@
           <v-text-field v-model="project.sql.login" label="Логин*" :rules="[rules.required]" />
         </v-col>
         <v-col cols="2" class="ml-2">
-          <v-text-field v-model="project.sql.password" label="Пароль*" type="password" :rules="[rules.required]" />
+          <v-text-field v-model="project.sql.password" label="Пароль*" :rules="[rules.required]" />
         </v-col>
         <v-col cols="12">
           <select-folder v-model="project.path.version" label="Каталог версии*" :rules="[rules.required]" />
@@ -38,11 +42,6 @@
       </v-col>
       <v-col cols="1">
         <v-text-field v-model="task.port" type="number" dense hide-details clearable />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12" class="d-flex justify-end align-self-center">
-        <v-btn :disabled="!valid || loading" @click="onRebuildProject">Пересобрать</v-btn>
       </v-col>
     </v-row>
   </v-container>

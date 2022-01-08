@@ -10,11 +10,11 @@
 
         <v-icon v-for="(app, idxtask) in item.apps" :key="idxtask" small :color="appColor(app.status)"> mdi-circle </v-icon>
 
-        <v-btn icon tile small class="ml-5">
-          <v-icon color="primary" @click="$emit('edit')"> mdi-pencil </v-icon>
+        <v-btn icon tile small class="ml-5" @click="$emit('edit')">
+          <v-icon color="primary"> mdi-pencil </v-icon>
         </v-btn>
-        <v-btn icon tile small>
-          <v-icon color="error" @click="$emit('delete')"> mdi-delete </v-icon>
+        <v-btn icon tile small @click="$emit('delete')">
+          <v-icon color="error"> mdi-delete </v-icon>
         </v-btn>
       </v-app-bar>
     </v-expansion-panel-header>
@@ -28,8 +28,8 @@
         <v-list-item-subtitle>{{ app.name }}</v-list-item-subtitle>
 
         <v-list-item-subtitle class="text-right">
-          <v-btn icon tile small>
-            <v-icon color="primary" @click="$emit('start', app.name)"> mdi-refresh </v-icon>
+          <v-btn icon tile small @click="$emit('start', app.name)">
+            <v-icon color="primary"> mdi-refresh </v-icon>
           </v-btn>
           <v-btn icon tile small v-if="app.status === 2" @click="$emit('start', app.name)">
             <v-icon color="primary"> mdi-play </v-icon>
