@@ -41,7 +41,7 @@ export default Vue.extend({
       }
       this.visibleDialog = false;
       this.delIndex = null;
-      if (answer && id) {
+      if (answer && id !== null) {
         await projectDelete(id);
         this.items = await getProjects();
       }
