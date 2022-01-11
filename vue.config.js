@@ -13,6 +13,12 @@ module.exports = {
 
       builderOptions: {
         extraResources: ['./build/**'],
+        nsis: {
+          allowElevation: false,
+          allowToChangeInstallationDirectory: true,
+          oneClick: false,
+          perMachine: true,
+        },
       },
     },
   },
