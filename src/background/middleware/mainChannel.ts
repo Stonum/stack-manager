@@ -19,7 +19,7 @@ ipcMain.on('main', async (event, payload) => {
       break;
 
     case 'setSettings':
-      if (payload.key && payload.data) {
+      if (payload.key) {
         settings.set(payload.key, payload.data || '');
       }
       break;
