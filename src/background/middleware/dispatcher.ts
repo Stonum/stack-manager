@@ -1,4 +1,5 @@
 import http from 'http';
+import log from '../log';
 
 export default class Dispatcher {
   private url: URL;
@@ -38,14 +39,13 @@ export default class Dispatcher {
   async authenticate(secret: string) {
     const response = await this._send({ secret });
     this.token = response['S-Session-Token'] || null;
-    console.log(this.token);
     return this.token !== null;
   }
 
   _send(body: object): Promise<any> {
     return new Promise((resolve, reject) => {
       const json = JSON.stringify(body);
-      console.log('_send', json);
+      log.debug('dispatcher', json);
       const data = Buffer.from(json, 'utf-8');
       // @ts-ignore
       const request = http

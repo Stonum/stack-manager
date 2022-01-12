@@ -2,8 +2,11 @@ import { ipcMain, dialog } from 'electron';
 
 import Window from '../window';
 import { settings } from '../store';
+import log from '../log';
 
 ipcMain.on('main', async (event, payload) => {
+  log.debug('main', payload);
+
   switch (payload.message) {
     case 'getSettings':
       if (payload.key) {
@@ -36,7 +39,7 @@ ipcMain.on('main', async (event, payload) => {
     }
 
     default:
-      console.log('Unknown message - ', payload.message);
+      log.warn('Unknown message - ', payload.message);
   }
 });
 

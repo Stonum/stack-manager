@@ -21,6 +21,9 @@
       <v-col cols="12">
         <select-folder v-model="bin" label="Каталог bin" clearable />
       </v-col>
+      <v-col cols="12">
+        <v-switch v-model="fullLogging" label="Полное логирование ( включает логирование всех запросов после перезапуска )" />
+      </v-col>
     </v-row>
     <v-row>
       <v-col cols="4"> Список задач </v-col>
@@ -50,6 +53,7 @@ export default Vue.extend({
       stackversion: '',
       nginx: '',
       bin: '',
+      fullLogging: '',
       tasks: [] as Task[],
     };
   },
@@ -60,6 +64,7 @@ export default Vue.extend({
       setSettings('stackversion', this.stackversion);
       setSettings('nginx', this.nginx);
       setSettings('bin', this.bin);
+      setSettings('fullLogging', this.fullLogging);
       setSettings('tasks', this.tasks);
 
       this.$router.push('/');
@@ -71,6 +76,7 @@ export default Vue.extend({
     this.stackversion = await getSettings('stackversion');
     this.nginx = await getSettings('nginx');
     this.bin = await getSettings('bin');
+    this.fullLogging = await getSettings('fullLogging');
     this.tasks = await getSettings('tasks');
   },
 });

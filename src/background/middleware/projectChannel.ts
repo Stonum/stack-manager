@@ -6,11 +6,12 @@ import fs from 'fs';
 
 import { projects, settings } from '../store';
 import { getFiles, copyFiles, readIniFile, writeIniFile } from '../utils';
+import log from '../log';
 
 import Dispatcher from './dispatcher';
 
 ipcMain.on('project', async (event, payload) => {
-  console.log(payload);
+  log.debug('project', payload);
 
   const window = new Window();
 
@@ -120,10 +121,10 @@ ipcMain.on('project', async (event, payload) => {
       }
 
       default:
-        console.log('Unknown message - ', payload.message);
+        log.warn('Unknown message - ', payload.message);
     }
   } catch (e: AnyException) {
-    console.log(e);
+    log.error(e);
     window.webContents.send('error', e.message || e);
   }
 });
@@ -181,7 +182,7 @@ function getDataFromIni(pathFile: string) {
 }
 
 async function addProject(payload: Project) {
-  console.log(payload);
+  log.debug(payload);
 
   const project = {} as Project;
   project.name = payload.name;
@@ -306,7 +307,7 @@ async function deleteProject(project: Project) {
       await _app.stop();
       await _app.delete();
     } catch (e: AnyException) {
-      console.log(e);
+      log.error(e);
     }
   }
 
@@ -321,6 +322,14 @@ async function deleteProject(project: Project) {
 function getWebServer() {
   const address = settings.get('dispatcher_url') as string;
   const secret = settings.get('dispatcher_password') as string;
+
+  if (!address) {
+    throw new Error('Не указан адрес диспетчера');
+  }
+  if (!secret) {
+    throw new Error('Не указан пароль для диспетчера');
+  }
+
   const setupDispatcher = new Dispatcher(address, secret);
   const webServer = setupDispatcher.webServer;
   return webServer;
