@@ -281,7 +281,7 @@ async function addProject(payload: Project) {
     await _app.setParams({
       UrlPathPrefix: app.path,
       StackProgramDir: project.path.bin,
-      StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${app.id} -LOADRES -nc`,
+      StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${app.id} -LOADRES --inspect:${app.port || '0000'} -nc`,
       IsActive: 1,
       FunctionName: 'StackAPI_kvplata_v1',
       ResultContentType: 'application/json;charset=utf-8',
