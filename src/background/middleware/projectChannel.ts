@@ -219,17 +219,7 @@ async function addProject(payload: Project) {
   // редактируем stack.ini и создаем в целевом каталоге
   const pathini = path.join(pathbin_old, 'stack.ini');
   if (fs.existsSync(pathini)) {
-    let data = readIniFile(pathini);
-    if (data.Include) {
-      const dataInc = readIniFile(path.join(pathbin_old, data.Include));
-      data = Object.assign({}, data, dataInc);
-    }
-    for (const key of Object.keys(data)) {
-      if (data[key].Include) {
-        const dataInc = readIniFile(path.join(pathbin_old, data[key].Include));
-        data = Object.assign({}, data, dataInc);
-      }
-    }
+    const data = readIniFile(pathini);
 
     data['SQL-mode'].Server = payload.sql.server;
     data['SQL-mode'].Base = payload.sql.base;
@@ -292,7 +282,7 @@ async function addProject(payload: Project) {
     await _app.setParams({
       UrlPathPrefix: app.path,
       StackProgramDir: project.path.bin,
-      StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${app.id} -LOADRES --inspect:${app.port || '0000'} -nc`,
+      StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${app.id} -LOADRES --inspect=${app.port || '0000'} -nc`,
       IsActive: 1,
       FunctionName: 'StackAPI_kvplata_v1',
       ResultContentType: 'application/json;charset=utf-8',

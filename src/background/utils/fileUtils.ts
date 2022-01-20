@@ -7,7 +7,19 @@ export function readIniFile(filePath: string) {
   let strData = fs.readFileSync(filePath, 'utf8');
   // костыль с обработкой массивов
   strData = strData.replaceAll('PRG=', 'PRG[]=').replaceAll('DB=', 'DB[]=').replaceAll('RS=', 'RS[]=').replaceAll('RPT=', 'RPT[]=');
-  const data = ini.parse(strData);
+  let data = ini.parse(strData);
+
+  if (data.Include) {
+    const dataInc = readIniFile(path.join(path.dirname(filePath), data.Include));
+    data = Object.assign({}, data, dataInc);
+  }
+  for (const key of Object.keys(data)) {
+    if (data[key].Include) {
+      const dataInc = readIniFile(path.join(path.dirname(filePath), data[key].Include));
+      data = Object.assign({}, data, dataInc);
+    }
+  }
+
   return data;
 }
 
@@ -26,7 +38,7 @@ export async function getFiles(dir: string): Promise<string[]> {
     dirents.map(async (dirent) => {
       const res = path.resolve(dir, dirent.name);
       return dirent.isDirectory() ? await getFiles(res) : res;
-    })
+    }),
   );
   return Array.prototype.concat(...files);
 }
@@ -43,6 +55,6 @@ export async function copyFiles(src: string, desc: string) {
         }
         return fsp.copyFile(file, path.join(folder, fname));
       }
-    })
+    }),
   );
 }
