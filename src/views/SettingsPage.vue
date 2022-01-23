@@ -14,16 +14,34 @@
         <v-text-field v-model="dispatcher_password" label="Пароль" type="password" clearable />
       </v-col>
       <v-col cols="12">
-        <select-folder v-model="dispatcher_folder" label="Каталог службы диспетчера" clearable />
+        <select-folder v-model="dispatcher_folder" label="Каталог службы диспетчера" clearable>
+          <template #append-outer>
+            <help-icon>Каталог службы диспетчера. Нужен для парсинга проектов. Если в команде запуска указан путь типа "../"</help-icon>
+          </template>
+        </select-folder>
       </v-col>
       <v-col cols="12">
-        <select-folder v-model="stackversion" label="Каталог Stack_Version" clearable />
+        <select-folder v-model="stackversion" label="Каталог Stack_Version" clearable>
+          <template #append-outer>
+            <help-icon
+              >Локальный каталог для версий. Сюда будет копироваться каталог версии. Если не указан, будем использовать ссылку на каталог версии указанной при создании</help-icon
+            >
+          </template>
+        </select-folder>
       </v-col>
       <v-col cols="12">
-        <select-folder v-model="nginx" label="Каталог nginx" clearable />
+        <select-folder v-model="nginx" label="Каталог nginx" clearable>
+          <template #append-outer>
+            <help-icon>Каталог установки nginx. Требуется для деплоя фронта</help-icon>
+          </template>
+        </select-folder>
       </v-col>
       <v-col cols="12">
-        <select-folder v-model="bin" label="Каталог bin" clearable />
+        <select-folder v-model="bin" label="Каталог bin" clearable>
+          <template #append-outer>
+            <help-icon>Общий каталог где будут создаваться папки для запуска веб сервиса. Если не заполнен, создаем в bin проекта</help-icon>
+          </template>
+        </select-folder>
       </v-col>
       <v-col cols="12">
         <v-switch v-model="fullLogging" label="Полное логирование ( включает логирование всех запросов после перезапуска )" />
@@ -81,7 +99,7 @@ export default Vue.extend({
       this.loading = true;
       await fillProjects();
       this.loading = false;
-      // this.$router.push('/');
+      this.$router.push('/');
     },
   },
   async created() {

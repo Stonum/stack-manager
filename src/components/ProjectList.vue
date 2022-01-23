@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panels>
+  <v-expansion-panels v-if="items.length || loading">
     <v-container fluid>
       <draggable v-model="items" @change="onMoveProject">
         <template v-for="(item, idx) in items">
@@ -9,6 +9,7 @@
     </v-container>
     <yes-no-dialog v-if="visibleDialog" message="Удалить проект?" @click="onDelete(delIndex, $event)" />
   </v-expansion-panels>
+  <p style="text-align: center" v-else>Проектов пока нет. Добавьте новые, либо заполните из существующих в настройках.</p>
 </template>
 
 <script lang="ts">
@@ -28,6 +29,7 @@ export default Vue.extend({
       items: [] as Project[],
       visibleDialog: false,
       delIndex: null as number | null,
+      loading: false,
     };
   },
   methods: {
@@ -62,7 +64,9 @@ export default Vue.extend({
     },
   },
   async mounted() {
+    this.loading = true;
     this.items = await getProjects();
+    this.loading = false;
   },
 });
 </script>

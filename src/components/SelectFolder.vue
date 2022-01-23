@@ -1,5 +1,9 @@
 <template>
-  <v-text-field :value="value" v-bind="$attrs" prepend-icon="$file" readonly @click:prepend="onChangeFolder" v-on="$listeners" />
+  <v-text-field :value="value" v-bind="$attrs" prepend-icon="$file" readonly @click:prepend="onChangeFolder" v-on="$listeners">
+    <template v-if="$scopedSlots['append-outer']" #append-outer>
+      <slot name="append-outer" />
+    </template>
+  </v-text-field>
 </template>
 
 <script lang="ts">
