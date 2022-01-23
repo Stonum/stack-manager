@@ -5,7 +5,7 @@ import path from 'path';
 import fs from 'fs';
 
 import { projects, settings } from '../store';
-import { getFiles, copyFiles, readIniFile, writeIniFile } from '../utils';
+import { getFiles, copyFiles, readIniFile, writeIniFile, parseArgs } from '../utils';
 import log from '../log';
 
 import Dispatcher from './dispatcher';
@@ -27,9 +27,9 @@ ipcMain.on('project', async (event, payload) => {
         for (const project of data) {
           if (project.apps) {
             for (const app of project.apps) {
-              const wsapp = webServer.item(app.name);
+              const wsapp = await webServer.getItem(app.name);
               try {
-                app.status = await wsapp.getState();
+                app.status = +wsapp.State;
               } catch (e: AnyException) {
                 window.webContents.send('error', e.message || e);
               }
@@ -108,15 +108,21 @@ ipcMain.on('project', async (event, payload) => {
 
       case 'appStart': {
         const webServer = getWebServer();
-        const wsapp = webServer.item(payload.params);
-        event.sender.send(payload.message, await wsapp.restart());
+        const res = await webServer.restartItem(payload.params);
+        event.sender.send(payload.message, res);
         break;
       }
 
       case 'appStop': {
         const webServer = getWebServer();
-        const wsapp = webServer.item(payload.params);
-        event.sender.send(payload.message, await wsapp.stop());
+        const res = await webServer.stopItem(payload.params);
+        event.sender.send(payload.message, res);
+        break;
+      }
+
+      case 'fillProjects': {
+        await fillProjects();
+        event.sender.send(payload.message, true);
         break;
       }
 
@@ -168,6 +174,7 @@ function getDataFromIni(pathFile: string) {
 
   result.server = data['SQL-mode'].Server;
   result.base = data['SQL-mode'].Base;
+  result.version = '';
 
   if (data.AppPath.DB.length) {
     for (const path of data.AppPath.DB) {
@@ -189,7 +196,7 @@ async function addProject(payload: Project) {
 
   const bindir = settings.get('bin') as string;
   const pathbin_old = path.dirname(payload.path.ini);
-  const pathbin_new = path.join(bindir, '0_' + payload.name);
+  const pathbin_new = path.join(bindir, payload.name);
   const mathed = payload.path.version.match(verpattern);
   let verdir = '';
   if (mathed && mathed[1]) {
@@ -201,7 +208,7 @@ async function addProject(payload: Project) {
     version: verdir,
     bin: pathbin_new,
     git: payload.path.git,
-    ini: payload.path.ini,
+    ini: path.join(pathbin_new, 'stack.ini'),
     front: payload.path.front,
   };
 
@@ -277,9 +284,7 @@ async function addProject(payload: Project) {
   const webServer = getWebServer();
 
   for (const app of payload.apps) {
-    await webServer.add(app.name);
-    const _app = webServer.item(app.name);
-    await _app.setParams({
+    await webServer.addItem(app.name, {
       UrlPathPrefix: app.path,
       StackProgramDir: project.path.bin,
       StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${app.id} -LOADRES --inspect=${app.port || '0000'} -nc`,
@@ -292,7 +297,7 @@ async function addProject(payload: Project) {
       FallbackEnabled: 0,
       AllowServiceCommands: 0,
     });
-    await _app.restart();
+    await webServer.restartItem(app.name);
     project.apps.push({ id: app.id, port: app.port, name: app.name, path: app.path });
   }
 
@@ -304,9 +309,7 @@ async function deleteProject(project: Project) {
   const webServer = getWebServer();
   for (const app of project.apps) {
     try {
-      const _app = webServer.item(app.name);
-      await _app.stop();
-      await _app.delete();
+      const _app = webServer.deleteItem(app.name);
     } catch (e: AnyException) {
       log.error(e);
     }
@@ -318,6 +321,101 @@ async function deleteProject(project: Project) {
   }
 
   return {};
+}
+
+async function fillProjects() {
+  const ws = getWebServer();
+  const items = await ws.getItems();
+  if (items.length === 0) {
+    throw new Error('Не найдено элементов веб сервера');
+  }
+  const dispdir = settings.get('dispatcher_folder') as string;
+
+  const allProjects = projects.get('projects', []) as Project[];
+
+  for (const item of items) {
+    if (item.FunctionName === 'StackAPI_kvplata_v1' && item.StackProgramDir) {
+      const programDir = item.StackProgramDir;
+      const bin = path.resolve(dispdir, programDir);
+      const pathini = path.join(bin, 'stack.ini');
+
+      if (fs.existsSync(bin) && fs.existsSync(pathini)) {
+        const project = {} as Project;
+
+        project.name = path.basename(programDir);
+        if (project.name.startsWith('0_')) {
+          project.name = project.name.substring(2);
+        }
+
+        const app = {
+          name: item.Name,
+          path: item.UrlPathPrefix,
+          id: 0,
+          port: 0,
+        };
+
+        const data = getDataFromIni(pathini);
+        const args = parseArgs(item.StackProgramParameters);
+
+        project.sql = {
+          server: data.server,
+          base: data.base,
+          login: args.u.trim(),
+          password: args.p.trim(),
+        };
+
+        app.id = +args.t;
+        app.port = +args.inspect;
+
+        const dataIni = readIniFile(pathini);
+        let gitpath = '';
+        // тут ищем клиенсткий каталог, если нашли пробуем его зарезолвить
+        // находим stack.srv
+        if (dataIni?.AppPath?.DB?.length) {
+          for (const cpath of dataIni.AppPath.DB) {
+            if (cpath.toLowerCase().indexOf('client') >= 0) {
+              gitpath = path.resolve(bin, cpath);
+              const srv_index = gitpath.toLowerCase().indexOf('stack.srv');
+              if (srv_index > 0) {
+                gitpath = gitpath.substring(0, srv_index);
+              }
+            }
+          }
+        }
+
+        const pathfront = fs.existsSync(path.join(gitpath, 'Stack.Front')) ? path.join(gitpath, 'Stack.Front') : '';
+
+        project.path = {
+          version: data.version,
+          bin,
+          git: gitpath,
+          ini: pathini,
+          front: pathfront,
+        };
+
+        const finded = allProjects.find((item: Project) => {
+          return item.name.toLowerCase() === project.name.toLowerCase() && item.path.ini.toLowerCase() === project.path.ini.toLowerCase();
+        });
+        if (finded) {
+          if (!finded.apps) {
+            finded.apps = [];
+          }
+          const appindex = finded.apps.findIndex((item: App) => {
+            return item.name.toLowerCase() === app.name.toLowerCase();
+          });
+          if (appindex === -1) {
+            finded.apps.push(app);
+          }
+        } else {
+          project.apps = [];
+          project.apps.push(app);
+          allProjects.push(project);
+        }
+      }
+    }
+  }
+
+  projects.set('projects', allProjects);
 }
 
 function getWebServer() {
@@ -332,6 +430,6 @@ function getWebServer() {
   }
 
   const setupDispatcher = new Dispatcher(address, secret);
-  const webServer = setupDispatcher.webServer;
+  const webServer = setupDispatcher.webServer();
   return webServer;
 }

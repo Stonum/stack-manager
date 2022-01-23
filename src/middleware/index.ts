@@ -93,3 +93,12 @@ export const readIniFile = async (path: string): Promise<any> => {
     });
   });
 };
+
+export const fillProjects = async (): Promise<boolean> => {
+  ipcRenderer.send('project', { message: 'fillProjects' });
+  return new Promise((resolve) => {
+    ipcRenderer.on('fillProjects', (event, payload: boolean) => {
+      resolve(payload);
+    });
+  });
+};

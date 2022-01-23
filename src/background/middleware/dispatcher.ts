@@ -1,5 +1,19 @@
-import http from 'http';
+import Axios from 'axios';
 import log from '../log';
+
+const axios = Axios.create({
+  method: 'post',
+});
+
+interface DispatherItem {
+  Name: string;
+  State: string;
+  StackProgramDir: string;
+  FunctionName: string;
+  UrlPathPrefix: string;
+  StackProgramParameters: string;
+  [parameter: string]: string | number;
+}
 
 export default class Dispatcher {
   private url: URL;
@@ -20,255 +34,404 @@ export default class Dispatcher {
     this.token = null;
   }
 
-  get webServer() {
+  public webServer() {
     return new WebServer(this);
   }
 
-  get appLauncher() {
-    return new AppLauncher(this);
-  }
-
-  async send(body: any): Promise<any> {
-    if (this.token === null) {
-      await this.authenticate(this.secret);
-      return this._send(body);
-    }
-    return this._send(body);
-  }
-
-  async authenticate(secret: string) {
-    const response = await this._send({ secret });
+  private async authenticate() {
+    const response = await this._sendRequest({ secret: this.secret });
     this.token = response['S-Session-Token'] || null;
     return this.token !== null;
   }
 
-  _send(body: object): Promise<any> {
-    return new Promise((resolve, reject) => {
-      const json = JSON.stringify(body);
-      log.debug('dispatcher', json);
-      const data = Buffer.from(json, 'utf-8');
-      // @ts-ignore
-      const request = http
-        .request(this.url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8',
-            'Content-Length': data.byteLength,
-            's-session-token': this.token,
-          },
-        })
-        .end(data);
-      // @ts-ignore
-      request.on('response', (response: any) => {
-        let data = '';
-        response.on('data', (chunk: any) => {
-          data += chunk;
-        });
-        response.on('end', () => {
-          try {
-            const resp = JSON.parse(data);
-            if (resp.error) {
-              reject(resp.error);
-            }
-            resolve(resp);
-          } catch (err) {
-            reject(err);
-          }
-        });
+  public async sendRequest(request: object): Promise<any> {
+    if (this.token === null) {
+      await this.authenticate();
+      return this._sendRequest(request);
+    }
+    try {
+      return this._sendRequest(request);
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        await this.authenticate();
+        return this._sendRequest(request);
+      }
+    }
+  }
+
+  // Посылаем запрос на бекенд и сразу парсим результат
+  private async _sendRequest(request: object): Promise<any> {
+    const URL = this.url.toString();
+    const headers = {} as any;
+    const token = this.token;
+    if (token) {
+      headers['s-session-token'] = token;
+    }
+    const timeout = 60000;
+    log.debug('dispatcher', 'req', JSON.stringify(request));
+    const result = await axios
+      .post(URL, request, { headers, timeout })
+      .then((response: any) => {
+        // log.debug('dispatcher', 'res', JSON.stringify(response.data));
+        return response.data;
+      })
+      .catch((error: any) => {
+        if (error.response && error.response.status === 401) {
+          return Promise.reject(error);
+        }
       });
-      // @ts-ignore
-      request.on('error', (error: any) => {
-        reject(error);
+
+    if (result) {
+      return result;
+    }
+    return '';
+  }
+}
+
+class DispatcherAPI {
+  private type: string;
+  private dispatcher: Dispatcher;
+
+  constructor(dispather: Dispatcher, type: string) {
+    this.dispatcher = dispather;
+    this.type = type;
+  }
+
+  public async Add(name: string): Promise<boolean> {
+    try {
+      const request = [{ [this.type]: [{ params: [name], type: 'method', Add: [] }] }];
+      await this.dispatcher.sendRequest(request);
+      return true;
+    } catch (error: AnyException) {
+      return false;
+    }
+  }
+
+  public async Delete(name: string): Promise<boolean> {
+    try {
+      const request = [{ [this.type]: [this.setMethod(name as string, 'Delete')] }];
+      await this.dispatcher.sendRequest(request);
+      return true;
+    } catch (error: AnyException) {
+      return false;
+    }
+  }
+
+  public async Save(name: string, params?: any): Promise<boolean> {
+    try {
+      const arrParameters = [];
+      for (const property in params) {
+        if (property !== 'Name' && property !== 'State') {
+          const res = this.setParameter(property, params[property] as string);
+          arrParameters.push(res);
+        }
+      }
+      const request = [{ [this.type]: [{ params: [name], type: 'method', Item: arrParameters }] }];
+      await this.dispatcher.sendRequest(request);
+      return true;
+    } catch (error: AnyException) {
+      return false;
+    }
+  }
+
+  public async getMainProperties(): Promise<{}> {
+    // Запрашиваем список св-в
+    const namesProp = await this.getParameterNamesList();
+    if (!namesProp) {
+      return [];
+    }
+    // Запрашиваем значения параметров
+    const selection = await this.getParameterValue(namesProp);
+    return selection;
+  }
+
+  public async saveMainProperties(record: {}): Promise<boolean> {
+    try {
+      const arrParameters = [];
+      for (const property in record) {
+        // @ts-ignore
+        const res = this.setParameter(property, record[property] as string);
+        arrParameters.push(res);
+      }
+
+      const request = [{ [this.type]: arrParameters }];
+      await this.dispatcher.sendRequest(request);
+      return true;
+    } catch (error: AnyException) {
+      return false;
+    }
+  }
+
+  public async getRecords(name?: string): Promise<DispatherItem[]> {
+    // Запрашиваем данные об именах диспетчеров или веб-сервисов
+    const res = await this.getNameList();
+    const names = name === undefined ? res : res.filter((item: string) => item === name);
+    if (!names) {
+      return [];
+    }
+
+    // Запрашиваем имена параметров, доступных для указанного типа
+    const parameters = await this.getParametersList(names);
+    // Запрашиваем значения параметров
+    return await this.getSelections(names, parameters);
+  }
+
+  public async executeMethod(name: string, method: string): Promise<boolean> {
+    try {
+      const request = this.setMethodsRequest(name, method);
+      await this.dispatcher.sendRequest(request);
+      return true;
+    } catch (error: AnyException) {
+      return false;
+    }
+  }
+
+  public async executeDispMethod(method: string): Promise<boolean> {
+    try {
+      const request = [{ [this.type]: [{ type: 'method', [method]: [] }] }];
+      await this.dispatcher.sendRequest(request);
+      return true;
+    } catch (error: AnyException) {
+      return false;
+    }
+  }
+
+  public async getResultExecuteDispMethod(method: string): Promise<string> {
+    try {
+      const request = [{ [this.type]: [{ type: 'method', [method]: [] }] }];
+      const result = await this.dispatcher.sendRequest(request);
+      if (result) {
+        return result[0][this.type][0][method].result;
+      }
+      return '';
+    } catch (error: AnyException) {
+      return 'Не удалось выполнить метод';
+    }
+  }
+
+  public setMethodsRequest(name: string, action: string) {
+    const arrServices = [];
+    arrServices.push(this.setMethod(name, action));
+    const request = [{ [this.type]: arrServices }];
+    return request;
+  }
+
+  // передает объекту метод на выполнение
+  public setMethod(title: string, method: string, params?: any) {
+    if (params) {
+      return { params: [title], type: 'method', Item: [{ params, type: 'method', [method]: [] }] };
+    } else {
+      return { params: [title], type: 'method', Item: [{ type: 'method', [method]: [] }] };
+    }
+  }
+
+  // создает объект для присвоения значения параметру
+  public setParameter(name: string, value: string) {
+    return { params: [name], type: 'property', Parameter: [{ params: [value], SetValue: [] }] };
+  }
+
+  // Список с-в, корневого элемента , например WebServer
+  public async getParameterNamesList(): Promise<string[]> {
+    const request = [];
+    request.push({ [this.type]: this.getParameterNamesRequest() });
+    const result = (await this.dispatcher.sendRequest(request))[0];
+    if (result && result[this.type] && result[this.type][0]) {
+      return JSON.parse(result[this.type][0].ParameterNames.result);
+    }
+    return [];
+  }
+
+  public async getNameList(): Promise<string[]> {
+    const request = [];
+    request.push({ [this.type]: this.getNamesRequest() });
+    const result = (await this.dispatcher.sendRequest(request))[0];
+    if (result && result[this.type] && result[this.type][0]) {
+      return JSON.parse(result[this.type][0].Names.result) || [];
+    }
+    return [];
+  }
+
+  public async getParametersList(names: string[]) {
+    const request = [];
+    request.push({ [this.type]: this.getParametersRequest(names) });
+    const result = (await this.dispatcher.sendRequest(request))[0];
+    if (result && result[this.type] && result[this.type][0] && result[this.type][0].Item && result[this.type][0].Item[0]) {
+      return JSON.parse(result[this.type][0].Item[0].ParameterNames.result);
+    }
+    return '';
+  }
+
+  protected async getParameterValue(paramNames: object) {
+    const resObj = { [this.type]: [] as object[] };
+    resObj[this.type] = this.getMainServiceParameters(paramNames);
+    const result = this.parseMainServiceParameters((await this.dispatcher.sendRequest([resObj]))[0][this.type]);
+    return result;
+  }
+
+  public async getSelections(serviceNames: any, paramNames: object) {
+    const resObj = { [this.type]: [] as object[] };
+    serviceNames.forEach((serviceName: string) => {
+      if (serviceName !== 'SetupDispatcher') {
+        resObj[this.type].push(this.getServiceParameters(serviceName, paramNames));
+      }
+    });
+    const result = this.parseResult((await this.dispatcher.sendRequest([resObj]))[0][this.type]);
+    return result;
+  }
+
+  public parseResult(res: any) {
+    const result = [] as any[];
+    res.forEach((service: object) => {
+      result.push(Object.assign({}, this.parseServiceParameters(service)));
+    });
+    return result;
+  }
+
+  // парсим блок с диспетчером или вебсервером, преобразуем его в объект { title: название, [параметр: значение] }
+  public parseServiceParameters(service: any) {
+    let res = { Name: '' };
+    if (service && service.params && service.params[0]) {
+      res.Name = service.params[0];
+    }
+    if (service && service.Item) {
+      service.Item.forEach((parameter: object) => {
+        res = Object.assign(res, {}, this.parseParameter(parameter));
       });
+    }
+    return res;
+  }
+
+  public parseMainServiceParameters(parameters: any) {
+    let res = {};
+    parameters.forEach((parameter: object) => {
+      res = Object.assign(res, {}, this.parseParameter(parameter));
     });
-  }
-}
-
-class DispatcherElement {
-  public connection: Dispatcher;
-
-  constructor(connection: Dispatcher) {
-    this.connection = connection;
+    return res;
   }
 
-  async _call(buildQuery: Function) {
-    const b = new QueryBuilder();
-    buildQuery(this._initBuilder(b));
-    return this.connection.send(b.root);
+  // парсим блок со значеним параметра и возвращаем его в виде { параметр: значение }
+  public parseParameter(parameter: any) {
+    let name = '';
+    let value = '';
+    if (parameter && parameter.params && parameter.params[0]) {
+      name = parameter.params[0];
+    }
+    if (parameter && parameter.Parameter && parameter.Parameter[0] && parameter.Parameter[0].Value && parameter.Parameter[0].Value.result) {
+      value = parameter.Parameter[0].Value.result;
+    }
+    // проверка на состояния проводится отдельно
+    if (parameter && parameter.State && parameter.State.result) {
+      name = 'State';
+      value = parameter.State.result;
+    }
+    return { [name]: value };
   }
 
-  _initBuilder(builder: QueryBuilder) {
-    return builder;
-  }
-}
-
-class DispatcherContainer extends DispatcherElement {
-  constructor(connection: Dispatcher) {
-    super(connection);
-  }
-
-  async add(name: string) {
-    await this._call((b: QueryBuilder) => b.method('Add', name));
-    return this.item(name);
-  }
-
-  item(name: string) {
-    // @ts-ignore
-    return this._createItem(name);
-  }
-
-  async restartItems(...names: any) {
-    return this._call((b: QueryBuilder) => {
-      for (const name of names) {
-        b.method('Item', name).method('Restart');
-      }
+  // блок запроса значения параметров по одному вебсерверу или диспетчеру
+  public getMainServiceParameters(paramNames: any) {
+    const res = [] as object[];
+    paramNames.forEach((paramName: string) => {
+      res.push(this.getParamValue(paramName));
     });
+    return res;
   }
 
-  async stopItems(...names: any) {
-    return this._call((b: QueryBuilder) => {
-      for (const name of names) {
-        b.method('Item', name).method('Stop');
-      }
+  // блок запроса значения параметров по одному вебсерверу или диспетчеру
+  public getServiceParameters(serviceName: string, paramNames: any) {
+    const res = { params: [] as string[], Item: [] as object[] };
+    res.params.push(serviceName);
+    paramNames.forEach((paramName: string) => {
+      res.Item.push(this.getParamValue(paramName));
     });
-  }
-}
-
-class DispatcherContainerItem extends DispatcherElement {
-  public container: DispatcherElement;
-  private name: string;
-
-  constructor(container: DispatcherElement, name: string) {
-    super(container.connection);
-    this.container = container;
-    this.name = name;
+    // проверка на состояния проводится отдельно
+    res.Item.push({ State: [] });
+    return res;
   }
 
-  _initBuilder(builder: QueryBuilder) {
-    return this.container._initBuilder(builder).method('Item', this.name);
+  // блок запроса значения параметра
+  public getParamValue(name: string) {
+    const res = { params: [] as string[], type: 'property', Parameter: [{ Value: [] }] };
+    res.params.push(name);
+    return res;
   }
 
-  async setParams(params: any) {
-    return this._call((b: QueryBuilder) => {
-      for (const [key, value] of Object.entries(params)) {
-        b.property('Parameter', key).method('SetValue', value);
-      }
+  // блок запроса свойств диспетчера или вебсервера
+  public getParametersRequest(names: string[]) {
+    const res = [];
+    res.push({
+      params: [1],
+      Item: [
+        {
+          ParameterNames: [],
+        },
+      ],
     });
+    return res;
   }
 
-  async getState(param: string) {
-    const res = await this._call((b: QueryBuilder) => {
-      b.root.push({ State: [] });
-    });
-    // TODO - все бы это дело надо привести в нормальный вид
-    return +res[0].WebServer[0].Item[0].State.result;
+  // Формирует блок для запроса имени вебсерверов, диспетчеров, все что имеет атрибут "имя"
+  public getNamesRequest() {
+    const res = [];
+    res.push(this.getMethod('Names'));
+    return res;
   }
 
-  async restart() {
-    return this._call((b: QueryBuilder) => b.method('Restart'));
+  public getParameterNamesRequest() {
+    const res = [];
+    res.push(this.getMethod('ParameterNames'));
+    return res;
   }
 
-  async stop() {
-    return this._call((b: QueryBuilder) => b.method('Stop'));
-  }
-
-  async delete() {
-    return this._call((b: QueryBuilder) => b.method('Delete'));
-  }
-}
-
-class WebServer extends DispatcherContainer {
-  constructor(connection: Dispatcher) {
-    super(connection);
-  }
-
-  _initBuilder(builder: QueryBuilder) {
-    return builder.class('WebServer');
-  }
-
-  _createItem(name: string) {
-    // @ts-ignore
-    return new WebApp(this, name);
+  public getMethod(name: string, param?: string) {
+    let res = {};
+    if (param) {
+      res = Object.assign(res, {}, { params: [param], [name]: [] });
+      return res;
+    } else {
+      return { [name]: [] };
+    }
   }
 }
 
-class AppLauncher extends DispatcherContainer {
-  constructor(connection: Dispatcher) {
-    super(connection);
+class WebServer {
+  private api: DispatcherAPI;
+
+  constructor(dispatcher: Dispatcher) {
+    this.api = new DispatcherAPI(dispatcher, 'WebServer');
   }
 
-  _initBuilder(builder: QueryBuilder) {
-    return builder.class('ProgramSpys');
+  async getItems(): Promise<DispatherItem[]> {
+    const res = await this.api.getRecords();
+    return res;
   }
 
-  _createItem(name: string) {
-    // @ts-ignore
-    return new AutoApp(this, name);
+  async getItem(name: string): Promise<DispatherItem> {
+    const res = await this.api.getRecords(name);
+    return res && res[0];
   }
 
-  async restartItems(...names: Array<string>) {
-    return this._call((b: QueryBuilder) => {
-      for (const name of names) {
-        b.method('Item', name).method('Stop');
-        b.method('Item', name).method('Start');
-      }
-    });
-  }
-}
-
-class WebApp extends DispatcherContainerItem {
-  constructor(container: Dispatcher, name: string) {
-    // @ts-ignore
-    super(container, name);
-  }
-}
-
-class AutoApp extends DispatcherContainerItem {
-  constructor(container: Dispatcher, name: string) {
-    // @ts-ignore
-    super(container, name);
+  async addItem(name: string, params?: any): Promise<boolean> {
+    const res = await this.api.Add(name);
+    if (res && params) {
+      return await this.api.Save(name, params);
+    }
+    return res;
   }
 
-  async start() {
-    return this._call((b: QueryBuilder) => b.method('Start'));
+  async deleteItem(name: string): Promise<boolean> {
+    this.stopItem(name);
+    return await this.api.Delete(name);
   }
 
-  async restart() {
-    await this.stop();
-    return this.start();
-  }
-}
-
-interface QueryBuilder {
-  root: Array<any>;
-}
-
-class QueryBuilder {
-  constructor(root?: Array<any>) {
-    this.root = root || [];
+  async setParameters(name: string, params: any): Promise<boolean> {
+    return await this.api.Save(name, params);
   }
 
-  clear() {
-    this.root = [];
+  async stopItem(name: string): Promise<boolean> {
+    return await this.api.executeMethod(name, 'Stop');
   }
 
-  class(name: string) {
-    const methods = [] as Array<any>;
-    this.root.push({ [name]: methods });
-    return new QueryBuilder(methods);
-  }
-
-  method(name: string, ...params: any) {
-    return this._push('method', name, params);
-  }
-
-  property(name: string, ...params: any) {
-    return this._push('property', name, params);
-  }
-
-  _push(type: string, name: string, params: any) {
-    const methods = [] as Array<any>;
-    this.root.push({ type, params, [name]: methods });
-    return new QueryBuilder(methods);
+  async restartItem(name: string): Promise<boolean> {
+    return await this.api.executeMethod(name, 'ReStart');
   }
 }

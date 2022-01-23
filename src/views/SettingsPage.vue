@@ -1,7 +1,8 @@
 <template>
   <v-container>
     <app-bar>
-      <v-btn plain @click="onClick">Сохранить настройки</v-btn>
+      <v-btn plain @click="onClickFill">Заполнить список проектов</v-btn>
+      <v-btn plain :loading="loading" @click="onClick">Сохранить настройки</v-btn>
     </app-bar>
 
     <v-row no-gutters>
@@ -11,6 +12,9 @@
       <v-spacer />
       <v-col cols="3">
         <v-text-field v-model="dispatcher_password" label="Пароль" type="password" clearable />
+      </v-col>
+      <v-col cols="12">
+        <select-folder v-model="dispatcher_folder" label="Каталог службы диспетчера" clearable />
       </v-col>
       <v-col cols="12">
         <select-folder v-model="stackversion" label="Каталог Stack_Version" clearable />
@@ -43,11 +47,12 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { setSettings, getSettings } from '@/middleware/index';
+import { setSettings, getSettings, fillProjects } from '@/middleware/index';
 
 export default Vue.extend({
   data() {
     return {
+      dispatcher_folder: '',
       dispatcher_url: '',
       dispatcher_password: '',
       stackversion: '',
@@ -55,10 +60,13 @@ export default Vue.extend({
       bin: '',
       fullLogging: '',
       tasks: [] as Task[],
+
+      loading: false,
     };
   },
   methods: {
     onClick() {
+      setSettings('dispatcher_folder', this.dispatcher_folder);
       setSettings('dispatcher_url', this.dispatcher_url);
       setSettings('dispatcher_password', this.dispatcher_password);
       setSettings('stackversion', this.stackversion);
@@ -69,8 +77,15 @@ export default Vue.extend({
 
       this.$router.push('/');
     },
+    async onClickFill() {
+      this.loading = true;
+      await fillProjects();
+      this.loading = false;
+      // this.$router.push('/');
+    },
   },
   async created() {
+    this.dispatcher_folder = await getSettings('dispatcher_folder');
     this.dispatcher_url = await getSettings('dispatcher_url');
     this.dispatcher_password = await getSettings('dispatcher_password');
     this.stackversion = await getSettings('stackversion');
