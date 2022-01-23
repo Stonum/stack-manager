@@ -24,17 +24,20 @@ ipcMain.on('project', async (event, payload) => {
           return { name: project.name, apps: project.apps };
         });
 
-        for (const project of data) {
-          if (project.apps) {
-            for (const app of project.apps) {
-              const wsapp = await webServer.getItem(app.name);
-              try {
-                app.status = +wsapp.State;
-              } catch (e: AnyException) {
-                window.webContents.send('error', e.message || e);
+        try {
+          const apps = await webServer.getItems();
+          for (const project of data) {
+            if (project.apps) {
+              for (const app of project.apps) {
+                const status = apps.find((item: DispatcherItem) => {
+                  return item.Name === app.name;
+                })?.State;
+                app.status = status ? +status : 0;
               }
             }
           }
+        } catch (e: AnyException) {
+          window.webContents.send('error', e.message || e);
         }
 
         event.sender.send(payload.message, data);

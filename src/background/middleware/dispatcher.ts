@@ -5,16 +5,6 @@ const axios = Axios.create({
   method: 'post',
 });
 
-interface DispatherItem {
-  Name: string;
-  State: string;
-  StackProgramDir: string;
-  FunctionName: string;
-  UrlPathPrefix: string;
-  StackProgramParameters: string;
-  [parameter: string]: string | number;
-}
-
 export default class Dispatcher {
   private url: URL;
   private secret: string;
@@ -162,7 +152,7 @@ class DispatcherAPI {
     }
   }
 
-  public async getRecords(name?: string): Promise<DispatherItem[]> {
+  public async getRecords(name?: string): Promise<DispatcherItem[]> {
     // Запрашиваем данные об именах диспетчеров или веб-сервисов
     const res = await this.getNameList();
     const names = name === undefined ? res : res.filter((item: string) => item === name);
@@ -400,12 +390,12 @@ class WebServer {
     this.api = new DispatcherAPI(dispatcher, 'WebServer');
   }
 
-  async getItems(): Promise<DispatherItem[]> {
+  async getItems(): Promise<DispatcherItem[]> {
     const res = await this.api.getRecords();
     return res;
   }
 
-  async getItem(name: string): Promise<DispatherItem> {
+  async getItem(name: string): Promise<DispatcherItem> {
     const res = await this.api.getRecords(name);
     return res && res[0];
   }

@@ -20,25 +20,32 @@
     </v-expansion-panel-header>
 
     <v-expansion-panel-content>
-      <v-list-item v-for="(app, idxtask) in item.apps" :key="idxtask" dense>
-        <v-list-item-icon>
-          <v-icon small :color="appColor(app.status)"> mdi-circle </v-icon>
-        </v-list-item-icon>
+      <v-list dense>
+        <v-list-item v-for="(app, idxtask) in item.apps" :key="idxtask" dense>
+          <v-list-item-icon>
+            <v-icon small :color="appColor(app.status)"> mdi-circle </v-icon>
+          </v-list-item-icon>
 
-        <v-list-item-subtitle>{{ app.name }}</v-list-item-subtitle>
+          <v-list-item-content>
+            <v-list-item-title>{{ app.name }}</v-list-item-title>
+            <v-list-item-subtitle v-if="+app.port > 0">--inspect={{ app.port }}</v-list-item-subtitle>
+          </v-list-item-content>
 
-        <v-list-item-subtitle class="text-right">
-          <v-btn icon tile small @click="$emit('start', app.name)">
-            <v-icon color="primary"> mdi-refresh </v-icon>
-          </v-btn>
-          <v-btn icon tile small v-if="app.status === 2" @click="$emit('start', app.name)">
-            <v-icon color="primary"> mdi-play </v-icon>
-          </v-btn>
-          <v-btn icon tile small v-if="app.status !== 2" @click="$emit('stop', app.name)">
-            <v-icon color="error"> mdi-stop </v-icon>
-          </v-btn>
-        </v-list-item-subtitle>
-      </v-list-item>
+          <v-list-item-action-text>
+            <v-list-item-subtitle class="text-right">
+              <v-btn icon tile small @click="$emit('start', app.name)">
+                <v-icon color="primary"> mdi-refresh </v-icon>
+              </v-btn>
+              <v-btn icon tile small v-if="app.status === 2" @click="$emit('start', app.name)">
+                <v-icon color="primary"> mdi-play </v-icon>
+              </v-btn>
+              <v-btn icon tile small v-if="app.status !== 2" @click="$emit('stop', app.name)">
+                <v-icon color="error"> mdi-stop </v-icon>
+              </v-btn>
+            </v-list-item-subtitle>
+          </v-list-item-action-text>
+        </v-list-item>
+      </v-list>
     </v-expansion-panel-content>
   </v-expansion-panel>
 </template>

@@ -33,3 +33,13 @@ interface Project {
   };
   apps: App[];
 }
+
+interface DispatcherItem {
+  Name: string;
+  State: string;
+  StackProgramDir: string;
+  FunctionName: string;
+  UrlPathPrefix: string;
+  StackProgramParameters: string;
+  [parameter: string]: string | number;
+}
