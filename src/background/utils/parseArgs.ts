@@ -4,7 +4,7 @@ export function parseArgs(argsString: string) {
 
   for (let i = 0; i < args.length; i++) {
     if (args[i].startsWith('-')) {
-      const arg = args[i].replaceAll('-', '');
+      const arg = args[i].replaceAll('-', '').replaceAll('"', '');
       const argm = arg.indexOf(':') > 0 ? arg.split(':') : arg.split('=');
       if (argm.length === 2) {
         tmp.push({ key: argm[0], value: argm[1] });
