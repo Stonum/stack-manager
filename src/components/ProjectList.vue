@@ -1,22 +1,28 @@
 <template>
   <v-expansion-panels>
-    <template v-for="(item, idx) in items">
-      <project-item :item="item" :key="idx" :id="idx" @stop="onStop(idx, $event)" @start="onStart(idx, $event)" @delete="onDelete(idx)" @edit="onEdit(idx)" />
-    </template>
+    <v-container fluid>
+      <draggable v-model="items" @change="onMoveProject">
+        <template v-for="(item, idx) in items">
+          <project-item :item="item" :key="idx" :id="idx" @stop="onStop(idx, $event)" @start="onStart(idx, $event)" @delete="onDelete(idx)" @edit="onEdit(idx)" />
+        </template>
+      </draggable>
+    </v-container>
     <yes-no-dialog v-if="visibleDialog" message="Удалить проект?" @click="onDelete(delIndex, $event)" />
   </v-expansion-panels>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import draggable from 'vuedraggable';
+
 import ProjectItem from './ProjectItem.vue';
 
-import { getProjects, projectSendJob, projectDelete } from '@/middleware/index';
+import { getProjects, projectSendJob, projectDelete, moveProject } from '@/middleware/index';
 import YesNoDialog from './YesNoDialog.vue';
 
 export default Vue.extend({
   name: 'ProjectList',
-  components: { ProjectItem, YesNoDialog },
+  components: { ProjectItem, YesNoDialog, draggable },
   data() {
     return {
       items: [] as Project[],
@@ -48,6 +54,11 @@ export default Vue.extend({
     },
     async onEdit(id: number) {
       this.$router.push(`/project/${id}`);
+    },
+    onMoveProject(payload: any) {
+      if (payload && payload.moved) {
+        moveProject(payload.moved.oldIndex, payload.moved.newIndex);
+      }
     },
   },
   async mounted() {

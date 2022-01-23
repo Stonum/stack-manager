@@ -98,6 +98,22 @@ ipcMain.on('project', async (event, payload) => {
         break;
       }
 
+      case 'moveProject': {
+        const id = payload.oldIndex;
+        const newId = payload.newIndex;
+        const allProjects = projects.get('projects', []) as Project[];
+        if (allProjects[id]) {
+          const project = allProjects[id];
+          allProjects.splice(id, 1); // удаляем
+          allProjects.splice(newId, 0, project); // добавляем в позицию нового ( если новый больше старого - то +1, иначе как есть)
+          projects.set('projects', allProjects);
+          event.sender.send(payload.message, true);
+        } else {
+          event.sender.send(payload.message, false);
+        }
+        break;
+      }
+
       case 'readFolder':
         event.sender.send(payload.message, await readProjectFolder(payload.path));
         break;

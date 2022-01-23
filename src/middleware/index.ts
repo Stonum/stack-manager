@@ -102,3 +102,12 @@ export const fillProjects = async (): Promise<boolean> => {
     });
   });
 };
+
+export const moveProject = async (oldIndex: number, newIndex: number): Promise<boolean> => {
+  ipcRenderer.send('project', { message: 'moveProject', oldIndex, newIndex });
+  return new Promise((resolve) => {
+    ipcRenderer.on('moveProject', (event, payload: boolean) => {
+      resolve(payload);
+    });
+  });
+};
