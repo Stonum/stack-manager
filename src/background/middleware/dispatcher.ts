@@ -68,7 +68,7 @@ export default class Dispatcher {
       headers['s-session-token'] = token;
     }
     const timeout = 60000;
-    log.debug('dispatcher', 'req', JSON.stringify(request));
+    // log.debug('dispatcher', 'req', JSON.stringify(request));
     const result = await axios
       .post(URL, request, { headers, timeout })
       .then((response: any) => {
@@ -428,10 +428,12 @@ class WebServer {
   }
 
   async stopItem(name: string): Promise<boolean> {
+    await this.setParameters(name, { IsActive: 0 });
     return await this.api.executeMethod(name, 'Stop');
   }
 
   async restartItem(name: string): Promise<boolean> {
+    await this.setParameters(name, { IsActive: 1 });
     return await this.api.executeMethod(name, 'ReStart');
   }
 }
