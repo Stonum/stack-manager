@@ -1,4 +1,4 @@
-import { BrowserWindow, Menu, Tray } from 'electron';
+import { BrowserWindow, Menu, app } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import path from 'path';
 
@@ -9,6 +9,7 @@ export default class Window extends BrowserWindow {
     if (!Window.current) {
       // Create the browser window.
       super({
+        title: `${app.getName()} ${app.getVersion()}`,
         width: 1280,
         height: 720,
         resizable: false,

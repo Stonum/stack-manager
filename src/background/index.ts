@@ -52,7 +52,7 @@ app.on('ready', async () => {
       },
     },
   ]);
-  appTray.setToolTip('Electron.js App');
+  appTray.setToolTip(`${app.getName()} ${app.getVersion()}`);
   appTray.setContextMenu(contextMenu);
 
   appTray.on('double-click', function (event: any) {
