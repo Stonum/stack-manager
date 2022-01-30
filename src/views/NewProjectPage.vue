@@ -13,7 +13,7 @@
           <v-text-field v-model="inspectport" label="Порт" type="number" @change="onChangePort" />
         </v-col>
         <v-col cols="12">
-          <select-folder v-model="project.path.git" label="Каталог проекта в git*" append-icon="mdi-book-open" :rules="[rules.required]" @click:append="onReadFolder" />
+          <select-folder v-model="project.path.git" label="Каталог проекта в git*" :rules="[rules.required]" @change="onReadFolder" />
         </v-col>
         <v-col cols="12">
           <select-folder v-model="project.path.front" label="Каталог Stack.Front*" :rules="[rules.required]" />
