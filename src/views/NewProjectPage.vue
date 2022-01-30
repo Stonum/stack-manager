@@ -32,7 +32,7 @@
           <v-text-field v-model="project.sql.login" label="Логин*" :rules="[rules.required]" />
         </v-col>
         <v-col cols="2" class="ml-2">
-          <v-text-field v-model="project.sql.password" label="Пароль*" :rules="[rules.required]" />
+          <v-text-field v-model="project.sql.password" label="Пароль" />
         </v-col>
         <v-col cols="12">
           <select-folder v-model="project.path.version" label="Каталог версии*" :rules="[rules.required]" />

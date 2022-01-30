@@ -1,9 +1,11 @@
 <template>
   <v-container fluid>
-    <app-bar />
+    <app-bar>
+      <v-btn plain icon @click="onRefresh"><v-icon>mdi-refresh</v-icon></v-btn>
+    </app-bar>
     <v-row>
       <v-col>
-        <project-list />
+        <project-list v-if="visibleProjects" />
       </v-col>
     </v-row>
   </v-container>
@@ -16,5 +18,20 @@ import ProjectList from '@/components/ProjectList.vue';
 export default Vue.extend({
   name: 'Main',
   components: { ProjectList },
+  data() {
+    return {
+      visibleProjects: true,
+    };
+  },
+  methods: {
+    // TODO пока костыль, надо будет подумать над принудетльным обновлением
+    onRefresh() {
+      this.visibleProjects = false;
+
+      this.$nextTick(() => {
+        this.visibleProjects = true;
+      });
+    },
+  },
 });
 </script>

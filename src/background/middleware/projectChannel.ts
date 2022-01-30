@@ -32,7 +32,7 @@ ipcMain.on('project', async (event, payload) => {
                 const status = apps.find((item: DispatcherItem) => {
                   return item.Name === app.name;
                 })?.State;
-                app.status = status ? +status : 0;
+                app.status = status !== undefined ? +status : undefined;
               }
             }
           }
@@ -62,6 +62,7 @@ ipcMain.on('project', async (event, payload) => {
         const project = await addProject(payload.params);
         allProjects.push(project);
         projects.set('projects', allProjects);
+        await buildProject(project);
         event.sender.send(payload.message, project);
         break;
       }
@@ -92,8 +93,8 @@ ipcMain.on('project', async (event, payload) => {
 
         const data = projects.get('projects', []) as Project[];
         if (data && data[id]) {
-          await deleteProject(data[id]);
-          data[id] = await addProject(project);
+          data[id] = project;
+          await buildProject(project);
           projects.set('projects', data);
         } else {
           throw new Error(`Не найден проект с указанным id - ${id}`);
@@ -208,88 +209,19 @@ function getDataFromIni(pathFile: string) {
 }
 
 async function addProject(payload: Project) {
-  log.debug(payload);
-
   const project = {} as Project;
   project.name = payload.name;
 
   const bindir = settings.get('bin') as string;
-  const pathbin_old = path.dirname(payload.path.ini);
   const pathbin_new = path.join(bindir, payload.name);
-  const mathed = payload.path.version.match(verpattern);
-  let verdir = '';
-  if (mathed && mathed[1]) {
-    const ver = mathed[1].replaceAll('//', '');
-    verdir = path.join(settings.get('stackversion') as string, ver);
-  }
 
   project.path = {
-    version: verdir,
+    version: payload.path.version,
     bin: pathbin_new,
     git: payload.path.git,
-    ini: path.join(pathbin_new, 'stack.ini'),
+    ini: payload.path.ini,
     front: payload.path.front,
   };
-
-  // копируем каталог версии если его нет
-  if (!fs.existsSync(verdir)) {
-    await copyFiles(payload.path.version, verdir);
-  }
-
-  // копируем exe и прочие файлы в бин каталог
-  const pathbin_ver = path.join(verdir, 'Stack.srv', 'Bin', '0');
-  // if (!fs.existsSync(pathbin_new)) {
-  await copyFiles(pathbin_ver, pathbin_new);
-  // }
-
-  // редактируем stack.ini и создаем в целевом каталоге
-  const pathini = path.join(pathbin_old, 'stack.ini');
-  if (fs.existsSync(pathini)) {
-    const data = readIniFile(pathini);
-
-    data['SQL-mode'].Server = payload.sql.server;
-    data['SQL-mode'].Base = payload.sql.base;
-
-    // correct path of resources
-    for (const key of Object.keys(data['AppPath'])) {
-      for (const idx in data['AppPath'][key]) {
-        const respath = data['AppPath'][key][idx];
-        if (respath.startsWith('..')) {
-          data['AppPath'][key][idx] = path.join(pathbin_old, respath);
-        } else if (respath.startsWith(payload.path.version)) {
-          data['AppPath'][key][idx] = respath.replace(payload.path.version, verdir);
-        }
-      }
-    }
-    const libpath = data['LibPath'].Path || '';
-    if (libpath.startsWith('..')) {
-      data['LibPath'].Path = path.join(pathbin_old, libpath);
-    } else if (libpath.startsWith(payload.path.version)) {
-      data['LibPath'].Path = libpath.replace(payload.path.version, verdir);
-    }
-
-    const jspath = data['JavaClient'].JCPath || '';
-    if (jspath.startsWith('..')) {
-      data['JavaClient'].JCPath = path.join(pathbin_old, jspath);
-    } else if (jspath.startsWith(payload.path.version)) {
-      data['JavaClient'].JCPath = jspath.replace(payload.path.version, verdir);
-    }
-
-    const jrepath = data['JavaClient'].JREPath || '';
-    if (jrepath.startsWith('..')) {
-      data['JavaClient'].JREPath = path.join(pathbin_old, jrepath);
-    } else if (jrepath.startsWith(payload.path.version)) {
-      data['JavaClient'].JREPath = jrepath.replace(payload.path.version, verdir);
-    }
-
-    const jsupath = data['JavaClient'].JRUpdatePath || '';
-    if (jsupath.startsWith('..')) {
-      data['JavaClient'].JRUpdatePath = path.join(pathbin_old, jsupath);
-    } else if (jsupath.startsWith(payload.path.version)) {
-      data['JavaClient'].JRUpdatePath = jsupath.replace(payload.path.version, verdir);
-    }
-    writeIniFile(path.join(pathbin_new, 'stack.ini'), data);
-  }
 
   project.sql = {
     server: payload.sql.server,
@@ -300,9 +232,102 @@ async function addProject(payload: Project) {
 
   project.apps = [];
 
+  for (const app of payload.apps) {
+    project.apps.push({ id: app.id, port: app.port, name: app.name, path: app.path });
+  }
+
+  return project;
+}
+
+async function buildProject(project: Project) {
   const webServer = getWebServer();
 
-  for (const app of payload.apps) {
+  // остановим приложения если есть
+  for (const app of project.apps) {
+    try {
+      webServer.stopItem(app.name);
+    } catch (e) {
+      //
+    }
+  }
+
+  const pathbin_old = path.dirname(project.path.ini);
+  const pathbin_new = project.path.bin;
+  const mathed = project.path.version.match(verpattern);
+  let verdir = project.path.version;
+  if (settings.get('stackversion')) {
+    if (mathed && mathed[1]) {
+      const ver = mathed[1].replaceAll('//', '');
+      verdir = path.join(settings.get('stackversion') as string, ver);
+    }
+
+    // копируем каталог версии если его нет
+    if (!fs.existsSync(verdir)) {
+      await copyFiles(project.path.version, verdir);
+    }
+  }
+  verdir = path.join(verdir, '\\');
+
+  // копируем exe и прочие файлы в бин каталог
+  const pathbin_ver = path.join(verdir, 'Stack.srv', 'Bin', '0');
+  await copyFiles(pathbin_ver, pathbin_new);
+
+  // редактируем stack.ini и создаем в целевом каталоге
+  const pathini = project.path.ini;
+  if (fs.existsSync(pathini)) {
+    const data = readIniFile(pathini);
+
+    data['SQL-mode'].Server = project.sql.server;
+    data['SQL-mode'].Base = project.sql.base;
+
+    // correct path of resources
+    for (const key of Object.keys(data['AppPath'])) {
+      for (const idx in data['AppPath'][key]) {
+        const respath = data['AppPath'][key][idx];
+        if (respath.startsWith('..')) {
+          data['AppPath'][key][idx] = path.join(pathbin_old, respath);
+        } else {
+          data['AppPath'][key][idx] = respath.replace(verpattern, verdir);
+        }
+      }
+    }
+    const libpath = data['LibPath'].Path || '';
+    if (libpath.startsWith('..')) {
+      data['LibPath'].Path = path.join(pathbin_old, libpath);
+    } else {
+      data['LibPath'].Path = libpath.replace(verpattern, verdir);
+    }
+
+    const jspath = data['JavaClient'].JCPath || '';
+    if (jspath.startsWith('..')) {
+      data['JavaClient'].JCPath = path.join(pathbin_old, jspath);
+    } else {
+      data['JavaClient'].JCPath = jspath.replace(verpattern, verdir);
+    }
+
+    const jrepath = data['JavaClient'].JREPath || '';
+    if (jrepath.startsWith('..')) {
+      data['JavaClient'].JREPath = path.join(pathbin_old, jrepath);
+    } else {
+      data['JavaClient'].JREPath = jrepath.replace(verpattern, verdir);
+    }
+
+    const jsupath = data['JavaClient'].JCUpdatePath || '';
+    if (jsupath.startsWith('..')) {
+      data['JavaClient'].JCUpdatePath = path.join(pathbin_old, jsupath);
+    } else {
+      data['JavaClient'].JCUpdatePath = jsupath.replace(verpattern, verdir);
+    }
+    writeIniFile(path.join(pathbin_new, 'stack.ini'), data);
+  }
+
+  for (const app of project.apps) {
+    // предварительно удалим если есть итемы с  этим именем
+    try {
+      await webServer.deleteItem(app.name);
+    } catch (e: AnyException) {
+      //
+    }
     await webServer.addItem(app.name, {
       UrlPathPrefix: app.path,
       StackProgramDir: project.path.bin,
@@ -316,11 +341,8 @@ async function addProject(payload: Project) {
       FallbackEnabled: 0,
       AllowServiceCommands: 0,
     });
-    await webServer.restartItem(app.name);
-    project.apps.push({ id: app.id, port: app.port, name: app.name, path: app.path });
+    webServer.restartItem(app.name);
   }
-
-  return project;
 }
 
 async function deleteProject(project: Project) {
@@ -328,7 +350,7 @@ async function deleteProject(project: Project) {
   const webServer = getWebServer();
   for (const app of project.apps) {
     try {
-      const _app = webServer.deleteItem(app.name);
+      webServer.deleteItem(app.name);
     } catch (e: AnyException) {
       log.error(e);
     }
@@ -437,7 +459,12 @@ async function fillProjects() {
   projects.set('projects', allProjects);
 }
 
+let webServer: any;
 function getWebServer() {
+  if (webServer) {
+    return webServer;
+  }
+
   const address = settings.get('dispatcher_url') as string;
   const secret = settings.get('dispatcher_password') as string;
 
@@ -449,6 +476,6 @@ function getWebServer() {
   }
 
   const setupDispatcher = new Dispatcher(address, secret);
-  const webServer = setupDispatcher.webServer();
+  webServer = setupDispatcher.webServer();
   return webServer;
 }

@@ -29,7 +29,7 @@
           <v-text-field v-model="project.sql.login" label="Логин*" :rules="[rules.required]" />
         </v-col>
         <v-col cols="2" class="ml-2">
-          <v-text-field v-model="project.sql.password" label="Пароль*" :rules="[rules.required]" />
+          <v-text-field v-model="project.sql.password" label="Пароль" />
         </v-col>
         <v-col cols="12">
           <select-folder v-model="project.path.version" label="Каталог версии*" :rules="[rules.required]" />
@@ -44,6 +44,16 @@
         <v-text-field v-model="task.port" type="number" dense hide-details clearable />
       </v-col>
     </v-row>
+    <yes-no-dialog
+      v-if="visibleDialog"
+      header="Версия в stack.ini отличается от текущей. Изменить?"
+      :text="`${this.project.path.version} -> ${this.version}`"
+      :width="700"
+      @click="
+        project.path.version = $event ? version : project.path.version;
+        visibleDialog = false;
+      "
+    />
   </v-container>
 </template>
 
@@ -62,6 +72,8 @@ export default Vue.extend({
       inspectport: 0,
       loading: false,
       tasks: [] as Task[],
+      version: '',
+      visibleDialog: false,
       rules: {
         required: (value: string): boolean | string => {
           return !!value || 'Поле не может быть пустым';
@@ -108,6 +120,12 @@ export default Vue.extend({
         task.selected = true;
       }
     });
+
+    const data = await readIniFile(this.project.path.ini);
+    if (data.version !== this.project.path.version) {
+      this.version = data.version;
+      this.visibleDialog = true;
+    }
   },
 });
 </script>

@@ -1,8 +1,9 @@
 <template>
   <v-row justify="center">
-    <v-dialog v-model="dialog" persistent max-width="290">
+    <v-dialog v-model="dialog" persistent :max-width="width">
       <v-card>
-        <v-card-title> {{ message }} </v-card-title>
+        <v-card-title> {{ header }} </v-card-title>
+        <v-card-text v-if="text"> {{ text }} </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="primary" text @click="$emit('click', true)"> Да </v-btn>
@@ -19,7 +20,9 @@ import Vue from 'vue';
 export default Vue.extend({
   name: 'YesNoDialog',
   props: {
-    message: { type: String, required: true },
+    header: { type: String, required: true },
+    text: { type: String },
+    width: { type: Number, default: 290 },
   },
   data() {
     return {

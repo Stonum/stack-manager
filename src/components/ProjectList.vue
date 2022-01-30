@@ -1,5 +1,7 @@
 <template>
-  <v-expansion-panels v-if="items.length || loading">
+  <v-progress-linear v-if="loading" indeterminate />
+  <p style="text-align: center" v-else-if="!items.length">Проектов пока нет. Добавьте новые, либо заполните из существующих в настройках.</p>
+  <v-expansion-panels v-else>
     <v-container fluid>
       <draggable v-model="items" @change="onMoveProject">
         <template v-for="(item, idx) in items">
@@ -7,9 +9,8 @@
         </template>
       </draggable>
     </v-container>
-    <yes-no-dialog v-if="visibleDialog" message="Удалить проект?" @click="onDelete(delIndex, $event)" />
+    <yes-no-dialog v-if="visibleDialog" header="Удалить проект?" @click="onDelete(delIndex, $event)" />
   </v-expansion-panels>
-  <p style="text-align: center" v-else>Проектов пока нет. Добавьте новые, либо заполните из существующих в настройках.</p>
 </template>
 
 <script lang="ts">
@@ -19,11 +20,10 @@ import draggable from 'vuedraggable';
 import ProjectItem from './ProjectItem.vue';
 
 import { getProjects, projectSendJob, projectDelete, moveProject } from '@/middleware/index';
-import YesNoDialog from './YesNoDialog.vue';
 
 export default Vue.extend({
   name: 'ProjectList',
-  components: { ProjectItem, YesNoDialog, draggable },
+  components: { ProjectItem, draggable },
   data() {
     return {
       items: [] as Project[],
