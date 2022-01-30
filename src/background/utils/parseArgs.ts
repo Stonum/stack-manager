@@ -5,11 +5,11 @@ export function parseArgs(argsString: string) {
   for (let i = 0; i < args.length; i++) {
     if (args[i].startsWith('-')) {
       const arg = args[i].replaceAll('-', '').replaceAll('"', '');
-      const argm = arg.indexOf(':') > 0 ? arg.split(':') : arg.split('=');
-      if (argm.length === 2) {
-        tmp.push({ key: argm[0], value: argm[1] });
+      const [key, value] = arg.indexOf(':') > 0 ? arg.split(':') : arg.split('=');
+      if (value !== undefined) {
+        tmp.push({ key, value });
       } else {
-        tmp.push({ key: argm[0], value: true });
+        tmp.push({ key, value: true });
       }
     } else {
       // значит это значение которое ввели через пробел
