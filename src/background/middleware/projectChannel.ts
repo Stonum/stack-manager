@@ -212,7 +212,11 @@ async function addProject(payload: Project) {
   const project = {} as Project;
   project.name = payload.name;
 
-  const bindir = settings.get('bin') as string;
+  let bindir = settings.get('bin') as string;
+  // если каталог не указан, то будем создавать в папке проекта
+  if (!bindir) {
+    bindir = path.join(payload.path.git, 'Stack.Srv', 'bin');
+  }
   const pathbin_new = path.join(bindir, payload.name);
 
   project.path = {
