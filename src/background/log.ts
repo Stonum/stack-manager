@@ -15,4 +15,10 @@ if (!isDevelopment && !isFullLogging) {
   log.transports.file.level = 'error';
 }
 
+if (!isDevelopment) {
+  log.transports.console.level = false;
+} else {
+  log.transports.file.level = false;
+}
+
 export default log;
