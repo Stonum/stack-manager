@@ -377,6 +377,7 @@ async function fillProjects() {
   const dispdir = settings.get('dispatcher_folder') as string;
 
   const allProjects = projects.get('projects', []) as Project[];
+  const newProjects = [];
 
   for (const item of items) {
     if (item.FunctionName === 'StackAPI_kvplata_v1' && item.StackProgramDir) {
@@ -455,8 +456,19 @@ async function fillProjects() {
           project.apps = [];
           project.apps.push(app);
           allProjects.push(project);
+          newProjects.push(project.name);
         }
       }
+    }
+  }
+
+  for (const _name of newProjects) {
+    const findIndex = allProjects.findIndex((item: Project) => {
+      return item.name.toLowerCase() === _name.toLowerCase();
+    });
+    if (_name.length <= 2 && findIndex > 0) {
+      const newName = path.basename(allProjects[findIndex].path.git);
+      allProjects[findIndex].name += '_' + newName;
     }
   }
 
@@ -465,7 +477,7 @@ async function fillProjects() {
 
 let webServer: any;
 function getWebServer() {
-  if (webServer) {
+  if (webServer && webServer.isAuth) {
     return webServer;
   }
 

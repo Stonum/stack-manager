@@ -24,6 +24,10 @@ export default class Dispatcher {
     this.token = null;
   }
 
+  get isAuth() {
+    return this.token !== null;
+  }
+
   public webServer() {
     return new WebServer(this);
   }
@@ -55,21 +59,22 @@ export default class Dispatcher {
 
   // Посылаем запрос на бекенд и сразу парсим результат
   private async _sendRequest(request: object): Promise<any> {
-    const URL = this.url.toString();
+    const URL = this.url.href;
     const headers = {} as any;
     const token = this.token;
     if (token) {
       headers['s-session-token'] = token;
     }
     const timeout = 60000;
-    log.debug('dispatcher', 'req', JSON.stringify(request).substring(1, 100));
+    log.debug('dispatcher', 'req', JSON.stringify(request).substring(0, 100));
     const result = await axios
       .post(URL, request, { headers, timeout })
       .then((response: any) => {
-        // log.debug('dispatcher', 'res', JSON.stringify(response.data));
+        log.debug('dispatcher', 'res', JSON.stringify(response.data).substring(0, 100));
         return response.data;
       })
       .catch((error: any) => {
+        log.error('dispatcher', 'res', JSON.stringify(error).substring(0, 100));
         if (error.response && error.response.status === 401) {
           return Promise.reject(error);
         }
@@ -89,6 +94,10 @@ class DispatcherAPI {
   constructor(dispather: Dispatcher, type: string) {
     this.dispatcher = dispather;
     this.type = type;
+  }
+
+  get isAuth() {
+    return this.dispatcher.isAuth;
   }
 
   public async Add(name: string): Promise<boolean> {
@@ -392,6 +401,10 @@ class WebServer {
 
   constructor(dispatcher: Dispatcher) {
     this.api = new DispatcherAPI(dispatcher, 'WebServer');
+  }
+
+  get isAuth() {
+    return this.api.isAuth;
   }
 
   async getItems(): Promise<DispatcherItem[]> {
