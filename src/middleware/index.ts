@@ -49,6 +49,15 @@ export const projectRebuild = async (projectId: number, params: Project): Promis
   });
 };
 
+export const projectSave = async (projectId: number, params: Project): Promise<any> => {
+  ipcRenderer.send('project', { message: 'save', projectId, params });
+  return new Promise((resolve) => {
+    ipcRenderer.on('save', (event, payload: any) => {
+      resolve(payload);
+    });
+  });
+};
+
 export const getProjects = async (): Promise<Project[]> => {
   ipcRenderer.send('project', { message: 'getAll' });
   return new Promise((resolve) => {

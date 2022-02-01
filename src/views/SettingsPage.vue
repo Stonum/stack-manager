@@ -1,8 +1,8 @@
 <template>
   <v-container>
     <app-bar>
-      <v-btn plain @click="onClickFill">Заполнить список проектов</v-btn>
-      <v-btn plain :loading="loading" @click="onClick">Сохранить настройки</v-btn>
+      <v-btn plain :loading="loading" @click="onClickFill">Заполнить список проектов</v-btn>
+      <v-btn plain @click="onClick">Сохранить настройки</v-btn>
     </app-bar>
 
     <v-row no-gutters>
@@ -97,8 +97,11 @@ export default Vue.extend({
     },
     async onClickFill() {
       this.loading = true;
-      await fillProjects();
-      this.loading = false;
+      try {
+        await fillProjects();
+      } finally {
+        this.loading = false;
+      }
       this.$router.push('/');
     },
   },

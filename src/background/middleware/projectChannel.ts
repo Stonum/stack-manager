@@ -24,20 +24,22 @@ ipcMain.on('project', async (event, payload) => {
           return { name: project.name, apps: project.apps };
         });
 
-        try {
-          const apps = await webServer.getItems();
-          for (const project of data) {
-            if (project.apps) {
-              for (const app of project.apps) {
-                const status = apps.find((item: DispatcherItem) => {
-                  return item.Name === app.name;
-                })?.State;
-                app.status = status !== undefined ? +status : undefined;
+        if (data.length) {
+          try {
+            const apps = await webServer.getItems();
+            for (const project of data) {
+              if (project.apps) {
+                for (const app of project.apps) {
+                  const status = apps.find((item: DispatcherItem) => {
+                    return item.Name === app.name;
+                  })?.State;
+                  app.status = status !== undefined ? +status : undefined;
+                }
               }
             }
+          } catch (e: AnyException) {
+            window.webContents.send('error', e.message || e);
           }
-        } catch (e: AnyException) {
-          window.webContents.send('error', e.message || e);
         }
 
         event.sender.send(payload.message, data);
@@ -87,18 +89,34 @@ ipcMain.on('project', async (event, payload) => {
         break;
       }
 
-      case 'rebuild': {
+      case 'save': {
         const id = payload.projectId;
         const project = payload.params as Project;
 
         const data = projects.get('projects', []) as Project[];
         if (data && data[id]) {
           data[id] = project;
-          await buildProject(project);
           projects.set('projects', data);
         } else {
           throw new Error(`Не найден проект с указанным id - ${id}`);
         }
+        event.sender.send(payload.message, {});
+        break;
+      }
+
+      case 'rebuild': {
+        const id = payload.projectId;
+        const project = payload.params as Project;
+
+        const data = projects.get('projects', []) as Project[];
+        if (data && data[id]) {
+          await buildProject(project, data[id].apps);
+          data[id] = project;
+          projects.set('projects', data);
+        } else {
+          throw new Error(`Не найден проект с указанным id - ${id}`);
+        }
+        event.sender.send(payload.message, {});
         break;
       }
 
@@ -243,7 +261,7 @@ async function addProject(payload: Project) {
   return project;
 }
 
-async function buildProject(project: Project) {
+async function buildProject(project: Project, oldApps?: App[]) {
   const webServer = getWebServer();
 
   // остановим приложения если есть
@@ -325,13 +343,18 @@ async function buildProject(project: Project) {
     writeIniFile(path.join(pathbin_new, 'stack.ini'), data);
   }
 
-  for (const app of project.apps) {
-    // предварительно удалим если есть итемы с  этим именем
-    try {
-      await webServer.deleteItem(app.name);
-    } catch (e: AnyException) {
-      //
+  if (oldApps && oldApps.length) {
+    for (const app of oldApps) {
+      // предварительно удалим если есть итемы с  этим именем
+      try {
+        await webServer.deleteItem(app.name);
+      } catch (e: AnyException) {
+        //
+      }
     }
+  }
+
+  for (const app of project.apps) {
     await webServer.addItem(app.name, {
       UrlPathPrefix: app.path,
       StackProgramDir: project.path.bin,

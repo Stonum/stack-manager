@@ -1,7 +1,9 @@
 <template>
   <v-container>
     <app-bar>
-      <v-btn plain :disabled="!valid || loading" @click="onRebuildProject">Пересобрать</v-btn>
+      <h4 v-if="appNameChanged" class="warning--text">Изменено имя приложения, необходимо пересобрать проект</h4>
+      <v-btn plain :disabled="!valid || loading" @click="onRebuildProject" :loading="loading">Пересобрать</v-btn>
+      <v-btn plain :disabled="!valid || appNameChanged" @click="onSaveProject">Сохранить</v-btn>
     </app-bar>
 
     <v-form v-model="valid" @submit.prevent="$event = {}">
@@ -13,7 +15,7 @@
           <select-folder v-model="project.path.git" label="Каталог проекта в git*" readonly />
         </v-col>
         <v-col cols="12">
-          <select-folder v-model="project.path.front" label="Каталог Stack.Front*" :rules="[rules.required]" />
+          <select-folder v-model="project.path.front" label="Каталог Stack.Front" />
         </v-col>
         <v-col cols="12">
           <v-text-field v-model="project.path.ini" label="Путь к stack.ini*" @change="onReadIni" :rules="[rules.required]" />
@@ -36,12 +38,15 @@
         </v-col>
       </v-row>
     </v-form>
-    <v-row v-for="task in tasks" :key="task.id" no-gutters>
-      <v-col cols="4" :key="task.id">
-        <v-checkbox :key="task.id" v-model="task.selected" :label="task.title" dense hide-details />
+    <v-row v-for="app in apps" :key="app.id">
+      <v-col cols="4" :key="app.id">
+        <v-checkbox :key="app.id" v-model="app.selected" :label="app.title" dense hide-details />
+      </v-col>
+      <v-col cols="2">
+        <v-text-field v-model="app.name" dense hide-details @change="appNameChanged = true" />
       </v-col>
       <v-col cols="1">
-        <v-text-field v-model="task.port" type="number" dense hide-details clearable />
+        <v-text-field v-model="app.port" type="number" dense hide-details />
       </v-col>
     </v-row>
     <yes-no-dialog
@@ -60,7 +65,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { getProject, readIniFile, getSettings, projectRebuild } from '@/middleware/index';
+import { getProject, readIniFile, getSettings, projectRebuild, projectSave } from '@/middleware/index';
 
 export default Vue.extend({
   name: 'Project',
@@ -79,6 +84,8 @@ export default Vue.extend({
           return !!value || 'Поле не может быть пустым';
         },
       },
+      apps: [] as any[],
+      appNameChanged: false,
     };
   },
 
@@ -92,18 +99,27 @@ export default Vue.extend({
       }
     },
     async onRebuildProject() {
+      this.loading = true;
       this.project.apps = [];
 
-      for (const task of this.tasks) {
-        if (task.selected) {
-          const taskname = `api_${this.project.name}_${task.prefix}`;
-          const pathname = `/api/${this.project.name}/${task.prefix}`;
-          this.project.apps.push({ id: task.id, port: task.port, name: taskname, path: pathname });
+      for (const app of this.apps) {
+        if (app.selected) {
+          const taskname = app.name;
+          const pathname = '/' + app.name.replaceAll('_', '/');
+          this.project.apps.push({ id: app.id, port: app.port, name: taskname, path: pathname });
         }
       }
-
-      await projectRebuild(+this.projectid, this.project);
-      this.$router.push('/');
+      try {
+        await projectRebuild(+this.projectid, this.project);
+      } finally {
+        this.loading = false;
+      }
+      this.appNameChanged = false;
+      this.$router.go(-1);
+    },
+    async onSaveProject() {
+      await projectSave(+this.projectid, this.project);
+      this.$router.go(-1);
     },
   },
 
@@ -112,12 +128,11 @@ export default Vue.extend({
 
     this.tasks = await getSettings('tasks');
     this.tasks.forEach((task: Task) => {
-      task.selected = false;
-      task.port = null;
       const app = this.project.apps.find((app) => app.id === task.id);
       if (app) {
-        task.port = app.port;
-        task.selected = true;
+        this.apps.push({ ...task, ...app });
+      } else {
+        this.apps.push({ ...task, name: null, port: null });
       }
     });
 
