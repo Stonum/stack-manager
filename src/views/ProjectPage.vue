@@ -67,6 +67,8 @@ import Vue from 'vue';
 
 import { getProject, readIniFile, getSettings, projectRebuild, projectSave } from '@/middleware/index';
 
+interface SelectableApp extends App, Task {}
+
 export default Vue.extend({
   name: 'Project',
   props: { projectid: String },
@@ -84,7 +86,7 @@ export default Vue.extend({
           return !!value || 'Поле не может быть пустым';
         },
       },
-      apps: [] as any[],
+      apps: [] as SelectableApp[],
       appNameChanged: false,
     };
   },
@@ -132,7 +134,7 @@ export default Vue.extend({
       if (app) {
         this.apps.push({ ...task, ...app });
       } else {
-        this.apps.push({ ...task, name: null, port: null });
+        this.apps.push({ ...task, name: '', path: '', port: null });
       }
     });
 
