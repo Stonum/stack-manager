@@ -50,7 +50,7 @@ export default Vue.extend({
       await projectSendJob('appStart', id, appname);
       this.items = await getProjects();
     },
-    async onReStart(id: number) {
+    async onRestart(id: number) {
       for (const app of this.items[id].apps) {
         await projectSendJob('appReStart', id, app.name);
       }
