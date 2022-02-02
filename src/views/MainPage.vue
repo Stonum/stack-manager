@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <app-bar>
-      <v-btn plain icon @click="onRefresh"><v-icon>mdi-refresh</v-icon></v-btn>
+      <v-btn plain icon title="Обновить список" @click="onRefresh"><v-icon>mdi-refresh</v-icon></v-btn>
     </app-bar>
     <v-row>
       <v-col>
