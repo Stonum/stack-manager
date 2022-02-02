@@ -146,6 +146,13 @@ ipcMain.on('project', async (event, payload) => {
 
       case 'appStart': {
         const webServer = getWebServer();
+        const res = await webServer.startItem(payload.params);
+        event.sender.send(payload.message, res);
+        break;
+      }
+
+      case 'appReStart': {
+        const webServer = getWebServer();
         const res = await webServer.restartItem(payload.params);
         event.sender.send(payload.message, res);
         break;
@@ -368,7 +375,7 @@ async function buildProject(project: Project, oldApps?: App[]) {
       FallbackEnabled: 0,
       AllowServiceCommands: 0,
     });
-    webServer.restartItem(app.name);
+    webServer.startItem(app.name);
   }
 }
 

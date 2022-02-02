@@ -10,7 +10,10 @@
 
         <v-icon v-for="(app, idxtask) in item.apps" :key="idxtask" small :color="appColor(app.status)"> mdi-circle </v-icon>
 
-        <v-btn icon tile small class="ml-5" @click.stop="$emit('edit')">
+        <v-btn icon tile small class="ml-5" title="Перезапустить все приложения" @click.stop="$emit('restart')">
+          <v-icon color="primary"> mdi-restart </v-icon>
+        </v-btn>
+        <v-btn icon tile small @click.stop="$emit('edit')">
           <v-icon color="primary"> mdi-pencil </v-icon>
         </v-btn>
         <v-btn icon tile small @click.stop="$emit('delete')">
@@ -33,13 +36,13 @@
 
           <v-list-item-action-text>
             <v-list-item-subtitle class="text-right">
-              <v-btn icon tile small @click="$emit('start', app.name)">
-                <v-icon color="primary"> mdi-refresh </v-icon>
+              <v-btn icon tile small title="Перезапустить" @click="$emit('start', app.name)">
+                <v-icon color="primary"> mdi-restart </v-icon>
               </v-btn>
-              <v-btn icon tile small v-if="app.status === 2" @click="$emit('start', app.name)">
+              <v-btn icon tile small v-if="app.status === 2" title="Запустить" @click="$emit('start', app.name)">
                 <v-icon color="primary"> mdi-play </v-icon>
               </v-btn>
-              <v-btn icon tile small v-if="app.status !== 2" @click="$emit('stop', app.name)">
+              <v-btn icon tile small v-if="app.status !== 2" title="Остановить" @click="$emit('stop', app.name)">
                 <v-icon color="error"> mdi-stop </v-icon>
               </v-btn>
             </v-list-item-subtitle>

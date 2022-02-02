@@ -5,7 +5,16 @@
     <v-container fluid>
       <draggable v-model="items" @change="onMoveProject">
         <template v-for="(item, idx) in items">
-          <project-item :item="item" :key="idx" :id="idx" @stop="onStop(idx, $event)" @start="onStart(idx, $event)" @delete="onDelete(idx)" @edit="onEdit(idx)" />
+          <project-item
+            :item="item"
+            :key="idx"
+            :id="idx"
+            @stop="onStop(idx, $event)"
+            @start="onStart(idx, $event)"
+            @delete="onDelete(idx)"
+            @edit="onEdit(idx)"
+            @restart="onRestart(idx)"
+          />
         </template>
       </draggable>
     </v-container>
@@ -39,6 +48,12 @@ export default Vue.extend({
     },
     async onStart(id: number, appname?: string) {
       await projectSendJob('appStart', id, appname);
+      this.items = await getProjects();
+    },
+    async onReStart(id: number) {
+      for (const app of this.items[id].apps) {
+        await projectSendJob('appReStart', id, app.name);
+      }
       this.items = await getProjects();
     },
     async onDelete(id: number | null, answer?: boolean) {

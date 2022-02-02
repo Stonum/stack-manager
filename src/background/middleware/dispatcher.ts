@@ -33,6 +33,7 @@ export default class Dispatcher {
   }
 
   private async authenticate() {
+    this.token = null;
     const response = await this._sendRequest({ secret: this.secret });
     this.token = response['S-Session-Token'] || null;
     if (this.token === null) {
@@ -439,8 +440,12 @@ class WebServer {
     return await this.api.executeMethod(name, 'Stop');
   }
 
-  async restartItem(name: string): Promise<boolean> {
+  async startItem(name: string): Promise<boolean> {
     await this.setParameters(name, { IsActive: 1 });
+    return await this.api.executeMethod(name, 'ReStart');
+  }
+
+  async restartItem(name: string): Promise<boolean> {
     return await this.api.executeMethod(name, 'ReStart');
   }
 }
