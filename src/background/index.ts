@@ -55,11 +55,11 @@ app.on('ready', async () => {
   appTray.setToolTip(`${app.getName()} ${app.getVersion()}`);
   appTray.setContextMenu(contextMenu);
 
-  appTray.on('double-click', function (event: any) {
+  appTray.on('click', function (event: any) {
     window.show();
   });
 
-  window.on('minimize', function (event: any) {
+  window.on('close', function (event: any) {
     event.preventDefault();
     window.hide();
 
