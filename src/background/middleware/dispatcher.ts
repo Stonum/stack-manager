@@ -37,23 +37,25 @@ export default class Dispatcher {
     const response = await this._sendRequest({ secret: this.secret });
     this.token = response['S-Session-Token'] || null;
     if (this.token === null) {
-      throw new Error('Не удалось авторизоваться в службе диспетчера');
+      throw { message: 'Не удалось авторизоваться в службе диспетчера', code: 500 };
     } else {
       return true;
     }
   }
 
   public async sendRequest(request: object): Promise<any> {
-    if (this.token === null) {
-      await this.authenticate();
-      return this._sendRequest(request);
-    }
     try {
-      return this._sendRequest(request);
-    } catch (error: any) {
-      if (error.response && error.response.status === 401) {
+      if (this.token === null) {
         await this.authenticate();
         return this._sendRequest(request);
+      }
+      return await this._sendRequest(request);
+    } catch (error: any) {
+      if (error.code === 401) {
+        await this.authenticate();
+        return await this._sendRequest(request);
+      } else {
+        throw new Error(`Dispatcher error: ${error.message}, code: ${error.code}`);
       }
     }
   }
@@ -76,12 +78,15 @@ export default class Dispatcher {
       })
       .catch((error: any) => {
         log.error('dispatcher', 'res', JSON.stringify(error).substring(0, 100));
-        if (error.response && error.response.status === 401) {
-          return Promise.reject(error);
+        if (error.response?.data) {
+          return error.response.data;
         }
       });
 
     if (result) {
+      if (result.error) {
+        throw result.error;
+      }
       return result;
     }
     return '';
@@ -170,7 +175,7 @@ class DispatcherAPI {
     // Запрашиваем данные об именах диспетчеров или веб-сервисов
     const res = await this.getNameList();
     const names = name === undefined ? res : res.filter((item: string) => item === name);
-    if (!names) {
+    if (!names.length) {
       return [];
     }
 
