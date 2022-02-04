@@ -44,27 +44,30 @@ app.on('ready', async () => {
   const window = new Window();
 
   appTray = new Tray(path.join(__dirname, '../build/icon.png'));
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: 'Выход',
-      click() {
-        window.close();
-      },
-    },
-  ]);
   appTray.setToolTip(`${app.getName()} ${app.getVersion()}`);
-  appTray.setContextMenu(contextMenu);
 
   appTray.on('click', function (event: any) {
     window.show();
   });
 
-  window.on('close', function (event: any) {
+  const closeHndl = function (event: any) {
     event.preventDefault();
     window.hide();
 
     return false;
-  });
+  };
+
+  window.on('close', closeHndl);
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Выход',
+      click() {
+        window.removeListener('close', closeHndl);
+        window.close();
+      },
+    },
+  ]);
+  appTray.setContextMenu(contextMenu);
 });
 
 // Exit cleanly on request from parent process in development mode.
