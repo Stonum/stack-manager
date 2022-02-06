@@ -294,6 +294,14 @@ async function addProject(payload: Project) {
     project.apps.push({ id: app.id, port: app.port, name: app.name, path: app.path });
   }
 
+  // проверим валидность путей
+  for (const key of Object.keys(project.path)) {
+    const cpath = project.path[key];
+    if (cpath && !fs.existsSync(cpath)) {
+      throw new Error(`Некорректный путь ${cpath}`);
+    }
+  }
+
   return project;
 }
 
