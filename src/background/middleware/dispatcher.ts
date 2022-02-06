@@ -432,7 +432,7 @@ class WebServer {
   }
 
   async deleteItem(name: string): Promise<boolean> {
-    this.stopItem(name);
+    await this.stopItem(name);
     return await this.api.Delete(name);
   }
 

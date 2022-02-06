@@ -38,9 +38,9 @@
         </v-col>
       </v-row>
     </v-form>
-    <v-row v-for="app in apps" :key="app.id">
+    <v-row v-for="(app, idx) in apps" :key="app.id">
       <v-col cols="4" :key="app.id">
-        <v-checkbox :key="app.id" v-model="app.selected" :label="app.title" dense hide-details />
+        <v-checkbox :key="app.id" v-model="app.selected" :label="app.title" dense hide-details @change="onAppCheck(idx, $event)" />
       </v-col>
       <v-col cols="2">
         <v-text-field v-model="app.name" dense hide-details @change="appNameChanged = true" />
@@ -123,6 +123,14 @@ export default Vue.extend({
       await projectSave(+this.projectid, this.project);
       this.$router.go(-1);
     },
+    async onAppCheck(appId: number, checked: boolean) {
+      if (!checked) {
+        this.apps[appId].name = '';
+      } else {
+        this.apps[appId].name = `api_${this.project.name}_${this.apps[appId].prefix}`;
+      }
+      this.appNameChanged = true;
+    },
   },
 
   async created() {
@@ -132,7 +140,7 @@ export default Vue.extend({
     this.tasks.forEach((task: Task) => {
       const app = this.project.apps.find((app) => app.id === task.id);
       if (app) {
-        this.apps.push({ ...task, ...app });
+        this.apps.push({ ...task, ...app, selected: true });
       } else {
         this.apps.push({ ...task, name: '', path: '', port: null });
       }

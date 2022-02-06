@@ -38,6 +38,7 @@ ipcMain.on('project', async (event, payload) => {
               }
             }
           } catch (e: AnyException) {
+            log.error(e);
             window.webContents.send('error', e.message || e);
           }
         }
@@ -220,14 +221,42 @@ function getDataFromIni(pathFile: string) {
   result.server = data['SQL-mode'].Server;
   result.base = data['SQL-mode'].Base;
   result.version = '';
+  result.commonFolder = '';
+
+  const pathlist = [];
 
   if (data.AppPath.DB.length) {
-    for (const path of data.AppPath.DB) {
-      const res = path.match(verpattern);
+    for (const cpath of data.AppPath.DB) {
+      const res = cpath.match(verpattern);
       if (res) {
         result.version = res[0];
       }
+
+      const cpath_res = path.resolve(path.dirname(pathFile), cpath);
+      pathlist.push(cpath_res);
     }
+  }
+
+  for (let i = 1; i < pathlist.length; i++) {
+    const checkString = pathlist[i - 1];
+    let tmpString = pathlist[i];
+    while (tmpString.length > 1) {
+      if (checkString.indexOf(tmpString) >= 0) {
+        result.commonFolder = tmpString;
+        break;
+      }
+      tmpString = tmpString.slice(0, tmpString.length - 1);
+    }
+  }
+
+  if (result.commonFolder) {
+    const srv_index = result.commonFolder.toLowerCase().indexOf('stack.srv');
+    if (srv_index > 0) {
+      result.commonFolder = result.commonFolder.substring(0, srv_index);
+    }
+  }
+  if (!result.version) {
+    result.version = result.commonFolder;
   }
 
   return result;
@@ -298,11 +327,20 @@ async function buildProject(project: Project, oldApps?: App[]) {
   verdir = path.join(verdir, '\\');
 
   // копируем exe и прочие файлы в бин каталог
+  const pathini = project.path.ini;
   const pathbin_ver = path.join(verdir, 'Stack.srv', 'Bin', '0');
-  await copyFiles(pathbin_ver, pathbin_new);
+
+  if (fs.existsSync(pathbin_ver)) {
+    await copyFiles(pathbin_ver, pathbin_new);
+  } else {
+    // смотрим путь в котором лежит инишка, и копируем оттуда
+    if (fs.existsSync(pathini)) {
+      const bin_dir = path.dirname(pathini);
+      await copyFiles(bin_dir, pathbin_new);
+    }
+  }
 
   // редактируем stack.ini и создаем в целевом каталоге
-  const pathini = project.path.ini;
   if (fs.existsSync(pathini)) {
     const data = readIniFile(pathini);
 
@@ -384,7 +422,7 @@ async function deleteProject(project: Project) {
   const webServer = getWebServer();
   for (const app of project.apps) {
     try {
-      webServer.deleteItem(app.name);
+      await webServer.deleteItem(app.name);
     } catch (e: AnyException) {
       log.error(e);
     }
@@ -443,28 +481,12 @@ async function fillProjects() {
         app.id = +args.t;
         app.port = +args.inspect;
 
-        const dataIni = readIniFile(pathini);
-        let gitpath = '';
-        // тут ищем клиенсткий каталог, если нашли пробуем его зарезолвить
-        // находим stack.srv
-        if (dataIni?.AppPath?.DB?.length) {
-          for (const cpath of dataIni.AppPath.DB) {
-            if (cpath.toLowerCase().indexOf('client') >= 0) {
-              gitpath = path.resolve(bin, cpath);
-              const srv_index = gitpath.toLowerCase().indexOf('stack.srv');
-              if (srv_index > 0) {
-                gitpath = gitpath.substring(0, srv_index);
-              }
-            }
-          }
-        }
-
-        const pathfront = fs.existsSync(path.join(gitpath, 'Stack.Front')) ? path.join(gitpath, 'Stack.Front') : '';
+        const pathfront = fs.existsSync(path.join(data.commonFolder, 'Stack.Front')) ? path.join(data.commonFolder, 'Stack.Front') : '';
 
         project.path = {
           version: data.version,
           bin,
-          git: gitpath,
+          git: data.commonFolder,
           ini: pathini,
           front: pathfront,
         };
