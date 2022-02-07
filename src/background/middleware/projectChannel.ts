@@ -297,7 +297,7 @@ async function addProject(payload: Project) {
   // проверим валидность путей
   for (const key of Object.keys(project.path) as Array<keyof typeof project.path>) {
     const cpath = project.path[key];
-    if (cpath && !fs.existsSync(cpath)) {
+    if (cpath && !fs.existsSync(cpath) && key !== 'bin') {
       throw new Error(`Некорректный путь ${cpath}`);
     }
   }
