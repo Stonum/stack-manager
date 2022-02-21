@@ -3,6 +3,7 @@ import { ipcMain, dialog } from 'electron';
 import Window from '../window';
 import { settings } from '../store';
 import log from '../log';
+import cmd from '../cmd';
 
 ipcMain.on('main', async (event, payload) => {
   log.debug('main', payload);
@@ -34,6 +35,19 @@ ipcMain.on('main', async (event, payload) => {
         event.sender.send(payload.message, res.filePaths[0]);
       } else {
         event.sender.send(payload.message, payload.path || '');
+      }
+      break;
+    }
+
+    case 'restartDispatcher': {
+      try {
+        await cmd.execSudo('net stop DispatcherService');
+        const res = await cmd.execSudo('net start DispatcherService');
+        event.sender.send(payload.message, res);
+      } catch (e: AnyException) {
+        log.error(e);
+        const window = new Window();
+        window.webContents.send('error', e.message || e);
       }
       break;
     }

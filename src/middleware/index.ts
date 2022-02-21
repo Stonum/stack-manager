@@ -22,6 +22,15 @@ export const selectDir = async (path?: string): Promise<string> => {
   });
 };
 
+export const restartDisp = async (): Promise<string> => {
+  ipcRenderer.send('main', { message: 'restartDispatcher' });
+  return new Promise((resolve) => {
+    ipcRenderer.on('restartDispatcher', (event, payload: string) => {
+      resolve(payload);
+    });
+  });
+};
+
 export const projectAdd = async (params: Project): Promise<any> => {
   ipcRenderer.send('project', { message: 'add', params });
   return new Promise((resolve) => {

@@ -23,6 +23,7 @@
     "electron-store": "^8.0.1",
     "ini": "^2.0.0",
     "roboto-fontface": "*",
+    "sudo-prompt": "^9.2.1",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
     "vuedraggable": "^2.24.3",
