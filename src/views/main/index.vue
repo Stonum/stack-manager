@@ -1,38 +1,43 @@
 <template>
-  <v-progress-linear v-if="loading" indeterminate />
-  <p style="text-align: center" v-else-if="!items.length">Проектов пока нет. Добавьте новые, либо заполните из существующих в настройках.</p>
-  <v-expansion-panels v-else>
-    <v-container fluid>
-      <draggable v-model="items" @change="onMoveProject">
-        <template v-for="(item, idx) in items">
-          <project-item
-            :item="item"
-            :key="idx"
-            :id="idx"
-            @stop="onStop(idx, $event)"
-            @start="onStart(idx, $event)"
-            @delete="onDelete(idx)"
-            @edit="onEdit(idx)"
-            @restart="onRestart(idx)"
-          />
-        </template>
-      </draggable>
-    </v-container>
-    <yes-no-dialog v-if="visibleDialog" header="Удалить проект?" @click="onDelete(delIndex, $event)" />
-  </v-expansion-panels>
+  <v-container fluid>
+    <main-tool-bar @refresh="onRefresh" />
+
+    <v-progress-linear v-if="loading" indeterminate />
+    <p style="text-align: center" v-else-if="!items.length">Проектов пока нет. Добавьте новые, либо заполните из существующих в настройках.</p>
+    <v-expansion-panels v-else>
+      <v-container fluid>
+        <v-draggable v-model="items" @change="onMoveProject">
+          <template v-for="(item, idx) in items">
+            <project-item
+              :item="item"
+              :key="idx"
+              :id="idx"
+              @stop="onStop(idx, $event)"
+              @start="onStart(idx, $event)"
+              @delete="onDelete(idx)"
+              @edit="onEdit(idx)"
+              @restart="onRestart(idx)"
+            />
+          </template>
+        </v-draggable>
+      </v-container>
+      <yes-no-dialog v-if="visibleDialog" header="Удалить проект?" @click="onDelete(delIndex, $event)" />
+    </v-expansion-panels>
+  </v-container>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import draggable from 'vuedraggable';
+import VDraggable from 'vuedraggable';
 
-import ProjectItem from './ProjectItem.vue';
+import MainToolBar from './MainToolBar.vue';
+import ProjectItem from '@/views/main/ProjectItem.vue';
 
 import { getProjects, projectSendJob, projectDelete, moveProject } from '@/middleware/index';
 
 export default Vue.extend({
-  name: 'ProjectList',
-  components: { ProjectItem, draggable },
+  name: 'Main',
+  components: { MainToolBar, ProjectItem, VDraggable },
   data() {
     return {
       items: [] as Project[],
@@ -42,6 +47,11 @@ export default Vue.extend({
     };
   },
   methods: {
+    async onRefresh() {
+      this.loading = true;
+      this.items = await getProjects();
+      this.loading = false;
+    },
     async onStop(id: number, appname?: string) {
       await projectSendJob('appStop', id, appname);
       this.items = await getProjects();
@@ -79,9 +89,7 @@ export default Vue.extend({
     },
   },
   async mounted() {
-    this.loading = true;
-    this.items = await getProjects();
-    this.loading = false;
+    this.onRefresh();
   },
 });
 </script>

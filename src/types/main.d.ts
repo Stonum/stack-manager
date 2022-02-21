@@ -1,5 +1,9 @@
 type AnyException = any;
 
+interface Settings {
+  [index: string]: string;
+}
+
 interface Task {
   title: string;
   prefix: string;

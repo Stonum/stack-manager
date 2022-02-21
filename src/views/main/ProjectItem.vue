@@ -31,7 +31,7 @@
 
           <v-list-item-content>
             <v-list-item-title>{{ app.name }}</v-list-item-title>
-            <v-list-item-subtitle v-if="app.port && app.port > 0">--inspect={{ app.port }}</v-list-item-subtitle>
+            <v-list-item-subtitle>{{ app.path }} --inspect={{ app.port || '0000' }}</v-list-item-subtitle>
           </v-list-item-content>
 
           <v-list-item-action-text>

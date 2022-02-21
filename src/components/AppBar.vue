@@ -3,7 +3,7 @@
     <v-btn v-if="!hideHomeBtn" plain icon to="/" title="На главную">
       <v-icon>mdi-home</v-icon>
     </v-btn>
-    <v-btn v-if="!hideAddBtn" plain icon to="/new" title="Добавить новый проект">
+    <v-btn v-if="!hideAddBtn" plain icon to="/project/-1" title="Добавить новый проект">
       <v-icon>mdi-plus</v-icon>
     </v-btn>
 
