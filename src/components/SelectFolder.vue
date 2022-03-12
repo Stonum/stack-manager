@@ -8,7 +8,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { selectDir } from '@/middleware/index';
 
 export default Vue.extend({
   model: {
@@ -20,7 +19,7 @@ export default Vue.extend({
   },
   methods: {
     async onChangeFolder() {
-      const result = await selectDir(this.value);
+      const result = await this.$store.dispatch('mainStore/selectDir', { path: this.value });
       if (result) {
         this.$emit('change', result);
       }

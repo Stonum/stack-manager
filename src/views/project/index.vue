@@ -35,12 +35,12 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { mapActions } from 'vuex';
+
 import AppsTab from './AppsTab.vue';
 import CommonTab from './CommonTab.vue';
 
-import { getProject, readIniFile, readProjectFolder, getSettings, projectRebuild, projectSave, projectAdd } from '@/middleware/index';
-
-interface SelectableApp extends App, Task {}
+interface SelectableApp extends ProjectApp, Task {}
 
 export default Vue.extend({
   name: 'Project',
@@ -63,7 +63,7 @@ export default Vue.extend({
           login: '',
           password: '',
         },
-        apps: [] as App[],
+        apps: [] as ProjectApp[],
       } as Project,
       valid: false,
       inspectport: 0,
@@ -89,8 +89,10 @@ export default Vue.extend({
   },
 
   methods: {
+    ...mapActions('projectStore', ['readIniFile', 'readProjectFolder', 'projectAdd', 'projectRebuild', 'getProject']),
+
     async onReadIni() {
-      const data = await readIniFile(this.project.path.ini);
+      const data = await this.readIniFile(this.project.path.ini);
       if (data) {
         this.project.sql.server = data.server;
         this.project.sql.base = data.base;
@@ -98,7 +100,7 @@ export default Vue.extend({
       }
     },
     async onReadFolder() {
-      const data = await readProjectFolder(this.project.path.git);
+      const data = await this.readProjectFolder(this.project.path.git);
       if (data) {
         this.inifiles = data.ini;
         this.project.path.front = data.front;
@@ -122,14 +124,14 @@ export default Vue.extend({
 
       for (const app of this.apps) {
         if (app.selected) {
-          this.project.apps.push({ id: app.id, port: app.port, name: app.name, path: app.path });
+          this.project.apps.push({ id: app.id, port: app.port, name: app.name, path: app.path, args: '' });
         }
       }
       try {
         if (this.isNewProject) {
-          await projectAdd(this.project);
+          await this.projectAdd(this.project);
         } else {
-          await projectRebuild(+this.projectid, this.project);
+          await this.projectRebuild({ projectId: +this.projectid, params: this.project });
         }
       } finally {
         this.loading = false;
@@ -141,16 +143,16 @@ export default Vue.extend({
 
   async created() {
     if (+this.projectid !== -1) {
-      this.project = await getProject(+this.projectid);
+      this.project = await this.getProject(+this.projectid);
 
-      const data = await readIniFile(this.project.path.ini);
+      const data = await this.readIniFile(this.project.path.ini);
       if (data.version !== this.project.path.version) {
         this.version = data.version;
         this.visibleDialog = true;
       }
     }
 
-    this.tasks = await getSettings('tasks');
+    this.tasks = await this.$store.dispatch('mainStore/getSettings', { key: 'tasks' });
     this.tasks.forEach((task: Task) => {
       const app = this.project.apps.find((app) => app.id === task.id);
       if (app) {

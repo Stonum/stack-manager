@@ -38,6 +38,9 @@
           </template>
         </select-folder>
       </v-col>
+      <v-col cols="3">
+        <v-text-field v-model.number="settings.refresh_interval" label="Интервал обномления статусов приложений" type="number" suffix="мс" />
+      </v-col>
       <v-col cols="12">
         <v-switch v-model="settings.fullLogging" label="Полное логирование ( включает логирование всех запросов после перезапуска )" />
       </v-col>

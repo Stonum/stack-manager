@@ -1,7 +1,7 @@
 type AnyException = any;
 
 interface Settings {
-  [index: string]: string;
+  [index: string]: string | number;
 }
 
 interface Task {
@@ -12,30 +12,33 @@ interface Task {
   port: number | null;
 }
 
-interface App {
+interface ProjectApp {
   name: string;
   id: number;
   path: string;
   port: number | null;
-  status?: number;
+  args: string;
 }
 
+interface ProjectSQLSettings {
+  server: string;
+  base: string;
+  login: string;
+  password: string;
+}
+
+interface ProjectPaths {
+  version: string;
+  bin: string;
+  git: string;
+  ini: string;
+  front: string;
+}
 interface Project {
   name: string;
-  path: {
-    version: string;
-    bin: string;
-    git: string;
-    ini: string;
-    front: string;
-  };
-  sql: {
-    server: string;
-    base: string;
-    login: string;
-    password: string;
-  };
-  apps: App[];
+  path: ProjectPaths;
+  sql: ProjectSQLSettings;
+  apps: ProjectApp[];
 }
 
 interface DispatcherItem {

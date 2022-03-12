@@ -18,32 +18,42 @@ ipcMain.on('project', async (event, payload) => {
   try {
     switch (payload.message) {
       case 'getAll': {
-        const webServer = getWebServer();
-
         const data = (projects.get('projects', []) as Project[]).map((project: Project) => {
           return { name: project.name, apps: project.apps };
         });
 
-        if (data.length) {
-          try {
-            const apps = await webServer.getItems();
-            for (const project of data) {
-              if (project.apps) {
-                for (const app of project.apps) {
-                  const status = apps.find((item: DispatcherItem) => {
-                    return item.Name === app.name;
-                  })?.State;
-                  app.status = status !== undefined ? +status : undefined;
-                }
-              }
-            }
-          } catch (e: AnyException) {
-            log.error(e);
-            window.webContents.send('error', e.message || e);
-          }
-        }
+        // if (data.length) {
+        //   try {
+        //     const apps = await webServer.getItems();
+        //     for (const project of data) {
+        //       if (project.apps) {
+        //         for (const app of project.apps) {
+        //           const status = apps.find((item: DispatcherItem) => {
+        //             return item.Name === app.name;
+        //           })?.State;
+        //           app.status = status !== undefined ? +status : undefined;
+        //         }
+        //       }
+        //     }
+        //   } catch (e: AnyException) {
+        //     log.error(e);
+        //     window.webContents.send('error', e.message || e);
+        //   }
+        // }
 
         event.sender.send(payload.message, data);
+        break;
+      }
+
+      case 'getAppStatus': {
+        const webServer = getWebServer();
+        const apps = await webServer.getItems();
+        event.sender.send(
+          payload.message,
+          apps.map((app: any) => {
+            return { name: app.Name, status: +app.State };
+          }),
+        );
         break;
       }
 

@@ -18,8 +18,6 @@ import SettingsToolBar from './SettingsTooBar.vue';
 import CommonTab from './CommonTab.vue';
 import TasksTab from './TasksTab.vue';
 
-import { setSettings, getSettings } from '@/middleware/index';
-
 export default Vue.extend({
   name: 'Settings',
   components: { SettingsToolBar, CommonTab, TasksTab },
@@ -33,6 +31,7 @@ export default Vue.extend({
         nginx: '',
         bin: '',
         fullLogging: '',
+        refresh_interval: 0,
       } as Settings,
       tasks: [] as Task[],
     };
@@ -40,18 +39,18 @@ export default Vue.extend({
   methods: {
     onClickSave() {
       for (const key of Object.keys(this.settings) as string[]) {
-        setSettings(key, this.settings[key]);
+        this.$store.dispatch('mainStore/setSettings', { key, data: this.settings[key] });
       }
-      setSettings('tasks', this.tasks);
+      this.$store.dispatch('mainStore/setSettings', { key: 'tasks', data: this.tasks });
 
       this.$router.push('/');
     },
   },
   async mounted() {
     for (const key of Object.keys(this.settings) as string[]) {
-      this.settings[key] = await getSettings(key);
+      this.settings[key] = await this.$store.dispatch('mainStore/getSettings', { key });
     }
-    this.tasks = await getSettings('tasks');
+    this.tasks = await this.$store.dispatch('mainStore/getSettings', { key: 'tasks' });
   },
 });
 </script>

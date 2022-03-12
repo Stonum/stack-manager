@@ -7,7 +7,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { fillProjects } from '@/middleware/index';
 
 export default Vue.extend({
   name: 'SettingsTooBar',
@@ -20,7 +19,7 @@ export default Vue.extend({
     async onClickFill() {
       this.loading = true;
       try {
-        await fillProjects();
+        await this.$store.dispatch('projectStore/fillProjects');
       } finally {
         this.loading = false;
       }

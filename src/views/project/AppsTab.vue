@@ -26,10 +26,13 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 
-interface SelectableApp extends App, Task {}
+interface SelectableApp extends ProjectApp, Task {}
 
 export default Vue.extend({
   name: 'AppsTab',
+  model: {
+    prop: 'apps',
+  },
   props: {
     apps: { type: Array as PropType<SelectableApp[]>, required: true },
     isNewProject: { type: Boolean, default: false },

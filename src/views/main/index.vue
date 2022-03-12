@@ -28,12 +28,11 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { mapActions } from 'vuex';
 import VDraggable from 'vuedraggable';
 
 import MainToolBar from './MainToolBar.vue';
 import ProjectItem from '@/views/main/ProjectItem.vue';
-
-import { getProjects, projectSendJob, projectDelete, moveProject } from '@/middleware/index';
 
 export default Vue.extend({
   name: 'Main',
@@ -47,24 +46,27 @@ export default Vue.extend({
     };
   },
   methods: {
+    ...mapActions('projectStore', ['getProjects', 'projectSendJob', 'projectDelete', 'moveProject', 'getAppStatus']),
+
     async onRefresh() {
       this.loading = true;
-      this.items = await getProjects();
+      this.items = await this.getProjects();
       this.loading = false;
+      this.getAppStatus();
     },
     async onStop(id: number, appname?: string) {
-      await projectSendJob('appStop', id, appname);
-      this.items = await getProjects();
+      await this.projectSendJob({ jobName: 'appStop', projectId: id, params: appname });
+      this.items = await this.getAppStatus();
     },
     async onStart(id: number, appname?: string) {
-      await projectSendJob('appStart', id, appname);
-      this.items = await getProjects();
+      await this.projectSendJob({ jobName: 'appStart', projectId: id, params: appname });
+      this.items = await this.getAppStatus();
     },
     async onRestart(id: number) {
       for (const app of this.items[id].apps) {
-        await projectSendJob('appReStart', id, app.name);
+        await this.projectSendJob({ jobName: 'appReStart', projectId: id, params: app.name });
       }
-      this.items = await getProjects();
+      this.items = await this.getAppStatus();
     },
     async onDelete(id: number | null, answer?: boolean) {
       if (answer === undefined) {
@@ -75,8 +77,8 @@ export default Vue.extend({
       this.visibleDialog = false;
       this.delIndex = null;
       if (answer && id !== null) {
-        await projectDelete(id);
-        this.items = await getProjects();
+        await this.projectDelete(id);
+        this.items = await this.getProjects();
       }
     },
     async onEdit(id: number) {
@@ -84,7 +86,7 @@ export default Vue.extend({
     },
     onMoveProject(payload: any) {
       if (payload && payload.moved) {
-        moveProject(payload.moved.oldIndex, payload.moved.newIndex);
+        this.moveProject(payload.moved);
       }
     },
   },

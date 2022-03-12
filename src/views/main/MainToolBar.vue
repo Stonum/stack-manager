@@ -7,7 +7,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { restartDisp } from '@/middleware';
 
 export default Vue.extend({
   name: 'MainToolBar',
@@ -22,7 +21,7 @@ export default Vue.extend({
     },
     async onReloadDisp() {
       this.onDispLoading = true;
-      await restartDisp();
+      await this.$store.dispatch('mainStore/restartDisp');
       this.onDispLoading = false;
       this.$emit('reload');
     },
