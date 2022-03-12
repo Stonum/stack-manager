@@ -5,6 +5,7 @@
       <v-col cols="2"> Имя </v-col>
       <v-col cols="2"> Путь </v-col>
       <v-col cols="1"> Порт </v-col>
+      <v-col cols="3"> Доп. аргументы </v-col>
     </v-row>
     <v-row v-for="(app, idx) in apps" :key="app.id">
       <v-col cols="4" :key="app.id">
@@ -18,6 +19,9 @@
       </v-col>
       <v-col cols="1">
         <v-text-field v-model="app.port" type="number" dense hide-details />
+      </v-col>
+      <v-col cols="3">
+        <v-text-field v-model="app.args" dense hide-details />
       </v-col>
     </v-row>
   </v-container>

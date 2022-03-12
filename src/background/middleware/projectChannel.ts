@@ -52,7 +52,7 @@ ipcMain.on('project', async (event, payload) => {
           payload.message,
           apps.map((app: any) => {
             return { name: app.Name, status: +app.State };
-          }),
+          })
         );
         break;
       }
@@ -306,7 +306,7 @@ async function addProject(payload: Project) {
   project.apps = [];
 
   for (const app of payload.apps) {
-    project.apps.push({ id: app.id, port: app.port, name: app.name, path: app.path });
+    project.apps.push({ id: app.id, port: app.port, name: app.name, path: app.path, args: app.args });
   }
 
   // проверим валидность путей
@@ -320,7 +320,7 @@ async function addProject(payload: Project) {
   return project;
 }
 
-async function buildProject(project: Project, oldApps?: App[]) {
+async function buildProject(project: Project, oldApps?: ProjectApp[]) {
   const webServer = getWebServer();
 
   // остановим приложения если есть
@@ -426,7 +426,7 @@ async function buildProject(project: Project, oldApps?: App[]) {
     await webServer.addItem(app.name, {
       UrlPathPrefix: app.path,
       StackProgramDir: project.path.bin,
-      StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${app.id} -LOADRES --inspect=${app.port || '0000'} -nc`,
+      StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${app.id} -LOADRES --inspect=${app.port || '0000'} -nc ${app.args}`,
       IsActive: 1,
       FunctionName: 'StackAPI_kvplata_v1',
       ResultContentType: 'application/json;charset=utf-8',
@@ -489,6 +489,7 @@ async function fillProjects() {
           path: item.UrlPathPrefix,
           id: 0,
           port: 0,
+          args: '',
         };
 
         const data = getDataFromIni(pathini);
@@ -521,7 +522,7 @@ async function fillProjects() {
           if (!finded.apps) {
             finded.apps = [];
           }
-          const appindex = finded.apps.findIndex((item: App) => {
+          const appindex = finded.apps.findIndex((item: ProjectApp) => {
             return item.name.toLowerCase() === app.name.toLowerCase();
           });
           if (appindex === -1) {

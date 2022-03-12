@@ -31,7 +31,7 @@ import Vue, { PropType } from 'vue';
 export default Vue.extend({
   name: 'AppItem',
   props: {
-    item: { type: Object as PropType<App>, required: true },
+    item: { type: Object as PropType<ProjectApp>, required: true },
   },
   computed: {
     status(): number {
