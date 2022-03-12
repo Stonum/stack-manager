@@ -25,21 +25,5 @@ Vue.component('HelpIcon', HelpIcon);
 export default Vue.extend({
   name: 'App',
   components: { Toast },
-  data() {
-    return {
-      timer: null as any,
-    };
-  },
-  async mounted() {
-    const interval = +(await this.$store.dispatch('mainStore/getSettings', { key: 'refresh_interval' })) || 20000;
-    this.timer = setInterval(() => {
-      this.$store.dispatch('projectStore/getAppStatus');
-    }, interval);
-  },
-  beforeDestroy() {
-    if (this.timer) {
-      clearInterval(this.timer);
-    }
-  },
 });
 </script>

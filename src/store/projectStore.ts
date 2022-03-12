@@ -73,14 +73,16 @@ const actions: ActionTree<ProjectState, any> = {
   },
 
   async getAppStatus({ state, commit }) {
-    ipcRenderer.send('project', { message: 'getAppStatus' });
-    ipcRenderer.on('getAppStatus', (event, payload: any) => {
-      if (payload?.length) {
-        for (const app of payload) {
-          commit('APP_SET_STATUS', { name: app.name, status: app.status });
+    if (state.apps.length !== 0) {
+      ipcRenderer.send('project', { message: 'getAppStatus' });
+      ipcRenderer.on('getAppStatus', (event, payload: any) => {
+        if (payload?.length) {
+          for (const app of payload) {
+            commit('APP_SET_STATUS', { name: app.name, status: app.status });
+          }
         }
-      }
-    });
+      });
+    }
   },
 
   async getProject(ctx, projectId: number): Promise<Project> {

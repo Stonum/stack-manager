@@ -43,6 +43,7 @@ export default Vue.extend({
       visibleDialog: false,
       delIndex: null as number | null,
       loading: false,
+      timer: null as any,
     };
   },
   methods: {
@@ -92,6 +93,15 @@ export default Vue.extend({
   },
   async mounted() {
     this.onRefresh();
+    const interval = +(await this.$store.dispatch('mainStore/getSettings', { key: 'refresh_interval' })) || 20000;
+    this.timer = setInterval(() => {
+      this.$store.dispatch('projectStore/getAppStatus');
+    }, interval);
+  },
+  beforeDestroy() {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
   },
 });
 </script>
