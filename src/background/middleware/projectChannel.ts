@@ -52,7 +52,7 @@ ipcMain.on('project', async (event, payload) => {
           payload.message,
           apps.map((app: any) => {
             return { name: app.Name, status: +app.State };
-          })
+          }),
         );
         break;
       }
@@ -504,6 +504,13 @@ async function fillProjects() {
 
         app.id = +args.t;
         app.port = +args.inspect;
+
+        const ignoreKeys = ['u', 'p', 't', 'inspect', 'nc', 'LOADRES'];
+        for (const keyArg of Object.keys(args)) {
+          if (!ignoreKeys.includes(keyArg)) {
+            app.args += ` -${keyArg}:${args[keyArg]}`;
+          }
+        }
 
         const pathfront = fs.existsSync(path.join(data.commonFolder, 'Stack.Front')) ? path.join(data.commonFolder, 'Stack.Front') : '';
 
