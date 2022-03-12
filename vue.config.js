@@ -1,13 +1,3 @@
-const fs = require('fs');
-let nodeModules = fs
-  .readdirSync('./node_modules')
-  .filter((module) => {
-    return module !== '.bin';
-  })
-  .reduce((prev, module) => {
-    return Object.assign(prev, { [module]: 'commonjs ' + module });
-  }, {});
-
 module.exports = {
   transpileDependencies: ['vuetify'],
   pluginOptions: {
@@ -36,10 +26,5 @@ module.exports = {
   },
   configureWebpack: {
     devtool: 'source-map',
-    // node: {
-    //   /* http://webpack.github.io/docs/configuration.html#node */
-    //   __dirname: true,
-    // },
-    // externals: nodeModules,
   },
 };
