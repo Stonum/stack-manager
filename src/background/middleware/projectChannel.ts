@@ -177,8 +177,13 @@ ipcMain.on('project', async (event, payload) => {
       }
 
       case 'fillProjects': {
-        await fillProjects();
-        event.sender.send(payload.message, true);
+        try {
+          await fillProjects();
+          event.sender.send(payload.message, true);
+        } catch (e: AnyException) {
+          event.sender.send(payload.message, false);
+          throw e;
+        }
         break;
       }
 

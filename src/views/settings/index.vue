@@ -42,8 +42,6 @@ export default Vue.extend({
         this.$store.dispatch('mainStore/setSettings', { key, data: this.settings[key] });
       }
       this.$store.dispatch('mainStore/setSettings', { key: 'tasks', data: this.tasks });
-
-      this.$router.push('/');
     },
   },
   async mounted() {

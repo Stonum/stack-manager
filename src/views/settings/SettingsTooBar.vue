@@ -23,7 +23,6 @@ export default Vue.extend({
       } finally {
         this.loading = false;
       }
-      this.$router.push('/');
     },
   },
 });
