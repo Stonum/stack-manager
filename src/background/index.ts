@@ -3,7 +3,7 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import path from 'path';
 
 import Window from './window';
-import './middleware/index';
+import { MainListener, ProjectListener } from './listeners';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -42,6 +42,10 @@ app.on('ready', async () => {
   }
 
   const window = new Window();
+
+  // регистрируем слушателей для общения фронта с бэком
+  new MainListener();
+  new ProjectListener();
 
   appTray = new Tray(path.join(__dirname, '../build/icon.png'));
   appTray.setToolTip(`${app.getName()} ${app.getVersion()}`);

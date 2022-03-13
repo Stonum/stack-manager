@@ -1,200 +1,145 @@
-import { ipcMain } from 'electron';
-import Window from '../window';
+import CommonListener from './commonListener';
 
 import path from 'path';
 import fs from 'fs';
 
 import { projects, settings } from '../store';
 import { getFiles, copyFiles, readIniFile, writeIniFile, parseArgs } from '../utils';
-import log from '../log';
 
-import Dispatcher from './dispatcher';
+import Dispatcher from '../middleware/dispatcher';
 
-ipcMain.on('project', async (event, payload) => {
-  log.debug('project', payload);
-
-  const window = new Window();
-
-  try {
-    switch (payload.message) {
-      case 'getAll': {
-        const data = (projects.get('projects', []) as Project[]).map((project: Project) => {
-          return { name: project.name, apps: project.apps };
-        });
-
-        // if (data.length) {
-        //   try {
-        //     const apps = await webServer.getItems();
-        //     for (const project of data) {
-        //       if (project.apps) {
-        //         for (const app of project.apps) {
-        //           const status = apps.find((item: DispatcherItem) => {
-        //             return item.Name === app.name;
-        //           })?.State;
-        //           app.status = status !== undefined ? +status : undefined;
-        //         }
-        //       }
-        //     }
-        //   } catch (e: AnyException) {
-        //     log.error(e);
-        //     window.webContents.send('error', e.message || e);
-        //   }
-        // }
-
-        event.sender.send(payload.message, data);
-        break;
-      }
-
-      case 'getAppStatus': {
-        const webServer = getWebServer();
-        const apps = await webServer.getItems();
-        event.sender.send(
-          payload.message,
-          apps.map((app: any) => {
-            return { name: app.Name, status: +app.State };
-          }),
-        );
-        break;
-      }
-
-      case 'get': {
-        const id = payload.projectId;
-
-        const data = projects.get('projects', []) as Project[];
-        if (data && data[id]) {
-          event.sender.send(payload.message, data[id]);
-        } else {
-          throw new Error(`Не найден проект с указанным id - ${id}`);
-        }
-
-        break;
-      }
-
-      case 'add': {
-        const allProjects = projects.get('projects', []) as Project[];
-        const project = await addProject(payload.params);
-        allProjects.push(project);
-        projects.set('projects', allProjects);
-        await buildProject(project);
-        event.sender.send(payload.message, project);
-        break;
-      }
-
-      case 'delete': {
-        const id = payload.projectId;
-        const allProjects = projects.get('projects', []) as Project[];
-        let project = null;
-        if (allProjects && allProjects[id]) {
-          project = allProjects[id];
-          allProjects.splice(id, 1);
-        }
-
-        if (!project) {
-          throw new Error(`Не найден проект с указанным id - ${id}`);
-        }
-
-        await deleteProject(project);
-        projects.set('projects', allProjects);
-
-        event.sender.send(payload.message, {});
-        break;
-      }
-
-      case 'save': {
-        const id = payload.projectId;
-        const project = payload.params as Project;
-
-        const data = projects.get('projects', []) as Project[];
-        if (data && data[id]) {
-          data[id] = project;
-          projects.set('projects', data);
-        } else {
-          throw new Error(`Не найден проект с указанным id - ${id}`);
-        }
-        event.sender.send(payload.message, {});
-        break;
-      }
-
-      case 'rebuild': {
-        const id = payload.projectId;
-        const project = payload.params as Project;
-
-        const data = projects.get('projects', []) as Project[];
-        if (data && data[id]) {
-          await buildProject(project, data[id].apps);
-          data[id] = project;
-          projects.set('projects', data);
-        } else {
-          throw new Error(`Не найден проект с указанным id - ${id}`);
-        }
-        event.sender.send(payload.message, {});
-        break;
-      }
-
-      case 'moveProject': {
-        const id = payload.oldIndex;
-        const newId = payload.newIndex;
-        const allProjects = projects.get('projects', []) as Project[];
-        if (allProjects[id]) {
-          const project = allProjects[id];
-          allProjects.splice(id, 1); // удаляем
-          allProjects.splice(newId, 0, project); // добавляем в позицию нового ( если новый больше старого - то +1, иначе как есть)
-          projects.set('projects', allProjects);
-          event.sender.send(payload.message, true);
-        } else {
-          event.sender.send(payload.message, false);
-        }
-        break;
-      }
-
-      case 'readFolder':
-        event.sender.send(payload.message, await readProjectFolder(payload.path));
-        break;
-
-      case 'readIniFile':
-        event.sender.send(payload.message, await getDataFromIni(payload.path));
-        break;
-
-      case 'appStart': {
-        const webServer = getWebServer();
-        const res = await webServer.startItem(payload.params);
-        event.sender.send(payload.message, res);
-        break;
-      }
-
-      case 'appReStart': {
-        const webServer = getWebServer();
-        const res = await webServer.restartItem(payload.params);
-        event.sender.send(payload.message, res);
-        break;
-      }
-
-      case 'appStop': {
-        const webServer = getWebServer();
-        const res = await webServer.stopItem(payload.params);
-        event.sender.send(payload.message, res);
-        break;
-      }
-
-      case 'fillProjects': {
-        try {
-          await fillProjects();
-          event.sender.send(payload.message, true);
-        } catch (e: AnyException) {
-          event.sender.send(payload.message, false);
-          throw e;
-        }
-        break;
-      }
-
-      default:
-        log.warn('Unknown message - ', payload.message);
-    }
-  } catch (e: AnyException) {
-    log.error(e);
-    window.webContents.send('error', e.message || e);
+export class ProjectListener extends CommonListener {
+  constructor() {
+    super('project');
   }
-});
+
+  getAll() {
+    const data = (projects.get('projects', []) as Project[]).map((project: Project) => {
+      return { name: project.name, apps: project.apps };
+    });
+
+    return data;
+  }
+
+  async getAppStatus() {
+    const webServer = getWebServer();
+    const apps = await webServer.getItems();
+    return apps.map((app: any) => {
+      return { name: app.Name, status: +app.State };
+    });
+  }
+
+  get(payload: any) {
+    const id = payload.projectId;
+
+    const data = projects.get('projects', []) as Project[];
+    if (data && data[id]) {
+      return data[id];
+    } else {
+      throw new Error(`Не найден проект с указанным id - ${id}`);
+    }
+  }
+
+  async add(payload: any) {
+    const allProjects = projects.get('projects', []) as Project[];
+    const project = await addProject(payload.params);
+    allProjects.push(project);
+    projects.set('projects', allProjects);
+    await buildProject(project);
+    return project;
+  }
+
+  async delete(payload: any) {
+    const id = payload.projectId;
+    const allProjects = projects.get('projects', []) as Project[];
+    let project = null;
+    if (allProjects && allProjects[id]) {
+      project = allProjects[id];
+      allProjects.splice(id, 1);
+    }
+
+    if (!project) {
+      throw new Error(`Не найден проект с указанным id - ${id}`);
+    }
+
+    await deleteProject(project);
+    projects.set('projects', allProjects);
+
+    return {};
+  }
+  save(payload: any) {
+    const id = payload.projectId;
+    const project = payload.params as Project;
+
+    const data = projects.get('projects', []) as Project[];
+    if (data && data[id]) {
+      data[id] = project;
+      projects.set('projects', data);
+    } else {
+      throw new Error(`Не найден проект с указанным id - ${id}`);
+    }
+
+    return {};
+  }
+
+  async rebuild(payload: any) {
+    const id = payload.projectId;
+    const project = payload.params as Project;
+
+    const data = projects.get('projects', []) as Project[];
+    if (data && data[id]) {
+      await buildProject(project, data[id].apps);
+      data[id] = project;
+      projects.set('projects', data);
+    } else {
+      throw new Error(`Не найден проект с указанным id - ${id}`);
+    }
+    return {};
+  }
+
+  moveProject(payload: any) {
+    const id = payload.oldIndex;
+    const newId = payload.newIndex;
+    const allProjects = projects.get('projects', []) as Project[];
+    if (allProjects[id]) {
+      const project = allProjects[id];
+      allProjects.splice(id, 1); // удаляем
+      allProjects.splice(newId, 0, project); // добавляем в позицию нового ( если новый больше старого - то +1, иначе как есть)
+      projects.set('projects', allProjects);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  async readFolder(payload: any) {
+    return await readProjectFolder(payload.path);
+  }
+
+  async readIniFile(payload: any) {
+    return await getDataFromIni(payload.path);
+  }
+
+  async appStart(payload: any) {
+    const webServer = getWebServer();
+    const res = await webServer.startItem(payload.params);
+    return res;
+  }
+  async appReStart(payload: any) {
+    const webServer = getWebServer();
+    const res = await webServer.restartItem(payload.params);
+    return res;
+  }
+  async appStop(payload: any) {
+    const webServer = getWebServer();
+    const res = await webServer.stopItem(payload.params);
+    return res;
+  }
+  async fillProjects() {
+    await fillProjects();
+    return true;
+  }
+}
 
 async function readProjectFolder(pathDir: string) {
   if (!pathDir) {

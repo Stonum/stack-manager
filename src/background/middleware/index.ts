@@ -1,2 +1,0 @@
-import './mainChannel';
-import './projectChannel';
