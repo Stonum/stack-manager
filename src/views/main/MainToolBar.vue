@@ -17,7 +17,7 @@ export default Vue.extend({
   },
   methods: {
     onRefresh() {
-      this.$emit('reload');
+      this.$emit('refresh');
     },
     async onReloadDisp() {
       this.onDispLoading = true;

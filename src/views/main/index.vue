@@ -8,16 +8,7 @@
       <v-container fluid>
         <v-draggable v-model="items" @change="onMoveProject">
           <template v-for="(item, idx) in items">
-            <project-item
-              :item="item"
-              :key="idx"
-              :id="idx"
-              @stop="onStop(idx, $event)"
-              @start="onStart(idx, $event)"
-              @delete="onDelete(idx)"
-              @edit="onEdit(idx)"
-              @restart="onRestart(idx)"
-            />
+            <project-item :item="item" :key="idx" :id="idx" @delete="onDelete(idx)" @edit="onEdit(idx)" />
           </template>
         </v-draggable>
       </v-container>
@@ -47,27 +38,13 @@ export default Vue.extend({
     };
   },
   methods: {
-    ...mapActions('projectStore', ['getProjects', 'projectSendJob', 'projectDelete', 'moveProject', 'getAppStatus']),
+    ...mapActions('projectStore', ['getProjects', 'projectDelete', 'moveProject', 'getAppStatus']),
 
     async onRefresh() {
       this.loading = true;
       this.items = await this.getProjects();
       this.loading = false;
       this.getAppStatus();
-    },
-    async onStop(id: number, appname?: string) {
-      await this.projectSendJob({ jobName: 'appStop', projectId: id, params: appname });
-      this.items = await this.getAppStatus();
-    },
-    async onStart(id: number, appname?: string) {
-      await this.projectSendJob({ jobName: 'appStart', projectId: id, params: appname });
-      this.items = await this.getAppStatus();
-    },
-    async onRestart(id: number) {
-      for (const app of this.items[id].apps) {
-        await this.projectSendJob({ jobName: 'appReStart', projectId: id, params: app.name });
-      }
-      this.items = await this.getAppStatus();
     },
     async onDelete(id: number | null, answer?: boolean) {
       if (answer === undefined) {

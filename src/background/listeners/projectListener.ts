@@ -1,5 +1,6 @@
 import CommonListener from './commonListener';
 
+import { app } from 'electron';
 import path from 'path';
 import fs from 'fs';
 
@@ -7,6 +8,7 @@ import { projects, settings } from '../store';
 import { getFiles, copyFiles, readIniFile, writeIniFile, parseArgs } from '../utils';
 
 import Dispatcher from '../middleware/dispatcher';
+import cmd from '../cmd';
 
 export class ProjectListener extends CommonListener {
   constructor() {
@@ -135,6 +137,28 @@ export class ProjectListener extends CommonListener {
     const res = await webServer.stopItem(payload.params);
     return res;
   }
+
+  async buildFront(payload: any) {
+    const id = payload.projectId;
+    const allProjects = projects.get('projects', []) as Project[];
+    if (allProjects[id]) {
+      const project = allProjects[id];
+      if (!project.path.front) {
+        throw new Error(`Не задан каталог Stack.Front`);
+      }
+      await cmd.exec('npm ci', project.path.front);
+      await cmd.exec('npm run build', project.path.front);
+      if (fs.existsSync(path.join(project.path.front, 'dist'))) {
+        copyFiles(path.join(project.path.front, 'dist'), path.join(app.getPath('userData'), 'domains', project.name));
+      } else {
+        throw new Error(`Не найден dist каталог`);
+      }
+    } else {
+      throw new Error(`Не найден проект с указанным id - ${id}`);
+    }
+    return true;
+  }
+
   async fillProjects() {
     await fillProjects();
     return true;
@@ -392,7 +416,7 @@ async function deleteProject(project: Project) {
     try {
       await webServer.deleteItem(app.name);
     } catch (e: AnyException) {
-      log.error(e);
+      // console.error(e);
     }
   }
 

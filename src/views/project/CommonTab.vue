@@ -4,6 +4,10 @@
       <v-col cols="3">
         <v-text-field v-model="project.name" label="Краткое название проекта*" :rules="[rules.required]" />
       </v-col>
+      <v-spacer />
+      <v-col cols="3">
+        <v-text-field v-model.number="project.port" label="Порт для публикации Stack.Front" type="number" />
+      </v-col>
       <v-col cols="12">
         <select-folder v-model="project.path.git" label="Каталог проекта в git*" :readonly="!isNewProject" @change="$emit('changeProjectFolder')" />
       </v-col>

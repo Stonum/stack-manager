@@ -39,6 +39,7 @@ interface Project {
   path: ProjectPaths;
   sql: ProjectSQLSettings;
   apps: ProjectApp[];
+  port: number | null;
 }
 
 interface DispatcherItem {
