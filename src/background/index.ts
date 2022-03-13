@@ -4,6 +4,7 @@ import path from 'path';
 
 import Window from './window';
 import { MainListener, ProjectListener } from './listeners';
+import StaticServer from './middleware/express';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -17,6 +18,10 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+app.on('ready', () => {
+  new StaticServer();
 });
 
 app.on('activate', () => {
