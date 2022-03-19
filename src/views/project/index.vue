@@ -158,7 +158,7 @@ export default Vue.extend({
       if (app) {
         this.apps.push({ ...task, ...app, selected: true });
       } else {
-        this.apps.push({ ...task, name: '', path: '', port: null, args: '' });
+        this.apps.push({ ...task, name: '', path: '', port: null, args: '', selected: false });
       }
     });
   },
