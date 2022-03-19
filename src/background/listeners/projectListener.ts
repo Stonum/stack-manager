@@ -161,8 +161,9 @@ export class ProjectListener extends CommonListener {
       await cmd.exec('npm ci', project.path.front);
       await cmd.exec('npm run build', project.path.front);
       if (fs.existsSync(path.join(project.path.front, 'dist'))) {
-        copyFiles(path.join(project.path.front, 'dist'), path.join(app.getPath('userData'), 'domains', project.name));
-        generateEnvJson(project, path.join(app.getPath('userData'), 'domains', project.name));
+        await copyFiles(path.join(project.path.front, 'dist'), path.join(app.getPath('userData'), 'domains', project.name));
+        await generateEnvJson(project, path.join(app.getPath('userData'), 'domains', project.name));
+        this.sendInfoMessage(project.name, 'Build complete');
       } else {
         throw new Error(`Не найден dist каталог`);
       }

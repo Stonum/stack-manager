@@ -1,12 +1,12 @@
-import { ipcMain } from 'electron';
+import { ipcMain, Notification } from 'electron';
 import Window from '../window';
 
 import log from '../log';
 
 export default class CommonListener {
-  constructor(_name: string) {
-    const window = new Window();
+  window = new Window();
 
+  constructor(_name: string) {
     ipcMain.on(_name, async (event, payload) => {
       const methodName = payload.message as string;
 
@@ -19,11 +19,16 @@ export default class CommonListener {
           event.sender.send(methodName, result);
         } catch (e: AnyException) {
           log.error(e);
-          window.webContents.send('error', e.message || e);
+          this.window.webContents.send('error', e.message || e);
         }
       } else {
         log.warn('Unknown method - ', methodName);
       }
     });
+  }
+
+  sendInfoMessage(title: string, message: string) {
+    new Notification({ title, body: message }).show();
+    // this.window.webContents.send('info', { title, message });
   }
 }
