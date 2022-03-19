@@ -13,6 +13,7 @@
     "postuninstall": "electron-builder install-app-deps",
     "lint": "vue-cli-service lint"
   },
+  "main": "background.js",
   "dependencies": {
     "@mdi/font": "5.9.55",
     "axios": "^0.25.0",
