@@ -3,7 +3,7 @@
     <v-expansion-panel-header style="padding: 0">
       <v-app-bar flat color="rgba(0, 0, 0, 0)">
         <v-toolbar-title>
-          {{ item.name }}
+          {{ item.name }} <a v-if="item.port" class="text-subtitle-1 px-2" :href="projectUrl" @click.stop="onOpenUrl">{{ projectUrl }}</a>
         </v-toolbar-title>
 
         <v-spacer />
@@ -52,6 +52,11 @@ export default Vue.extend({
       buildingFront: false,
     };
   },
+  computed: {
+    projectUrl() {
+      return `http://localhost:${this.item.port}`;
+    },
+  },
   methods: {
     ...mapActions('projectStore', ['projectSendJob', 'getAppStatus']),
 
@@ -77,6 +82,11 @@ export default Vue.extend({
       } finally {
         this.buildingFront = false;
       }
+    },
+
+    onOpenUrl(e: Event) {
+      e.preventDefault();
+      this.projectSendJob({ jobName: 'openUrl', projectId: this.id, params: this.projectUrl });
     },
 
     appColor(name: string | undefined) {

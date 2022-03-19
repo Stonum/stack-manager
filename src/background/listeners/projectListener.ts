@@ -1,6 +1,6 @@
 import CommonListener from './commonListener';
 
-import { app } from 'electron';
+import { app, shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
 
@@ -8,16 +8,22 @@ import { projects, settings } from '../store';
 import { getFiles, copyFiles, readIniFile, writeIniFile, parseArgs } from '../utils';
 
 import Dispatcher from '../middleware/dispatcher';
+import StaticServer from '../middleware/express';
 import cmd from '../cmd';
 
 export class ProjectListener extends CommonListener {
+  private servers = [] as StaticServer[];
+
   constructor() {
     super('project');
+
+    // стартанем статику при старте слушателя
+    this.restartServers();
   }
 
   getAll() {
     const data = (projects.get('projects', []) as Project[]).map((project: Project) => {
-      return { name: project.name, apps: project.apps };
+      return { name: project.name, apps: project.apps, port: project.port };
     });
 
     return data;
@@ -81,6 +87,7 @@ export class ProjectListener extends CommonListener {
       throw new Error(`Не найден проект с указанным id - ${id}`);
     }
 
+    this.restartServers();
     return {};
   }
 
@@ -96,6 +103,8 @@ export class ProjectListener extends CommonListener {
     } else {
       throw new Error(`Не найден проект с указанным id - ${id}`);
     }
+
+    this.restartServers();
     return {};
   }
 
@@ -146,17 +155,50 @@ export class ProjectListener extends CommonListener {
       if (!project.path.front) {
         throw new Error(`Не задан каталог Stack.Front`);
       }
+      if (!fs.existsSync(project.path.front)) {
+        throw new Error(`Не найден указанный каталог Stack.Front`);
+      }
       await cmd.exec('npm ci', project.path.front);
       await cmd.exec('npm run build', project.path.front);
       if (fs.existsSync(path.join(project.path.front, 'dist'))) {
         copyFiles(path.join(project.path.front, 'dist'), path.join(app.getPath('userData'), 'domains', project.name));
+        generateEnvJson(project, path.join(app.getPath('userData'), 'domains', project.name));
       } else {
         throw new Error(`Не найден dist каталог`);
       }
     } else {
       throw new Error(`Не найден проект с указанным id - ${id}`);
     }
+    this.restartServers();
     return true;
+  }
+
+  async restartServers() {
+    for (const server of this.servers) {
+      server.close();
+    }
+    this.servers = [];
+
+    const allProjects = projects.get('projects', []) as Project[];
+    for (const project of allProjects) {
+      if (project.port) {
+        try {
+          const server = new StaticServer(project.name, project.port);
+          if (server.started) {
+            this.servers.push(server);
+          }
+        } catch (e: AnyException) {
+          console.error(e);
+        }
+      }
+    }
+  }
+
+  openUrl(payload: any) {
+    if (payload.params) {
+      console.log(payload.params);
+      shell.openExternal(payload.params);
+    }
   }
 
   async fillProjects() {
@@ -426,6 +468,27 @@ async function deleteProject(project: Project) {
   }
 
   return {};
+}
+
+function generateEnvJson(project: Project, envpath: string) {
+  let envPath = path.join(project.path.front, '.env.local');
+  if (!fs.existsSync(envPath)) {
+    envPath = path.join(project.path.front, '.env.example');
+    if (fs.existsSync(envPath)) {
+      throw new Error('Не найден .env файл');
+    }
+  }
+
+  const tasks = settings.get('tasks') as Task[];
+  const disp = new URL(settings.get('dispatcher_url') as string);
+  const config = readIniFile(envPath);
+  for (const app of project.apps) {
+    const prefix = tasks.find((task) => {
+      return task.id === app.id;
+    })?.prefix;
+    config['API_HOST_' + prefix?.toUpperCase()] = disp.origin + app.path;
+  }
+  fs.writeFileSync(path.join(envpath, 'env.json'), JSON.stringify(config, null, '\t'));
 }
 
 async function fillProjects() {

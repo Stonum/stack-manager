@@ -4,7 +4,6 @@ import path from 'path';
 
 import Window from './window';
 import { MainListener, ProjectListener } from './listeners';
-import StaticServer from './middleware/express';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -20,9 +19,9 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.on('ready', () => {
-  new StaticServer();
-});
+// app.on('ready', () => {
+
+// });
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
