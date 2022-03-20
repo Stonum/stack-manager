@@ -14,7 +14,7 @@ module.exports = {
       externals: ['sudo-prompt'],
 
       builderOptions: {
-        extraResources: ['./build/**'],
+        extraResources: ['./build/**', './CHANGELOG.md'],
         nsis: {
           allowElevation: false,
           allowToChangeInstallationDirectory: true,

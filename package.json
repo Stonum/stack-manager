@@ -9,8 +9,8 @@
   "scripts": {
     "electron:serve": "vue-cli-service electron:serve",
     "electron:build": "vue-cli-service electron:build",
-    "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps",
+    "release-path": "standard-version",
+    "release-minor": "standard-version --release-as minor",
     "lint": "vue-cli-service lint"
   },
   "main": "background.js",
@@ -24,6 +24,7 @@
     "express": "^4.17.3",
     "ini": "^2.0.0",
     "roboto-fontface": "*",
+    "standard-version": "^9.3.2",
     "sudo-prompt": "^9.2.1",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",

@@ -1,4 +1,5 @@
-import { dialog } from 'electron';
+import { dialog, BrowserWindow, app } from 'electron';
+import path from 'path';
 
 import CommonListener from './commonListener';
 
@@ -22,6 +23,8 @@ export class MainListener extends CommonListener {
     { title: 'Расчеты с поставщиками', prefix: 'rsp', id: 279, selected: false, port: 11 },
   ];
 
+  window = new Window();
+
   constructor() {
     super('main');
   }
@@ -40,9 +43,12 @@ export class MainListener extends CommonListener {
     }
   }
 
+  getVersion() {
+    return app.getVersion();
+  }
+
   async selectDir(payload: any) {
-    const window = new Window();
-    const res = await dialog.showOpenDialog(window, {
+    const res = await dialog.showOpenDialog(this.window, {
       defaultPath: payload.path,
       properties: ['openDirectory'],
     });
@@ -57,5 +63,13 @@ export class MainListener extends CommonListener {
     await cmd.execSudo('net stop DispatcherService');
     const res = await cmd.execSudo('net start DispatcherService');
     return res;
+  }
+
+  async showChangeLog() {
+    const win = new BrowserWindow({ title: 'Change log', icon: path.join(__dirname, '../build/icon.png'), parent: this.window, modal: true });
+    win.loadFile(path.join(__dirname, '../CHANGELOG.md'));
+    win.once('ready-to-show', () => {
+      win.show();
+    });
   }
 }

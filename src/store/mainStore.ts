@@ -36,6 +36,19 @@ const actions: ActionTree<MainState, any> = {
       });
     });
   },
+
+  async showChangeLog({ state }) {
+    ipcRenderer.send('main', { message: 'showChangeLog' });
+  },
+
+  async getVersion({ state }) {
+    ipcRenderer.send('main', { message: 'getVersion' });
+    return new Promise((resolve) => {
+      ipcRenderer.once('getVersion', (event, payload: string) => {
+        resolve(payload);
+      });
+    });
+  },
 };
 
 const mainStore: Module<MainState, any> = {

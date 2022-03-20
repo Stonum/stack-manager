@@ -25,5 +25,14 @@ Vue.component('HelpIcon', HelpIcon);
 export default Vue.extend({
   name: 'App',
   components: { Toast },
+  async mounted() {
+    const currentVersion = await this.$store.dispatch('mainStore/getVersion');
+    const version = await this.$store.dispatch('mainStore/getSettings', { key: 'currentVersion' });
+
+    if (version != currentVersion) {
+      await this.$store.dispatch('mainStore/showChangeLog');
+      this.$store.dispatch('mainStore/setSettings', { key: 'currentVersion', data: currentVersion });
+    }
+  },
 });
 </script>
