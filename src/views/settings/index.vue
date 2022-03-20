@@ -28,7 +28,6 @@ export default Vue.extend({
         dispatcher_url: '',
         dispatcher_password: '',
         stackversion: '',
-        nginx: '',
         bin: '',
         fullLogging: '',
         refresh_interval: 0,

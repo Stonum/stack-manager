@@ -25,13 +25,6 @@
         </select-folder>
       </v-col>
       <v-col cols="12">
-        <select-folder v-model="settings.nginx" label="Каталог nginx" clearable>
-          <template #append-outer>
-            <help-icon>Каталог установки nginx. Требуется для деплоя фронта</help-icon>
-          </template>
-        </select-folder>
-      </v-col>
-      <v-col cols="12">
         <select-folder v-model="settings.bin" label="Каталог bin" clearable>
           <template #append-outer>
             <help-icon>Общий каталог где будут создаваться папки для запуска веб сервиса. Если не заполнен, создаем в bin проекта</help-icon>
