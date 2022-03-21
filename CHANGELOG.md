@@ -1,7 +1,3 @@
-# Changelog
-
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
-
 ## 0.4.0 (2022-03-20)
 
 
@@ -25,7 +21,7 @@ All notable changes to this project will be documented in this file. See [standa
 * список задач и валидация формы ([f8e7937](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/f8e79372b4e06df843acb9b78a85203ab7be209f))
 * статусы приложений. остановка и запуск ([6044492](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/6044492f29676858a047d88cd52dad55ccefc5d3))
 * удаление и пересборка проекта при редактировании ([7306b07](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/7306b07373a80c00653bfde631c8516eead79c32))
-* **ul:** деплой собранного фронта ([d49d5d1](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/d49d5d1785667b2cc9d45858083b16375afab390))
+* деплой собранного фронта ([d49d5d1](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/d49d5d1785667b2cc9d45858083b16375afab390))
 
 
 ### Bug Fixes

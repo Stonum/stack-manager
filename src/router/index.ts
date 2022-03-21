@@ -3,6 +3,7 @@ import VueRouter, { RouteConfig } from 'vue-router';
 import Main from '@/views/main/index.vue';
 import Settings from '@/views/settings/index.vue';
 import Project from '@/views/project/index.vue';
+import ChangeLog from '@/views/changelog/index.vue';
 
 Vue.use(VueRouter);
 
@@ -22,6 +23,11 @@ const routes: Array<RouteConfig> = [
     path: '/settings',
     name: 'Настройки',
     component: Settings,
+  },
+  {
+    path: '/changelog',
+    name: 'Список изменений',
+    component: ChangeLog,
   },
 ];
 

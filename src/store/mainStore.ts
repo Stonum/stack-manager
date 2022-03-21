@@ -37,8 +37,13 @@ const actions: ActionTree<MainState, any> = {
     });
   },
 
-  async showChangeLog({ state }) {
-    ipcRenderer.send('main', { message: 'showChangeLog' });
+  async getChangeLog({ state }) {
+    ipcRenderer.send('main', { message: 'getChangeLog' });
+    return new Promise((resolve) => {
+      ipcRenderer.once('getChangeLog', (event, payload: string) => {
+        resolve(payload);
+      });
+    });
   },
 
   async getVersion({ state }) {

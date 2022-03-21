@@ -6,6 +6,7 @@ import CommonListener from './commonListener';
 import Window from '../window';
 import { settings } from '../store';
 import cmd from '../cmd';
+import { readMarkdownFile } from '../utils';
 
 export class MainListener extends CommonListener {
   tasks: Task[] = [
@@ -65,11 +66,8 @@ export class MainListener extends CommonListener {
     return res;
   }
 
-  async showChangeLog() {
-    const win = new BrowserWindow({ title: 'Change log', icon: path.join(__dirname, '../build/icon.png'), parent: this.window, modal: true });
-    win.loadFile(path.join(__dirname, '../CHANGELOG.md'));
-    win.once('ready-to-show', () => {
-      win.show();
-    });
+  async getChangeLog() {
+    const result = readMarkdownFile(path.join(__dirname, '../CHANGELOG.md'));
+    return result;
   }
 }

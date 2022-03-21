@@ -30,7 +30,7 @@ export default Vue.extend({
     const version = await this.$store.dispatch('mainStore/getSettings', { key: 'currentVersion' });
 
     if (version != currentVersion) {
-      await this.$store.dispatch('mainStore/showChangeLog');
+      this.$router.push('/changelog');
       this.$store.dispatch('mainStore/setSettings', { key: 'currentVersion', data: currentVersion });
     }
   },
