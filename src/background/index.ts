@@ -7,6 +7,8 @@ import { MainListener, ProjectListener } from './listeners';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
+app.setAppUserModelId(app.getName());
+
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }]);
 

@@ -96,9 +96,13 @@ const actions: ActionTree<ProjectState, any> = {
 
   async projectSendJob(ctx, { jobName, projectId, params }: { jobName: string; projectId: number; params: any }): Promise<any> {
     ipcRenderer.send('project', { message: jobName, projectId, params });
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       ipcRenderer.on(jobName, (event, payload: any) => {
-        resolve(payload);
+        if (payload instanceof Error) {
+          reject(payload);
+        } else {
+          resolve(payload);
+        }
       });
     });
   },
@@ -123,9 +127,13 @@ const actions: ActionTree<ProjectState, any> = {
 
   async fillProjects(): Promise<boolean> {
     ipcRenderer.send('project', { message: 'fillProjects' });
-    return new Promise((resolve) => {
-      ipcRenderer.on('fillProjects', (event, payload: boolean) => {
-        resolve(payload);
+    return new Promise((resolve, reject) => {
+      ipcRenderer.on('fillProjects', (event, payload: boolean | Error) => {
+        if (payload instanceof Error) {
+          reject(payload);
+        } else {
+          resolve(payload);
+        }
       });
     });
   },

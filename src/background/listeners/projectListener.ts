@@ -158,13 +158,16 @@ export class ProjectListener extends CommonListener {
       if (!fs.existsSync(project.path.front)) {
         throw new Error(`Не найден указанный каталог Stack.Front`);
       }
+
+      this.sendInfoMessage(project.name, 'Сборка запущена');
       await cmd.exec('npm ci', project.path.front);
       await cmd.exec('npm run build', project.path.front);
       if (fs.existsSync(path.join(project.path.front, 'dist'))) {
         await copyFiles(path.join(project.path.front, 'dist'), path.join(app.getPath('userData'), 'domains', project.name));
         await generateEnvJson(project, path.join(app.getPath('userData'), 'domains', project.name));
-        this.sendInfoMessage(project.name, 'Build complete');
+        this.sendInfoMessage(project.name, 'Сборка завершена');
       } else {
+        this.sendInfoMessage(project.name, `Не найден dist каталог`);
         throw new Error(`Не найден dist каталог`);
       }
     } else {

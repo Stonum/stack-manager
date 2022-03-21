@@ -20,6 +20,7 @@ export default class CommonListener {
         } catch (e: AnyException) {
           log.error(e);
           this.window.webContents.send('error', e.message || e);
+          event.sender.send(methodName, e);
         }
       } else {
         log.warn('Unknown method - ', methodName);
