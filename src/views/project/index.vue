@@ -114,7 +114,7 @@ export default Vue.extend({
         this.apps[appId].path = '';
       } else {
         this.apps[appId].name = `api_${this.project.name}_${this.apps[appId].prefix}`;
-        this.apps[appId].path = `api/${this.project.name}/${this.apps[appId].prefix}`;
+        this.apps[appId].path = `/api/${this.project.name}/${this.apps[appId].prefix}`;
       }
       this.appNameChanged = true;
     },
