@@ -384,6 +384,9 @@ async function buildProject(project: Project, oldApps?: ProjectApp[]) {
 
     data['SQL-mode'].Server = project.sql.server;
     data['SQL-mode'].Base = project.sql.base;
+    if (data['SQL-mode'].Driver === 'Stack.DBDriver.MSSql') {
+      data['SQL-mode'].Shema = project.sql.base + '.stack';
+    }
 
     // correct path of resources
     for (const key of Object.keys(data['AppPath'])) {
