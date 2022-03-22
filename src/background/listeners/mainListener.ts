@@ -63,11 +63,14 @@ export class MainListener extends CommonListener {
   async restartDispatcher(payload: any) {
     // попытка остановить
     try {
+      this.sendInfoMessage('DispatcherService', 'Остановка службы');
       await cmd.execSudo('net stop DispatcherService');
     } catch (e: AnyException) {
       console.log(e);
     }
+    this.sendInfoMessage('DispatcherService', 'Запуск службы');
     const res = await cmd.execSudo('net start DispatcherService');
+    this.sendInfoMessage('DispatcherService', 'Служба запущена');
     return res;
   }
 
