@@ -13,6 +13,7 @@ import cmd from '../cmd';
 
 export class ProjectListener extends CommonListener {
   private servers = [] as StaticServer[];
+  private staticPath = path.join(app.getPath('userData'), 'domains');
 
   constructor() {
     super('project');
@@ -70,7 +71,27 @@ export class ProjectListener extends CommonListener {
       throw new Error(`Не найден проект с указанным id - ${id}`);
     }
 
-    await deleteProject(project);
+    // удаляем веб серверы
+    const webServer = getWebServer();
+    for (const app of project.apps) {
+      try {
+        await webServer.deleteItem(app.name);
+      } catch (e: AnyException) {
+        // console.error(e);
+      }
+    }
+
+    // удаляем созоданный каталог в бин
+    if (fs.existsSync(project.path.bin)) {
+      fs.rmSync(project.path.bin, { recursive: true, force: true });
+    }
+
+    // удаляем созоданный фронт
+    const frontPath = path.join(this.staticPath, project.name);
+    if (fs.existsSync(frontPath)) {
+      fs.rmSync(frontPath, { recursive: true, force: true });
+    }
+
     projects.set('projects', allProjects);
 
     return {};
@@ -163,8 +184,8 @@ export class ProjectListener extends CommonListener {
       await cmd.exec('npm ci', project.path.front);
       await cmd.exec('npm run build', project.path.front);
       if (fs.existsSync(path.join(project.path.front, 'dist'))) {
-        await copyFiles(path.join(project.path.front, 'dist'), path.join(app.getPath('userData'), 'domains', project.name));
-        await generateEnvJson(project, path.join(app.getPath('userData'), 'domains', project.name));
+        await copyFiles(path.join(project.path.front, 'dist'), path.join(this.staticPath, project.name));
+        await generateEnvJson(project, path.join(this.staticPath, project.name));
         this.sendInfoMessage(project.name, 'Сборка завершена');
       } else {
         this.sendInfoMessage(project.name, `Не найден dist каталог`);
@@ -326,6 +347,8 @@ async function addProject(payload: Project) {
   const project = {} as Project;
   project.name = payload.name;
 
+  project.port = payload.port;
+
   let bindir = settings.get('bin') as string;
   // если каталог не указан, то будем создавать в папке проекта
   if (!bindir) {
@@ -414,9 +437,7 @@ async function buildProject(project: Project, oldApps?: ProjectApp[]) {
 
     data['SQL-mode'].Server = project.sql.server;
     data['SQL-mode'].Base = project.sql.base;
-    if (data['SQL-mode'].Driver === 'Stack.DBDriver.MSSql') {
-      data['SQL-mode'].Shema = project.sql.base + '.stack';
-    }
+    data['SQL-mode'].Schema = project.sql.base + '.stack';
 
     // correct path of resources
     for (const key of Object.keys(data['AppPath'])) {
@@ -500,25 +521,6 @@ async function buildProject(project: Project, oldApps?: ProjectApp[]) {
     });
     webServer.startItem(app.name);
   }
-}
-
-async function deleteProject(project: Project) {
-  // удаляем веб серверы
-  const webServer = getWebServer();
-  for (const app of project.apps) {
-    try {
-      await webServer.deleteItem(app.name);
-    } catch (e: AnyException) {
-      // console.error(e);
-    }
-  }
-
-  // удаляем созоданный каталог в бин
-  if (fs.existsSync(project.path.bin)) {
-    fs.rmSync(project.path.bin, { recursive: true, force: true });
-  }
-
-  return {};
 }
 
 function generateEnvJson(project: Project, envpath: string) {

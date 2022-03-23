@@ -3,7 +3,7 @@
     <app-bar>
       <h4 v-if="appNameChanged && !isNewProject" class="warning--text">Изменено имя приложения, необходимо пересобрать проект</h4>
 
-      <v-btn plain :disabled="!valid || loading" :loading="loading" @click="onBuildProject">Пересобрать</v-btn>
+      <v-btn plain :disabled="!valid || loading" :loading="loading" @click="onBuildProject">{{ isNewProject ? 'Сохранить' : 'Пересобрать' }}</v-btn>
     </app-bar>
 
     <v-form v-model="valid" @submit.prevent="$event = {}">
