@@ -10,7 +10,14 @@
       <v-tabs>
         <v-tab>Общие настройки</v-tab>
         <v-tab-item>
-          <common-tab :project="project" :inifiles="inifiles" :is-new-project="isNewProject" @changeInIFile="onReadIni" @changeProjectFolder="onReadFolder" />
+          <common-tab
+            :project="project"
+            :inifiles="inifiles"
+            :is-new-project="isNewProject"
+            @changeInIFile="onReadIni"
+            @changeProjectFolder="onReadFolder"
+            @changeName="onChangeName"
+          />
         </v-tab-item>
 
         <v-tab>Веб приложения</v-tab>
@@ -109,6 +116,7 @@ export default Vue.extend({
       }
     },
     async onAppCheck({ appId, checked }: { appId: number; checked: boolean }) {
+      console.log(appId);
       if (!checked) {
         this.apps[appId].name = '';
         this.apps[appId].path = '';
@@ -117,6 +125,13 @@ export default Vue.extend({
         this.apps[appId].path = `/api/${this.project.name}/${this.apps[appId].prefix}`;
       }
       this.appNameChanged = true;
+    },
+    onChangeName() {
+      for (const idx in this.apps) {
+        if (this.apps[idx].selected) {
+          this.onAppCheck({ appId: +idx, checked: true });
+        }
+      }
     },
     async onBuildProject() {
       this.loading = true;
@@ -158,7 +173,7 @@ export default Vue.extend({
       if (app) {
         this.apps.push({ ...task, ...app, selected: true });
       } else {
-        this.apps.push({ ...task, name: '', path: '', port: null, args: '', selected: false });
+        this.apps.push({ ...task, name: '', path: '', port: null, args: '', selected: this.isNewProject ? task.selected : false });
       }
     });
   },

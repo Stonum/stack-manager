@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row no-gutters>
       <v-col cols="3">
-        <v-text-field v-model="project.name" label="Краткое название проекта*" :rules="[rules.required]" />
+        <v-text-field v-model="project.name" label="Краткое название проекта*" :rules="[rules.required]" @change="$emit('changeName')" />
       </v-col>
       <v-spacer />
       <v-col cols="3">
