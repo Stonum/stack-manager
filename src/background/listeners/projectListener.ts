@@ -209,6 +209,36 @@ export class ProjectListener extends CommonListener {
     await fillProjects();
     return true;
   }
+
+  async createStaticApp(payload: any) {
+    if (payload.name) {
+      if (payload.name === 'share' || payload.name === 'upload') {
+        const pathFolder = (await settings.get(payload.name)) as string;
+        if (!pathFolder || !fs.existsSync(pathFolder)) {
+          throw new Error('Не указан каталог сервиса');
+        }
+        const name = '_' + payload.name;
+        const webServer = getWebServer();
+        // удалим если уже есть с таким именем для пересоздания
+        try {
+          await webServer.deleteItem(name);
+        } catch (e: AnyException) {
+          //
+        }
+        await webServer.addItem(name, {
+          UrlPathPrefix: '/' + payload.name,
+          StaticContentPath: pathFolder,
+          [payload.name === 'share' ? 'ShareStaticContent' : 'UploadStaticContent']: 1,
+          IsActive: 1,
+          UseComStack: 0,
+          FallbackEnabled: 0,
+          AllowServiceCommands: 0,
+          CheckInterval: 0,
+        });
+        this.sendInfoMessage(name, `Веб сервис создан`);
+      }
+    }
+  }
 }
 
 async function readProjectFolder(pathDir: string) {
@@ -426,6 +456,20 @@ async function buildProject(project: Project, oldApps?: ProjectApp[]) {
     } else {
       data['JavaClient'].JCUpdatePath = jsupath.replace(verpattern, verdir);
     }
+
+    if (!data['API']) {
+      data['API'] = {};
+    }
+
+    const sharePath = settings.get('share') as string;
+    if (sharePath) {
+      data['API'].PublicFilesPath = sharePath;
+    }
+    const uploadPath = settings.get('upload') as string;
+    if (uploadPath) {
+      data['API'].UploadedFilesPath = uploadPath;
+    }
+
     writeIniFile(path.join(pathbin_new, 'stack.ini'), data);
   }
 
@@ -495,6 +539,16 @@ function generateEnvJson(project: Project, envpath: string) {
     })?.prefix;
     config['API_HOST_' + prefix?.toUpperCase()] = disp.origin + app.path;
   }
+
+  const sharePath = settings.get('share') as string;
+  if (sharePath) {
+    config['API_HOST_SHARE'] = disp.origin + '/share';
+  }
+  const uploadPath = settings.get('upload') as string;
+  if (uploadPath) {
+    config['API_HOST_UPLOAD'] = disp.origin + '/upload';
+  }
+
   fs.writeFileSync(path.join(envpath, 'env.json'), JSON.stringify(config, null, '\t'));
 }
 

@@ -4,7 +4,7 @@
 
     <v-tabs>
       <v-tab>Общие параметры</v-tab>
-      <v-tab-item><common-tab :settings="settings" /></v-tab-item>
+      <v-tab-item><common-tab :settings="settings" @create="onCreateService" /></v-tab-item>
 
       <v-tab>Задачи</v-tab>
       <v-tab-item><tasks-tab :tasks="tasks" /></v-tab-item>
@@ -28,6 +28,8 @@ export default Vue.extend({
         dispatcher_url: '',
         dispatcher_password: '',
         stackversion: '',
+        share: '',
+        upload: '',
         bin: '',
         fullLogging: '',
         refresh_interval: 0,
@@ -41,6 +43,10 @@ export default Vue.extend({
         this.$store.dispatch('mainStore/setSettings', { key, data: this.settings[key] });
       }
       this.$store.dispatch('mainStore/setSettings', { key: 'tasks', data: this.tasks });
+    },
+    async onCreateService(service: string) {
+      await this.$store.dispatch('mainStore/setSettings', { key: service, data: this.settings[service] });
+      await this.$store.dispatch('projectStore/createStaticApp', service);
     },
   },
   async mounted() {

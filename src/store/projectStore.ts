@@ -146,6 +146,15 @@ const actions: ActionTree<ProjectState, any> = {
       });
     });
   },
+
+  async createStaticApp(ctx, service: string): Promise<boolean> {
+    ipcRenderer.send('project', { message: 'createStaticApp', name: service });
+    return new Promise((resolve) => {
+      ipcRenderer.on('createStaticApp', (event, payload: boolean) => {
+        resolve(payload);
+      });
+    });
+  },
 };
 
 const getters: GetterTree<ProjectState, any> = {
