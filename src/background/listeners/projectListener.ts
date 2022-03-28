@@ -184,6 +184,9 @@ export class ProjectListener extends CommonListener {
       await cmd.exec('npm ci', project.path.front);
       await cmd.exec('npm run build', project.path.front);
       if (fs.existsSync(path.join(project.path.front, 'dist'))) {
+        if (fs.existsSync(path.join(this.staticPath, project.name))) {
+          fs.rmSync(path.join(this.staticPath, project.name), { recursive: true, force: true });
+        }
         await copyFiles(path.join(project.path.front, 'dist'), path.join(this.staticPath, project.name));
         await generateEnvJson(project, path.join(this.staticPath, project.name));
         this.sendInfoMessage(project.name, 'Сборка завершена');
