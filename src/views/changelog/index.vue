@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <app-bar />
-    <div v-html="html" @click.prevent.stop="onClick" />
+    <div v-html="html" @click.stop="onClick" />
   </v-container>
 </template>
 
@@ -17,11 +17,12 @@ export default Vue.extend({
     };
   },
   methods: {
-    ...mapActions('projectStore', ['projectSendJob']),
+    ...mapActions('mainStore', ['openURL']),
 
     onClick(payload: any) {
+      payload.preventDefault();
       if (payload.target.href) {
-        this.projectSendJob({ jobName: 'openUrl', projectId: null, params: payload.target.href });
+        this.openURL({ url: payload.target.href });
       }
     },
   },

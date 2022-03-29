@@ -59,6 +59,7 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions('projectStore', ['projectSendJob', 'getAppStatus']),
+    ...mapActions('mainStore', ['openURL']),
 
     async onStop(appname?: string) {
       await this.projectSendJob({ jobName: 'appStop', projectId: this.id, params: appname });
@@ -86,7 +87,7 @@ export default Vue.extend({
 
     onOpenUrl(e: Event) {
       e.preventDefault();
-      this.projectSendJob({ jobName: 'openUrl', projectId: this.id, params: this.projectUrl });
+      this.openURL({ url: this.projectUrl });
     },
 
     appColor(name: string | undefined) {

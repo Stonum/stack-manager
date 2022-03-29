@@ -54,6 +54,10 @@ const actions: ActionTree<MainState, any> = {
       });
     });
   },
+
+  async openURL({ state }, { url }: { url?: string }) {
+    ipcRenderer.send('main', { message: 'openURL', url });
+  },
 };
 
 const mainStore: Module<MainState, any> = {

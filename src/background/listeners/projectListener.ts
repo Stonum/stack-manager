@@ -1,6 +1,6 @@
 import CommonListener from './commonListener';
 
-import { app, shell } from 'electron';
+import { app } from 'electron';
 import path from 'path';
 import fs from 'fs';
 
@@ -219,13 +219,6 @@ export class ProjectListener extends CommonListener {
           console.error(e);
         }
       }
-    }
-  }
-
-  openUrl(payload: any) {
-    if (payload.params) {
-      console.log(payload.params);
-      shell.openExternal(payload.params);
     }
   }
 

@@ -1,4 +1,4 @@
-import { dialog, BrowserWindow, app } from 'electron';
+import { dialog, app, shell } from 'electron';
 import path from 'path';
 
 import CommonListener from './commonListener';
@@ -77,5 +77,11 @@ export class MainListener extends CommonListener {
   async getChangeLog() {
     const result = readMarkdownFile(path.join(__dirname, '../CHANGELOG.md'));
     return result;
+  }
+
+  openURL(payload: any) {
+    if (payload.url) {
+      shell.openExternal(payload.url);
+    }
   }
 }
