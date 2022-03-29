@@ -10,7 +10,10 @@
 
         <v-icon v-for="(app, idxtask) in item.apps" :key="idxtask" small :color="appColor(app.name)"> mdi-circle </v-icon>
 
-        <v-btn icon tile small class="ml-5" title="Собрать front" @click.stop="onBuildFront" :loading="buildingFront">
+        <v-btn icon tile small class="ml-5" title="Git pull" @click.stop="onGitPull" :loading="gitpulling">
+          <v-icon color="accent"> mdi-briefcase-download </v-icon>
+        </v-btn>
+        <v-btn icon tile small title="Собрать front" @click.stop="onBuildFront" :loading="buildingFront">
           <v-icon color="accent"> mdi-code-tags-check </v-icon>
         </v-btn>
         <v-btn icon tile small title="Перезапустить все приложения" @click.stop="onRestart">
@@ -50,6 +53,7 @@ export default Vue.extend({
   data() {
     return {
       buildingFront: false,
+      gitpulling: false,
     };
   },
   computed: {
@@ -82,6 +86,15 @@ export default Vue.extend({
         await this.projectSendJob({ jobName: 'buildFront', projectId: this.id });
       } finally {
         this.buildingFront = false;
+      }
+    },
+
+    async onGitPull() {
+      this.gitpulling = true;
+      try {
+        await this.projectSendJob({ jobName: 'gitPull', projectId: this.id });
+      } finally {
+        this.gitpulling = false;
       }
     },
 

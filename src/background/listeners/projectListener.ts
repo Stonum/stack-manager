@@ -256,6 +256,24 @@ export class ProjectListener extends CommonListener {
       }
     }
   }
+
+  async gitPull(payload: any) {
+    const id = payload.projectId;
+    const allProjects = projects.get('projects', []) as Project[];
+    if (allProjects[id]) {
+      const project = allProjects[id];
+
+      if (!project.path.git) {
+        throw new Error(`Не задан каталог git`);
+      }
+
+      this.sendInfoMessage(project.name, 'git pull запущен');
+      await cmd.exec('git pull', project.path.git);
+      this.sendInfoMessage(project.name, 'git pull завершен');
+    } else {
+      throw new Error(`Не найден проект с указанным id - ${id}`);
+    }
+  }
 }
 
 async function readProjectFolder(pathDir: string) {
