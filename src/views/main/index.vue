@@ -70,7 +70,7 @@ export default Vue.extend({
   },
   async mounted() {
     this.onRefresh();
-    const interval = +(await this.$store.dispatch('mainStore/getSettings', { key: 'refresh_interval' })) || 20000;
+    const interval = +(await this.$store.dispatch('mainStore/getSettings', { key: 'refresh_interval' }));
     this.timer = setInterval(() => {
       this.$store.dispatch('projectStore/getAppStatus');
     }, interval);
