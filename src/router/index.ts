@@ -15,7 +15,7 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: '/project/:projectid',
-    name: 'Редактирвоание проекта',
+    name: 'Редактирование проекта',
     component: Project,
     props: true,
   },
