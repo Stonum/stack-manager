@@ -55,6 +55,15 @@ const actions: ActionTree<MainState, any> = {
     });
   },
 
+  async getVisibleWindow({ state }) {
+    ipcRenderer.send('main', { message: 'getVisibleWindow' });
+    return new Promise((resolve) => {
+      ipcRenderer.once('getVisibleWindow', (event, payload: string) => {
+        resolve(payload);
+      });
+    });
+  },
+
   async openURL({ state }, { url }: { url?: string }) {
     ipcRenderer.send('main', { message: 'openURL', url });
   },

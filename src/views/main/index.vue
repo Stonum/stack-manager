@@ -71,7 +71,11 @@ export default Vue.extend({
   async mounted() {
     this.onRefresh();
     const interval = +(await this.$store.dispatch('mainStore/getSettings', { key: 'refresh_interval' }));
-    this.timer = setInterval(() => {
+    this.timer = setInterval(async () => {
+      const isVisible = await this.$store.dispatch('mainStore/getVisibleWindow');
+      if (!isVisible) {
+        return;
+      }
       this.$store.dispatch('projectStore/getAppStatus');
     }, interval);
   },

@@ -32,6 +32,10 @@ export class MainListener extends CommonListener {
     return app.getVersion();
   }
 
+  getVisibleWindow() {
+    return this.window.isVisible();
+  }
+
   async selectDir(payload: any) {
     const res = await dialog.showOpenDialog(this.window, {
       defaultPath: payload.path,
