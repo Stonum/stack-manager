@@ -4,7 +4,10 @@
 
     <v-tabs>
       <v-tab>Общие параметры</v-tab>
-      <v-tab-item><common-tab :settings="settings" @create="onCreateService" /></v-tab-item>
+      <v-tab-item><common-tab :settings="settings" /></v-tab-item>
+
+      <v-tab>Сервисы</v-tab>
+      <v-tab-item><services-tab :settings="settings" @create="onCreateService" /></v-tab-item>
 
       <v-tab>Задачи</v-tab>
       <v-tab-item><tasks-tab :tasks="tasks" /></v-tab-item>
@@ -16,21 +19,26 @@
 import Vue from 'vue';
 import SettingsToolBar from './SettingsTooBar.vue';
 import CommonTab from './CommonTab.vue';
+import ServicesTab from './ServicesTab.vue';
 import TasksTab from './TasksTab.vue';
 
 export default Vue.extend({
   name: 'Settings',
-  components: { SettingsToolBar, CommonTab, TasksTab },
+  components: { SettingsToolBar, CommonTab, ServicesTab, TasksTab },
   data() {
     return {
       settings: {
         dispatcher_folder: '',
         dispatcher_url: '',
         dispatcher_password: '',
+        rabbitmq_url: '',
         stackversion: '',
         share: '',
         upload: '',
         bin: '',
+        jre: '',
+        birt: '',
+        dotnetcore: '',
         fullLogging: '',
         refresh_interval: 0,
       } as Settings,

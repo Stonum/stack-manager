@@ -29,7 +29,11 @@ export default class Dispatcher {
   }
 
   public webServer() {
-    return new WebServer(this);
+    return new ServerAPI(this, 'WebServer');
+  }
+
+  public appServer() {
+    return new ServerAPI(this, 'ProgramSpys');
   }
 
   private async authenticate() {
@@ -402,11 +406,13 @@ class DispatcherAPI {
   }
 }
 
-class WebServer {
+class ServerAPI {
   private api: DispatcherAPI;
+  private type: string;
 
-  constructor(dispatcher: Dispatcher) {
-    this.api = new DispatcherAPI(dispatcher, 'WebServer');
+  constructor(dispatcher: Dispatcher, type: string) {
+    this.type = type;
+    this.api = new DispatcherAPI(dispatcher, type);
   }
 
   get isAuth() {
@@ -447,10 +453,11 @@ class WebServer {
 
   async startItem(name: string): Promise<boolean> {
     await this.setParameters(name, { IsActive: 1 });
-    return await this.api.executeMethod(name, 'ReStart');
+    return await this.api.executeMethod(name, this.type === 'WebServer' ? 'ReStart' : 'Start');
   }
 
   async restartItem(name: string): Promise<boolean> {
-    return await this.api.executeMethod(name, 'ReStart');
+    await this.stopItem(name);
+    return this.startItem(name);
   }
 }

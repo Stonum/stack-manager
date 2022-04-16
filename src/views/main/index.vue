@@ -12,7 +12,7 @@
           </template>
         </v-draggable>
       </v-container>
-      <yes-no-dialog v-if="visibleDialog" header="Удалить проект?" @click="onDelete(delIndex, $event)" />
+      <yes-no-dialog v-if="visibleDialog" :header="`Удалить проект ${delName}?`" @click="onDelete(delIndex, $event)" />
     </v-expansion-panels>
   </v-container>
 </template>
@@ -33,6 +33,7 @@ export default Vue.extend({
       items: [] as Project[],
       visibleDialog: false,
       delIndex: null as number | null,
+      delName: null as string | null,
       loading: false,
       timer: null as any,
     };
@@ -50,6 +51,9 @@ export default Vue.extend({
       if (answer === undefined) {
         this.visibleDialog = true;
         this.delIndex = id;
+        if (id) {
+          this.delName = this.items[id]?.name;
+        }
         return;
       }
       this.visibleDialog = false;

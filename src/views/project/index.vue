@@ -22,7 +22,7 @@
 
         <v-tab>Веб приложения</v-tab>
         <v-tab-item>
-          <apps-tab :apps="apps" :is-new-project="isNewProject" @change="appNameChanged = true" @select="onAppCheck" />
+          <apps-tab :apps="apps" :type="project.type" :is-new-project="isNewProject" @change="appNameChanged = true" @select="onAppCheck" />
         </v-tab-item>
       </v-tabs>
     </v-form>
@@ -70,6 +70,11 @@ export default Vue.extend({
           login: '',
           password: '',
         },
+        gateway: {
+          path: '',
+          port: '',
+        },
+        type: 0,
         apps: [] as ProjectApp[],
       } as Project,
       valid: false,
@@ -104,6 +109,9 @@ export default Vue.extend({
         this.project.sql.server = data.server;
         this.project.sql.base = data.base;
         this.project.path.version = data.version;
+        if (!this.project.gateway.path && data.gateway) {
+          this.project.gateway.path = data.gateway;
+        }
       }
     },
     async onReadFolder() {
@@ -112,11 +120,12 @@ export default Vue.extend({
         this.inifiles = data.ini;
         this.project.path.front = data.front;
         this.project.path.ini = this.inifiles[0];
+        this.project.type = data.type;
+        this.project.gateway.path = data.gateway;
         this.onReadIni();
       }
     },
     async onAppCheck({ appId, checked }: { appId: number; checked: boolean }) {
-      console.log(appId);
       if (!checked) {
         this.apps[appId].name = '';
         this.apps[appId].path = '';
@@ -161,7 +170,7 @@ export default Vue.extend({
       this.project = await this.getProject(+this.projectid);
 
       const data = await this.readIniFile(this.project.path.ini);
-      if (data.version !== this.project.path.version) {
+      if (data.version.toString().toLowerCase() !== this.project.path.version.toLowerCase()) {
         this.version = data.version;
         this.visibleDialog = true;
       }

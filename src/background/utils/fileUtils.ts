@@ -3,6 +3,38 @@ import fs from 'fs';
 import ini from 'ini';
 import fsp from 'fs/promises';
 import MarkdownIt from 'markdown-it';
+import toml from 'toml-js';
+import yaml from 'js-yaml';
+
+export function readSettingsFile(filePath: string) {
+  const ext = path.extname(filePath);
+
+  switch (ext) {
+    case '.ini':
+      return readIniFile(filePath);
+    case '.toml':
+      return readTomlFile(filePath);
+    case '.yml':
+      return readYamlFile(filePath);
+    default:
+      throw new Error('unknown extension');
+  }
+}
+
+export function writeSettingsFile(filePath: string, data: any) {
+  const ext = path.extname(filePath);
+
+  switch (ext) {
+    case '.ini':
+      return writeIniFile(filePath, data);
+    case '.toml':
+      return writeTomlFile(filePath, data);
+    case '.yml':
+      return writeYamlFile(filePath, data);
+    default:
+      throw new Error('unknown extension');
+  }
+}
 
 export function readIniFile(filePath: string) {
   let strData = fs.readFileSync(filePath, 'utf8');
@@ -26,7 +58,11 @@ export function readIniFile(filePath: string) {
 export function writeIniFile(filePath: string, data: any) {
   let strData = ini.stringify(data);
   // костыль с обработкой массивов
-  strData = strData.replaceAll('PRG[]=', 'PRG=').replaceAll('DB[]=', 'DB=').replaceAll('RS[]=', 'RS=').replaceAll('RPT[]=', 'RPT=');
+  strData = strData
+    .replaceAll(/PRG\[\]\=/g, 'PRG=')
+    .replaceAll(/DB\[\]\=/g, 'DB=')
+    .replaceAll(/RS\[\]\=/g, 'RS=')
+    .replaceAll(/RPT\[\]\=/g, 'RPT=');
   // костыль с кавычками в путях
   strData = strData.replaceAll('"', '');
   // костыль с двойными слэшами в путях
@@ -66,4 +102,30 @@ export async function readMarkdownFile(src: string) {
   const strData = fs.readFileSync(src, 'utf8');
   const result = md.render(strData);
   return result;
+}
+
+export function readTomlFile(filePath: string) {
+  let strData = fs.readFileSync(filePath, 'utf8');
+  // уберем закомментированные строки ( я нуб, надо удалить пустые строки тоже... )
+  strData = strData.replace(/\#(.+)$/gm, 'x').replaceAll('x\\r\\n', '');
+  return toml.parse(strData);
+}
+
+export function writeTomlFile(filePath: string, data: any) {
+  fs.writeFileSync(filePath, toml.dump(data));
+}
+
+export function readYamlFile(filePath: string) {
+  return yaml.loadAll(fs.readFileSync(filePath, 'utf8'));
+}
+
+export function writeYamlFile(filePath: string, data: any) {
+  let stringdata = '';
+  for (const doc of data) {
+    if (stringdata.length) {
+      stringdata += '\n---\n';
+    }
+    stringdata += yaml.dump(doc);
+  }
+  fs.writeFileSync(filePath, stringdata);
 }

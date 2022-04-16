@@ -1,5 +1,7 @@
 type AnyException = any;
 
+type StackBackendType = 0 | 1;
+
 interface Settings {
   [index: string]: string | number;
 }
@@ -18,6 +20,9 @@ interface ProjectApp {
   path: string;
   port: number | null;
   args: string;
+  syncThreadCount?: number;
+  asyncThreadCount?: number;
+  asyncTaskCount?: number;
 }
 
 interface ProjectSQLSettings {
@@ -25,6 +30,7 @@ interface ProjectSQLSettings {
   base: string;
   login: string;
   password: string;
+  port?: number;
 }
 
 interface ProjectPaths {
@@ -34,12 +40,20 @@ interface ProjectPaths {
   ini: string;
   front: string;
 }
+
+interface ProjectGateway {
+  name: string;
+  path: string;
+  port: number;
+}
 interface Project {
   name: string;
   path: ProjectPaths;
   sql: ProjectSQLSettings;
   apps: ProjectApp[];
   port: number | null;
+  type: StackBackendType;
+  gateway: ProjectGateway;
 }
 
 interface DispatcherItem {

@@ -8,6 +8,10 @@
       <v-col cols="3">
         <v-text-field v-model="settings.dispatcher_password" label="Пароль" type="password" clearable />
       </v-col>
+      <v-col cols="8">
+        <v-text-field v-model="settings.rabbitmq_url" label="RabbitMQ ( адрес : порт )" placeholder="http://<url>:<port>" prepend-icon="mdi-web" clearable />
+      </v-col>
+      <v-spacer />
       <v-col cols="12">
         <select-folder v-model="settings.dispatcher_folder" label="Каталог службы диспетчера" clearable>
           <template #append-outer>
@@ -32,22 +36,9 @@
         </select-folder>
       </v-col>
       <v-col cols="12">
-        <select-folder v-model="settings.share" label="Каталог публикации файлов (/share)" clearable>
+        <select-folder v-model="settings.jre" label="Каталог jre" clearable>
           <template #append-outer>
-            <v-btn icon tile small @click.stop="$emit('create', 'share')" title="Создать веб сервис">
-              <v-icon> mdi-export-variant </v-icon>
-            </v-btn>
-            <help-icon>Каталог куда стэк публикует файлы отчетов и прочие выгрузки</help-icon>
-          </template>
-        </select-folder>
-      </v-col>
-      <v-col cols="12">
-        <select-folder v-model="settings.upload" label="Каталог загрузки файлов (/upload)" clearable>
-          <template #append-outer>
-            <v-btn icon tile small @click.stop="$emit('create', 'upload')" title="Создать веб сервис">
-              <v-icon> mdi-export-variant </v-icon>
-            </v-btn>
-            <help-icon>Каталог куда загружаются файлы для подкачек</help-icon>
+            <help-icon>Каталог jre</help-icon>
           </template>
         </select-folder>
       </v-col>

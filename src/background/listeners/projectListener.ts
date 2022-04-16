@@ -3,13 +3,22 @@ import CommonListener from './commonListener';
 import { app } from 'electron';
 import path from 'path';
 import fs from 'fs';
+import os from 'os';
 
 import { projects, settings } from '../store';
-import { getFiles, copyFiles, readIniFile, writeIniFile, parseArgs } from '../utils';
+import { getFiles, copyFiles, readSettingsFile, writeSettingsFile, parseArgs, readIniFile } from '../utils';
 
 import Dispatcher from '../middleware/dispatcher';
 import StaticServer from '../middleware/express';
 import cmd from '../cmd';
+import { exec } from 'sudo-prompt';
+
+enum StackBackendType {
+  stack = 0,
+  apphost = 1,
+}
+
+const isDevelopment = process.env.NODE_ENV !== 'production';
 
 export class ProjectListener extends CommonListener {
   private servers = [] as StaticServer[];
@@ -24,18 +33,46 @@ export class ProjectListener extends CommonListener {
 
   getAll() {
     const data = (projects.get('projects', []) as Project[]).map((project: Project) => {
-      return { name: project.name, apps: project.apps, port: project.port };
+      const apps = [...project.apps];
+      if (project.gateway) {
+        apps.unshift({
+          name: project.gateway.name,
+          port: null,
+          path: '',
+          id: 0,
+          args: '',
+        });
+      }
+      return {
+        name: project.name,
+        port: project.port,
+        apps,
+      };
     });
 
     return data;
   }
 
   async getAppStatus() {
-    const webServer = getWebServer();
-    const apps = await webServer.getItems();
-    return apps.map((app: any) => {
-      return { name: app.Name, status: +app.State };
-    });
+    const statuses = [];
+
+    const webServer = getDispatcher().webServer();
+    let apps = await webServer.getItems();
+    statuses.push(
+      ...apps.map((app: any) => {
+        return { name: app.Name, status: +app.State };
+      })
+    );
+
+    const appServer = getDispatcher().appServer();
+    apps = await appServer.getItems();
+    statuses.push(
+      ...apps.map((app: any) => {
+        return { name: app.Name, status: +app.State ? 0 : 2 };
+      })
+    );
+
+    return statuses;
   }
 
   get(payload: any) {
@@ -72,10 +109,17 @@ export class ProjectListener extends CommonListener {
     }
 
     // удаляем веб серверы
-    const webServer = getWebServer();
+    const webServer = project.type === StackBackendType.apphost ? getDispatcher().appServer() : getDispatcher().webServer();
     for (const app of project.apps) {
       try {
         await webServer.deleteItem(app.name);
+      } catch (e: AnyException) {
+        // console.error(e);
+      }
+    }
+    if (project.gateway.name) {
+      try {
+        await webServer.deleteItem(project.gateway.name);
       } catch (e: AnyException) {
         // console.error(e);
       }
@@ -153,17 +197,29 @@ export class ProjectListener extends CommonListener {
   }
 
   async appStart(payload: any) {
-    const webServer = getWebServer();
+    const id = payload.projectId;
+    const allProjects = projects.get('projects', []) as Project[];
+    const apphost_project = (allProjects[id]?.type || StackBackendType.stack) === StackBackendType.apphost;
+
+    const webServer = apphost_project ? getDispatcher().appServer() : getDispatcher().webServer();
     const res = await webServer.startItem(payload.params);
     return res;
   }
   async appReStart(payload: any) {
-    const webServer = getWebServer();
+    const id = payload.projectId;
+    const allProjects = projects.get('projects', []) as Project[];
+    const apphost_project = (allProjects[id]?.type || StackBackendType.stack) === StackBackendType.apphost;
+
+    const webServer = apphost_project ? getDispatcher().appServer() : getDispatcher().webServer();
     const res = await webServer.restartItem(payload.params);
     return res;
   }
   async appStop(payload: any) {
-    const webServer = getWebServer();
+    const id = payload.projectId;
+    const allProjects = projects.get('projects', []) as Project[];
+    const apphost_project = (allProjects[id]?.type || StackBackendType.stack) === StackBackendType.apphost;
+
+    const webServer = apphost_project ? getDispatcher().appServer() : getDispatcher().webServer();
     const res = await webServer.stopItem(payload.params);
     return res;
   }
@@ -181,8 +237,8 @@ export class ProjectListener extends CommonListener {
       }
 
       this.sendInfoMessage(project.name, 'Сборка запущена');
-      await cmd.exec('npm ci', project.path.front);
-      await cmd.exec('npm run build', project.path.front);
+      // await cmd.exec('npm ci', project.path.front);
+      // await cmd.exec('npm run build', project.path.front);
       if (fs.existsSync(path.join(project.path.front, 'dist'))) {
         if (fs.existsSync(path.join(this.staticPath, project.name))) {
           fs.rmSync(path.join(this.staticPath, project.name), { recursive: true, force: true });
@@ -202,6 +258,10 @@ export class ProjectListener extends CommonListener {
   }
 
   async restartServers() {
+    if (isDevelopment) {
+      return;
+    }
+
     for (const server of this.servers) {
       server.close();
     }
@@ -235,7 +295,7 @@ export class ProjectListener extends CommonListener {
           throw new Error('Не указан каталог сервиса');
         }
         const name = '_' + payload.name;
-        const webServer = getWebServer();
+        const webServer = getDispatcher().webServer();
         // удалим если уже есть с таким именем для пересоздания
         try {
           await webServer.deleteItem(name);
@@ -255,6 +315,70 @@ export class ProjectListener extends CommonListener {
         this.sendInfoMessage(name, `Веб сервис создан`);
       }
     }
+    if (payload.name === 'birt') {
+      const jre = (await settings.get('jre')) as string;
+      if (!jre || !fs.existsSync(jre)) {
+        throw new Error('Не указан каталог JRE');
+      }
+      const birt = (await settings.get('birt')) as string;
+      if (!birt || !fs.existsSync(birt)) {
+        throw new Error('Не указан каталог сервиса');
+      }
+      if (!fs.existsSync(path.join(birt, 'BirtWebReporter.jar'))) {
+        throw new Error('Не найден файл BirtWebReporter.jar');
+      }
+
+      const name = '_' + payload.name;
+      const webServer = getDispatcher().appServer();
+      // удалим если уже есть с таким именем для пересоздания
+      try {
+        await webServer.deleteItem(name);
+      } catch (e: AnyException) {
+        //
+      }
+      await webServer.addItem(name, {
+        IsActive: 1,
+        cmd: path.join(jre, 'bin', 'javaw.exe'),
+        path: birt,
+        cmdArgs: ' -Xss4m -Xmx512m -Duser.country=RU -Duser.language=ru -jar BirtWebReporter.jar 20777 -log',
+        restart: 1,
+        restartMaxCount: 5,
+        checkPort: 20777,
+      });
+      webServer.startItem(name);
+      this.sendInfoMessage(name, `Веб сервис создан`);
+    }
+    if (payload.name === 'dotnetcore') {
+      const dotnet = (await settings.get('dotnetcore')) as string;
+      if (!dotnet || !fs.existsSync(dotnet)) {
+        throw new Error('Не указан каталог сервиса');
+      }
+
+      const name = '_' + payload.name;
+      const webServer = getDispatcher().appServer();
+      // удалим если уже есть с таким именем для пересоздания
+      try {
+        await webServer.deleteItem(name);
+      } catch (e: AnyException) {
+        //
+      }
+      await webServer.addItem(name, {
+        IsActive: 1,
+        cmd: 'C:\\Program Files\\dotnet\\dotnet.exe',
+        cmdArgs: `DotNetCore.dll 20001`,
+        path: dotnet,
+        restart: 1,
+        restartMaxCount: 5,
+        checkPort: 20001,
+      });
+      webServer.startItem(name);
+
+      if (!fs.existsSync('C:\\Program Files\\dotnet\\dotnet.exe')) {
+        exec('\\\\FSRV\\KVP_VERSION\\Test\\dotnetcore\\dotnet-runtime-5.0.12-win-x64.exe');
+      }
+
+      this.sendInfoMessage(name, `Веб сервис создан`);
+    }
   }
 
   async gitPull(payload: any) {
@@ -267,9 +391,7 @@ export class ProjectListener extends CommonListener {
         throw new Error(`Не задан каталог git`);
       }
 
-      this.sendInfoMessage(project.name, 'git pull запущен');
       await cmd.exec('git pull', project.path.git);
-      this.sendInfoMessage(project.name, 'git pull завершен');
     } else {
       throw new Error(`Не найден проект с указанным id - ${id}`);
     }
@@ -284,6 +406,8 @@ async function readProjectFolder(pathDir: string) {
   const result = {
     front: '',
     ini: [] as any[],
+    type: StackBackendType.stack,
+    gateway: '',
   };
 
   if (fs.existsSync(path.join(pathDir, 'Stack.Front'))) {
@@ -300,6 +424,14 @@ async function readProjectFolder(pathDir: string) {
     }
   }
 
+  if (fs.existsSync(path.join(pathBin, '0', 'app_host.exe'))) {
+    result.type = StackBackendType.apphost;
+    // поищем гейтвэй
+    const pathGateWay = path.join(pathDir, 'StackGateway');
+    if (fs.existsSync(pathGateWay)) {
+      result.gateway = pathGateWay;
+    }
+  }
   return result;
 }
 const verpattern = /.+(\\\d\d\.\d\d.+?(\\|$))/i;
@@ -311,12 +443,13 @@ function getDataFromIni(pathFile: string) {
 
   const result = {} as any;
 
-  const data = readIniFile(pathFile);
+  const data = readSettingsFile(pathFile);
 
   result.server = data['SQL-mode'].Server;
   result.base = data['SQL-mode'].Base;
   result.version = '';
   result.commonFolder = '';
+  result.gateway = '';
 
   const pathlist = [];
 
@@ -354,6 +487,12 @@ function getDataFromIni(pathFile: string) {
     result.version = result.commonFolder;
   }
 
+  // поищем гейтвэй
+  const pathGateWay = path.join(result.version, 'StackGateway');
+  if (fs.existsSync(pathGateWay)) {
+    result.gateway = pathGateWay;
+  }
+
   return result;
 }
 
@@ -362,6 +501,7 @@ async function addProject(payload: Project) {
   project.name = payload.name;
 
   project.port = payload.port;
+  project.type = payload.type;
 
   let bindir = settings.get('bin') as string;
   // если каталог не указан, то будем создавать в папке проекта
@@ -385,10 +525,24 @@ async function addProject(payload: Project) {
     password: payload.sql.password,
   };
 
+  if (project.type === StackBackendType.apphost) {
+    project.gateway = {
+      name: project.name + '_gateway',
+      path: payload.gateway.path,
+      port: payload.gateway.port,
+    };
+  }
+
   project.apps = [];
 
   for (const app of payload.apps) {
-    project.apps.push({ id: app.id, port: app.port, name: app.name, path: app.path, args: app.args });
+    project.apps.push({
+      id: app.id,
+      port: app.port,
+      name: app.name,
+      path: project.type === StackBackendType.apphost ? '' : app.path,
+      args: app.args,
+    });
   }
 
   // проверим валидность путей
@@ -403,14 +557,17 @@ async function addProject(payload: Project) {
 }
 
 async function buildProject(project: Project, oldApps?: ProjectApp[]) {
-  const webServer = getWebServer();
+  const apphost_project = project.type === StackBackendType.apphost;
+  const webServer = apphost_project ? getDispatcher().appServer() : getDispatcher().webServer();
 
-  // остановим приложения если есть
-  for (const app of project.apps) {
-    try {
-      webServer.stopItem(app.name);
-    } catch (e) {
-      //
+  // удалим старые приложения если есть
+  if (oldApps) {
+    for (const app of oldApps) {
+      try {
+        await webServer.deleteItem(app.name);
+      } catch (e) {
+        //
+      }
     }
   }
 
@@ -447,93 +604,75 @@ async function buildProject(project: Project, oldApps?: ProjectApp[]) {
 
   // редактируем stack.ini и создаем в целевом каталоге
   if (fs.existsSync(pathini)) {
-    const data = readIniFile(pathini);
-
-    data['SQL-mode'].Server = project.sql.server;
-    data['SQL-mode'].Base = project.sql.base;
-    data['SQL-mode'].Schema = project.sql.base + '.stack';
-
-    // correct path of resources
-    for (const key of Object.keys(data['AppPath'])) {
-      for (const idx in data['AppPath'][key]) {
-        const respath = data['AppPath'][key][idx];
-        if (respath.startsWith('..')) {
-          data['AppPath'][key][idx] = path.join(pathbin_old, respath);
-        } else {
-          data['AppPath'][key][idx] = respath.replace(verpattern, verdir);
-        }
-      }
-    }
-    const libpath = data['LibPath'].Path || '';
-    if (libpath.startsWith('..')) {
-      data['LibPath'].Path = path.join(pathbin_old, libpath);
-    } else {
-      data['LibPath'].Path = libpath.replace(verpattern, verdir);
-    }
-
-    const jspath = data['JavaClient'].JCPath || '';
-    if (jspath.startsWith('..')) {
-      data['JavaClient'].JCPath = path.join(pathbin_old, jspath);
-    } else {
-      data['JavaClient'].JCPath = jspath.replace(verpattern, verdir);
-    }
-
-    const jrepath = data['JavaClient'].JREPath || '';
-    if (jrepath.startsWith('..')) {
-      data['JavaClient'].JREPath = path.join(pathbin_old, jrepath);
-    } else {
-      data['JavaClient'].JREPath = jrepath.replace(verpattern, verdir);
-    }
-
-    const jsupath = data['JavaClient'].JCUpdatePath || '';
-    if (jsupath.startsWith('..')) {
-      data['JavaClient'].JCUpdatePath = path.join(pathbin_old, jsupath);
-    } else {
-      data['JavaClient'].JCUpdatePath = jsupath.replace(verpattern, verdir);
-    }
-
-    if (!data['API']) {
-      data['API'] = {};
-    }
-
-    const sharePath = settings.get('share') as string;
-    if (sharePath) {
-      data['API'].PublicFilesPath = sharePath;
-    }
-    const uploadPath = settings.get('upload') as string;
-    if (uploadPath) {
-      data['API'].UploadedFilesPath = uploadPath;
-    }
-
-    writeIniFile(path.join(pathbin_new, 'stack.ini'), data);
+    generateStackIni(project, pathini, pathbin_old, pathbin_new, verdir);
   }
 
-  if (oldApps && oldApps.length) {
-    for (const app of oldApps) {
-      // предварительно удалим если есть итемы с  этим именем
-      try {
-        await webServer.deleteItem(app.name);
-      } catch (e: AnyException) {
-        //
-      }
+  if (apphost_project) {
+    generateCredentials(project, pathbin_new);
+    const gatewaySettingsPath = generateGatewaySettings(project, pathbin_new);
+
+    try {
+      await webServer.deleteItem(project.gateway.name);
+    } catch (e) {
+      //
+    }
+
+    // деплоим гейтвэй
+    if (project.gateway.name) {
+      await webServer.addItem(project.gateway.name, {
+        IsActive: 1,
+        cmd: path.join(settings.get('jre'), 'bin', 'javaw.exe'),
+        cmdArgs: `-jar ${getGatewayFileName(project.gateway.path)} --spring.config.location=classpath:/application.yml,classpath:file:${gatewaySettingsPath}`,
+        path: project.gateway.path,
+        restart: 1,
+        restartMaxCount: 5,
+      });
+      await webServer.startItem(project.gateway.name);
     }
   }
 
-  for (const app of project.apps) {
-    await webServer.addItem(app.name, {
-      UrlPathPrefix: app.path,
-      StackProgramDir: project.path.bin,
-      StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${app.id} -LOADRES --inspect=${app.port || '0000'} -nc ${app.args}`,
-      IsActive: 1,
-      FunctionName: 'StackAPI_kvplata_v1',
-      ResultContentType: 'application/json;charset=utf-8',
-      UseComStack: 1,
-      ShareStaticContent: 0,
-      UploadStaticContent: 0,
-      FallbackEnabled: 0,
-      AllowServiceCommands: 0,
-    });
-    webServer.startItem(app.name);
+  if (!apphost_project) {
+    for (const app of project.apps) {
+      await webServer.addItem(app.name, {
+        UrlPathPrefix: app.path,
+        StackProgramDir: project.path.bin,
+        StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${app.id} -LOADRES --inspect=${app.port || '0000'} -nc ${app.args}`,
+        IsActive: 1,
+        FunctionName: 'StackAPI_kvplata_v1',
+        ResultContentType: 'application/json;charset=utf-8',
+        UseComStack: 1,
+        ShareStaticContent: 0,
+        UploadStaticContent: 0,
+        FallbackEnabled: 0,
+        AllowServiceCommands: 0,
+      });
+      webServer.startItem(app.name);
+    }
+  }
+  if (apphost_project) {
+    for (const app of project.apps) {
+      generateTaskSettings(project, app);
+
+      const task = (settings.get('tasks') as Task[])?.find((task: Task) => task.id === app.id);
+      const syncThreadCount = app.syncThreadCount || 20;
+      const asyncThreadCount = app.asyncThreadCount || 2;
+      const asyncTaskCount = app.asyncTaskCount || 5;
+
+      const addParams = app.id === 11075 ? ',очищатьПросроченныеДанные:true' : '';
+      const expression = `ЗапуститьОчередьСообщений(@{количествоПотоков:${syncThreadCount},количествоАсинхронныхПотоков:${asyncThreadCount},количествоАсинхронныхРабот:${asyncTaskCount}${addParams}})`;
+      const rabbitsettings = `settings_${task?.prefix || app.id}.toml`;
+      const cmdArgs = `--task=${app.id} --inspect=${app.port || '0000'} -r testsrv:9898 -i "stack.ini" -c "credentials.ini" --rabbit="${rabbitsettings}" -f "${expression}"`;
+
+      await webServer.addItem(app.name, {
+        IsActive: 1,
+        cmd: path.join(project.path.bin, 'app_host.exe'),
+        cmdArgs,
+        path: project.path.bin,
+        restart: 1,
+        restartMaxCount: 5,
+      });
+      webServer.startItem(app.name);
+    }
   }
 }
 
@@ -549,11 +688,16 @@ function generateEnvJson(project: Project, envpath: string) {
   const tasks = settings.get('tasks') as Task[];
   const disp = new URL(settings.get('dispatcher_url') as string);
   const config = readIniFile(envPath);
-  for (const app of project.apps) {
-    const prefix = tasks.find((task) => {
-      return task.id === app.id;
-    })?.prefix;
-    config['API_HOST_' + prefix?.toUpperCase()] = disp.origin + app.path;
+  if (project.type === StackBackendType.apphost) {
+    config['API_HOST'] = `http://${os.hostname().toLowerCase()}:${project.gateway.port}`;
+  }
+  if (project.type === StackBackendType.stack) {
+    for (const app of project.apps) {
+      const prefix = tasks.find((task) => {
+        return task.id === app.id;
+      })?.prefix;
+      config['API_HOST_' + prefix?.toUpperCase()] = disp.origin + app.path;
+    }
   }
 
   const sharePath = settings.get('share') as string;
@@ -568,8 +712,219 @@ function generateEnvJson(project: Project, envpath: string) {
   fs.writeFileSync(path.join(envpath, 'env.json'), JSON.stringify(config, null, '\t'));
 }
 
+function generateStackIni(project: Project, pathini: string, binold: string, binnew: string, version: string) {
+  const data = readSettingsFile(pathini);
+
+  data['SQL-mode'].Server = project.sql.server;
+  data['SQL-mode'].Base = project.sql.base;
+  data['SQL-mode'].Schema = project.type !== StackBackendType.apphost ? project.sql.base + '.stack' : 'stack';
+
+  // correct path of resources
+  for (const key of Object.keys(data['AppPath'])) {
+    for (const idx in data['AppPath'][key]) {
+      const respath = data['AppPath'][key][idx];
+      if (respath.startsWith('..')) {
+        data['AppPath'][key][idx] = path.join(binold, respath);
+      } else {
+        data['AppPath'][key][idx] = respath.replace(verpattern, version);
+      }
+    }
+  }
+
+  if (project.type !== StackBackendType.apphost) {
+    const libpath = data['LibPath'].Path || '';
+    if (libpath.startsWith('..')) {
+      data['LibPath'].Path = path.join(binold, libpath);
+    } else {
+      data['LibPath'].Path = libpath.replace(verpattern, version);
+    }
+  }
+
+  const jspath = data['JavaClient'].JCPath || '';
+  if (jspath.startsWith('..')) {
+    data['JavaClient'].JCPath = path.join(binold, jspath);
+  } else {
+    data['JavaClient'].JCPath = jspath.replace(verpattern, version);
+  }
+
+  const jrepath = data['JavaClient'].JREPath || '';
+  if (jrepath.startsWith('..')) {
+    data['JavaClient'].JREPath = path.join(binold, jrepath);
+  } else {
+    data['JavaClient'].JREPath = jrepath.replace(verpattern, version);
+  }
+
+  const jsupath = data['JavaClient'].JCUpdatePath || '';
+  if (jsupath.startsWith('..')) {
+    data['JavaClient'].JCUpdatePath = path.join(binold, jsupath);
+  } else {
+    data['JavaClient'].JCUpdatePath = jsupath.replace(verpattern, version);
+  }
+
+  if (!data['API']) {
+    data['API'] = {};
+  }
+
+  const sharePath = settings.get('share') as string;
+  if (sharePath) {
+    data['API'].PublicFilesPath = sharePath;
+  }
+  const uploadPath = settings.get('upload') as string;
+  if (uploadPath) {
+    data['API'].UploadedFilesPath = uploadPath;
+  }
+
+  writeSettingsFile(path.join(binnew, 'stack.ini'), data);
+}
+
+function generateTaskSettings(project: Project, app: ProjectApp) {
+  const commonSettingsPath = path.join(project.path.version, 'Stack.srv', 'Bin', 'ini', 'settings.toml');
+
+  let tomlData = {} as any;
+
+  if (fs.existsSync(commonSettingsPath)) {
+    tomlData = readSettingsFile(commonSettingsPath);
+  } else {
+    tomlData.RabbitMQrpc = {};
+    tomlData.RabbitMQrpc.exchange = '';
+    tomlData.RabbitMQrpc.routing_key = 'rpc_queue';
+    tomlData.RabbitMQrpc.qos = 1;
+    tomlData.RabbitMQrpc.product_name = 'StackExe';
+
+    tomlData.RabbitMQService = {};
+    tomlData.RabbitMQService.queue = '';
+    tomlData.RabbitMQService.product_name = 'StackService';
+  }
+  const task = (settings.get('tasks') as Task[])?.find((task: Task) => task.id === app.id);
+
+  const taskid = task?.prefix || app.id;
+  const rabbithost = new URL(settings.get('rabbitmq_url'));
+  if (rabbithost) {
+    tomlData.RabbitMQrpc.host = tomlData.RabbitMQService.host = rabbithost.hostname;
+    tomlData.RabbitMQrpc.port = tomlData.RabbitMQService.port = +rabbithost.port;
+
+    // tomlData.RabbitMQrpc.vhost = tomlData.RabbitMQService.vhost = '/';
+    // settings.RabbitMQrpc.login = settings.RabbitMQService.login = 'stack';
+    // settings.RabbitMQrpc.password = settings.RabbitMQService.password = 'stack';
+
+    tomlData.RabbitMQrpc.routing_key = os.hostname + '_' + project.name + '_' + taskid;
+    tomlData.RabbitMQrpc.routing_key_asynch = os.hostname + '_' + project.name + '_' + taskid;
+
+    tomlData.RabbitMQService.exchange_in = os.hostname + '_' + project.name + '_service_to_backend';
+    tomlData.RabbitMQService.exchange_out = os.hostname + '_' + project.name + '_service_from_backend';
+    tomlData.RabbitMQService.task = taskid;
+  }
+
+  const queueSettingsPath = path.join(project.path.bin, `settings_${taskid}.toml`);
+  writeSettingsFile(queueSettingsPath, tomlData);
+}
+
+function generateCredentials(project: Project, pathnew: string) {
+  const data = {
+    Database: {
+      login: project.sql.login,
+      password: project.sql.password,
+    },
+  };
+  writeSettingsFile(path.join(pathnew, 'credentials.ini'), data);
+}
+
+function generateGatewaySettings(project: Project, pathnew: string) {
+  const templateYaml = path.join(project.gateway.path || '', 'application.yml');
+  if (fs.existsSync(templateYaml)) {
+    const dataYaml = readSettingsFile(templateYaml);
+    const common = dataYaml[0];
+
+    common.server.port = +project.gateway.port || common.server.port;
+    common.stack.security.cors.allowedOrigins = createAllowedOrigins([8080, 8081, project.port || 0]);
+
+    const tasks = settings.get('tasks') as Task[];
+
+    common.stack.queue.rpc.tasks = Object.fromEntries(
+      project.apps.map((app: ProjectApp) => {
+        const task = tasks.find((task: Task) => task.id === app.id);
+        const taskid = task?.prefix || app.id;
+        return [
+          taskid,
+          {
+            url: '',
+            exchange: '',
+            routingKey: os.hostname + '_' + project.name + '_' + taskid,
+            routingKeyAsync: os.hostname + '_' + project.name + '_' + taskid,
+            useAsyncCache: false,
+          },
+        ];
+      })
+    );
+
+    common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
+    common.stack.queue.service.exchangeOut = os.hostname + '_' + project.name + '_service_to_backend';
+
+    const rabbithost = new URL(settings.get('rabbitmq_url'));
+    if (rabbithost) {
+      common.spring.rabbitmq.host = rabbithost.hostname;
+      common.spring.rabbitmq.port = +rabbithost.port;
+
+      // common.spring.rabbitmq['virtual-host'] = '/';
+      // common.spring.rabbitmq.username = 'stack';
+      // common.spring.rabbitmq.password = 'stack';
+    }
+
+    common.spring.profiles.active = 'postgresql';
+    const profile = (() => {
+      for (let i = 1; i < dataYaml.length; i++) {
+        const cur = dataYaml[i];
+        if (cur.spring && cur.spring.config && cur.spring.config.activate && cur.spring.config.activate['on-profile'] === common.spring.profiles.active) {
+          return cur;
+        }
+      }
+      return {
+        spring: {
+          config: {
+            activate: {
+              'on-profile': common.spring.profiles.active,
+            },
+          },
+        },
+      };
+    })();
+    profile.spring.datasource = {
+      url: `jdbc:postgresql://${project.sql.server}:${project.sql.port || 5432}/${project.sql.base}`,
+      username: project.sql.login,
+      password: project.sql.password,
+    };
+
+    writeSettingsFile(path.join(pathnew, 'application.yml'), dataYaml);
+    return path.join(pathnew, 'application.yml');
+  }
+}
+
+function createAllowedOrigins(ports: number[]) {
+  const result = [] as string[];
+  const push = (host: string) =>
+    ports.forEach((port: number) => {
+      result.push(`http://${host}:${port}`);
+    });
+  push('localhost');
+  push(os.hostname());
+  Object.values(os.networkInterfaces()).forEach((ni: any[]) => {
+    ni.filter((el) => el.family === 'IPv4').forEach((el) => push(el.address));
+  });
+  return result;
+}
+
+function getGatewayFileName(path: string) {
+  return (
+    fs
+      .readdirSync(path, { withFileTypes: true })
+      .filter((e) => e.isFile() && /^stackgateway-.*\.jar$/.test(e.name))
+      .map((e) => e.name)
+      .pop() || 'stackgateway-0.0.3.jar'
+  );
+}
+
 async function fillProjects() {
-  const ws = getWebServer();
+  const ws = getDispatcher().webServer();
   const items = await ws.getItems();
   if (items.length === 0) {
     throw new Error('Не найдено элементов веб сервера');
@@ -667,10 +1022,10 @@ async function fillProjects() {
   projects.set('projects', allProjects);
 }
 
-let webServer: any;
-function getWebServer() {
-  if (webServer && webServer.isAuth) {
-    return webServer;
+let dispatcher: any;
+function getDispatcher() {
+  if (dispatcher && dispatcher.isAuth) {
+    return dispatcher;
   }
 
   const address = settings.get('dispatcher_url') as string;
@@ -683,7 +1038,6 @@ function getWebServer() {
     throw new Error('Не указан пароль для диспетчера');
   }
 
-  const setupDispatcher = new Dispatcher(address, secret);
-  webServer = setupDispatcher.webServer();
-  return webServer;
+  dispatcher = new Dispatcher(address, secret);
+  return dispatcher;
 }
