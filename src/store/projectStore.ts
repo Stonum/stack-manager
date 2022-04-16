@@ -16,41 +16,37 @@ const state: ProjectState = {
   apps: [],
 };
 
+const eventResolver = function (name: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    ipcRenderer.on(name, (event, payload: any | Error): any => {
+      if (payload instanceof Error) {
+        reject(payload);
+      } else {
+        resolve(payload);
+      }
+    });
+  });
+};
+
 const actions: ActionTree<ProjectState, any> = {
   async projectAdd(ctx, params: Project): Promise<any> {
     ipcRenderer.send('project', { message: 'add', params });
-    return new Promise((resolve) => {
-      ipcRenderer.on('add', (event, payload: any) => {
-        resolve(payload);
-      });
-    });
+    return eventResolver('add');
   },
 
   async projectDelete(ctx, projectId: number): Promise<any> {
     ipcRenderer.send('project', { message: 'delete', projectId });
-    return new Promise((resolve) => {
-      ipcRenderer.on('delete', (event, payload: any) => {
-        resolve(payload);
-      });
-    });
+    return eventResolver('delete');
   },
 
   async projectRebuild(ctx, { projectId, params }: { projectId: number; params: Project }): Promise<any> {
     ipcRenderer.send('project', { message: 'rebuild', projectId, params });
-    return new Promise((resolve) => {
-      ipcRenderer.on('rebuild', (event, payload: any) => {
-        resolve(payload);
-      });
-    });
+    return eventResolver('rebuild');
   },
 
   async projectSave(ctx, { projectId, params }: { projectId: number; params: Project }): Promise<any> {
     ipcRenderer.send('project', { message: 'save', projectId, params });
-    return new Promise((resolve) => {
-      ipcRenderer.on('save', (event, payload: any) => {
-        resolve(payload);
-      });
-    });
+    return eventResolver('save');
   },
 
   async getProjects({ state, commit }): Promise<Project[]> {
@@ -87,73 +83,37 @@ const actions: ActionTree<ProjectState, any> = {
 
   async getProject(ctx, projectId: number): Promise<Project> {
     ipcRenderer.send('project', { message: 'get', projectId });
-    return new Promise((resolve) => {
-      ipcRenderer.on('get', (event, payload: Project) => {
-        resolve(payload);
-      });
-    });
+    return eventResolver('get');
   },
 
   async projectSendJob(ctx, { jobName, projectId, params }: { jobName: string; projectId: number; params: any }): Promise<any> {
     ipcRenderer.send('project', { message: jobName, projectId, params });
-    return new Promise((resolve, reject) => {
-      ipcRenderer.on(jobName, (event, payload: any) => {
-        if (payload instanceof Error) {
-          reject(payload);
-        } else {
-          resolve(payload);
-        }
-      });
-    });
+    return eventResolver(jobName);
   },
 
   async readProjectFolder(ctx, path: string): Promise<any> {
     ipcRenderer.send('project', { message: 'readFolder', path });
-    return new Promise((resolve) => {
-      ipcRenderer.on('readFolder', (event, payload: any) => {
-        resolve(payload);
-      });
-    });
+    return eventResolver('readFolder');
   },
 
   async readIniFile(ctx, path: string): Promise<any> {
     ipcRenderer.send('project', { message: 'readIniFile', path });
-    return new Promise((resolve) => {
-      ipcRenderer.on('readIniFile', (event, payload: any) => {
-        resolve(payload);
-      });
-    });
+    return eventResolver('readIniFile');
   },
 
   async fillProjects(): Promise<boolean> {
     ipcRenderer.send('project', { message: 'fillProjects' });
-    return new Promise((resolve, reject) => {
-      ipcRenderer.on('fillProjects', (event, payload: boolean | Error) => {
-        if (payload instanceof Error) {
-          reject(payload);
-        } else {
-          resolve(payload);
-        }
-      });
-    });
+    return eventResolver('fillProjects');
   },
 
   async moveProject(ctx, { oldIndex, newIndex }: { oldIndex: number; newIndex: number }): Promise<boolean> {
     ipcRenderer.send('project', { message: 'moveProject', oldIndex, newIndex });
-    return new Promise((resolve) => {
-      ipcRenderer.on('moveProject', (event, payload: boolean) => {
-        resolve(payload);
-      });
-    });
+    return eventResolver('moveProject');
   },
 
   async createStaticApp(ctx, service: string): Promise<boolean> {
     ipcRenderer.send('project', { message: 'createStaticApp', name: service });
-    return new Promise((resolve) => {
-      ipcRenderer.on('createStaticApp', (event, payload: boolean) => {
-        resolve(payload);
-      });
-    });
+    return eventResolver('createStaticApp');
   },
 };
 

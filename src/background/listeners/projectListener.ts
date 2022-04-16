@@ -89,6 +89,7 @@ export class ProjectListener extends CommonListener {
   async add(payload: any) {
     const allProjects = projects.get('projects', []) as Project[];
     const project = await addProject(payload.params);
+    checkProject(project, null);
     allProjects.push(project);
     projects.set('projects', allProjects);
     await buildProject(project);
@@ -146,6 +147,7 @@ export class ProjectListener extends CommonListener {
 
     const data = projects.get('projects', []) as Project[];
     if (data && data[id]) {
+      checkProject(project, id);
       data[id] = project;
       projects.set('projects', data);
     } else {
@@ -162,6 +164,7 @@ export class ProjectListener extends CommonListener {
 
     const data = projects.get('projects', []) as Project[];
     if (data && data[id]) {
+      checkProject(project, id);
       await buildProject(project, data[id].apps);
       data[id] = project;
       projects.set('projects', data);
@@ -540,9 +543,22 @@ async function addProject(payload: Project) {
       id: app.id,
       port: app.port,
       name: app.name,
-      path: project.type === StackBackendType.apphost ? '' : app.path,
+      path: app.path,
       args: app.args,
     });
+  }
+
+  return project;
+}
+
+function checkProject(project: Project, index: number | null) {
+  const allProjects = projects.get('projects', []) as Project[];
+
+  const indname = allProjects.findIndex((p: Project, id: number) => {
+    return p.name === project.name && id !== index;
+  });
+  if (indname >= 0) {
+    throw new Error(`Уже есть проект с таким именем`);
   }
 
   // проверим валидность путей
@@ -553,7 +569,24 @@ async function addProject(payload: Project) {
     }
   }
 
-  return project;
+  if (project.gateway.path && !fs.existsSync(project.gateway.path)) {
+    throw new Error(`Некорректный путь ${project.gateway.path}`);
+  }
+
+  const ports = [];
+  ports.push(project.port);
+  ports.push(project.gateway.port);
+
+  ports.forEach((port: number | null | undefined) => {
+    if (port) {
+      const res = allProjects.find((p: Project, id: number) => {
+        return id !== index && (p.gateway?.port === port || p.port === port);
+      });
+      if (res) {
+        throw new Error(`Указанный front порт ${port} уже используется в проекте ${res.name}`);
+      }
+    }
+  });
 }
 
 async function buildProject(project: Project, oldApps?: ProjectApp[]) {

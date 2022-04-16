@@ -72,7 +72,7 @@ export default Vue.extend({
         },
         gateway: {
           path: '',
-          port: '',
+          port: 8182,
         },
         type: 0,
         apps: [] as ProjectApp[],
@@ -97,6 +97,9 @@ export default Vue.extend({
   computed: {
     isNewProject(): boolean {
       return +this.projectid === -1;
+    },
+    isAppHost(): boolean {
+      return this.project.type === 1;
     },
   },
 
@@ -131,7 +134,7 @@ export default Vue.extend({
         this.apps[appId].path = '';
       } else {
         this.apps[appId].name = `api_${this.project.name}_${this.apps[appId].prefix}`;
-        this.apps[appId].path = `/api/${this.project.name}/${this.apps[appId].prefix}`;
+        this.apps[appId].path = this.isAppHost ? '' : `/api/${this.project.name}/${this.apps[appId].prefix}`;
       }
       this.appNameChanged = true;
     },
@@ -157,11 +160,11 @@ export default Vue.extend({
         } else {
           await this.projectRebuild({ projectId: +this.projectid, params: this.project });
         }
+        this.appNameChanged = false;
+        this.$router.go(-1);
       } finally {
         this.loading = false;
       }
-      this.appNameChanged = false;
-      this.$router.go(-1);
     },
   },
 
