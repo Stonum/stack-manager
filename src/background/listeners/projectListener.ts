@@ -61,7 +61,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State };
-      })
+      }),
     );
 
     const appServer = getDispatcher().appServer();
@@ -69,7 +69,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State ? 0 : 2 };
-      })
+      }),
     );
 
     return statuses;
@@ -916,7 +916,7 @@ function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      })
+      }),
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
@@ -969,8 +969,8 @@ function createAllowedOrigins(ports: number[]) {
     });
   push('localhost');
   push(os.hostname());
-  Object.values(os.networkInterfaces()).forEach((ni: any[]) => {
-    ni.filter((el) => el.family === 'IPv4').forEach((el) => push(el.address));
+  Object.values(os.networkInterfaces()).forEach((ni: any) => {
+    ni.filter((el: any) => el.family === 'IPv4').forEach((el: any) => push(el.address));
   });
   return result;
 }
