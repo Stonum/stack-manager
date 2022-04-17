@@ -38,7 +38,9 @@ export default Vue.extend({
         bin: '',
         jre: '',
         birt: '',
+        birt_port: '',
         dotnetcore: '',
+        dotnetcore_port: '',
         fullLogging: '',
         refresh_interval: 0,
       } as Settings,
@@ -54,6 +56,9 @@ export default Vue.extend({
     },
     async onCreateService(service: string) {
       await this.$store.dispatch('mainStore/setSettings', { key: service, data: this.settings[service] });
+      if (service === 'birt' || service === 'dotnetcore') {
+        await this.$store.dispatch('mainStore/setSettings', { key: service + '_port', data: this.settings[service + '_port'] });
+      }
       await this.$store.dispatch('projectStore/createStaticApp', service);
     },
   },

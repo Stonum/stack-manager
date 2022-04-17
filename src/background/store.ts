@@ -17,6 +17,12 @@ const defSettings = {
   ] as Task[],
 
   refresh_interval: 20000,
+  share_name: '_share',
+  upload_name: '_upload',
+  birt_name: '_birt',
+  birt_port: 20777,
+  dotnetcore_name: '_dotnetcore',
+  dotnetcore_port: 20001,
 };
 
 export const settings = new Store({ name: 'settings', cwd: 'config', defaults: defSettings });

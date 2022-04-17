@@ -297,7 +297,7 @@ export class ProjectListener extends CommonListener {
         if (!pathFolder || !fs.existsSync(pathFolder)) {
           throw new Error('Не указан каталог сервиса');
         }
-        const name = '_' + payload.name;
+        const name = (await settings.get(payload.name + '_name')) as string;
         const webServer = getDispatcher().webServer();
         // удалим если уже есть с таким именем для пересоздания
         try {
@@ -331,7 +331,10 @@ export class ProjectListener extends CommonListener {
         throw new Error('Не найден файл BirtWebReporter.jar');
       }
 
-      const name = '_' + payload.name;
+      const birt_name = (await settings.get('birt_name')) as string;
+      const birt_port = (await settings.get('birt_port')) as number;
+
+      const name = birt_name;
       const webServer = getDispatcher().appServer();
       // удалим если уже есть с таким именем для пересоздания
       try {
@@ -343,10 +346,10 @@ export class ProjectListener extends CommonListener {
         IsActive: 1,
         cmd: path.join(jre, 'bin', 'javaw.exe'),
         path: birt,
-        cmdArgs: ' -Xss4m -Xmx512m -Duser.country=RU -Duser.language=ru -jar BirtWebReporter.jar 20777 -log',
+        cmdArgs: ' -Xss4m -Xmx512m -Duser.country=RU -Duser.language=ru -jar BirtWebReporter.jar ' + birt_port + ' -log',
         restart: 1,
         restartMaxCount: 5,
-        checkPort: 20777,
+        checkPort: birt_port,
       });
       webServer.startItem(name);
       this.sendInfoMessage(name, `Веб сервис создан`);
@@ -357,7 +360,10 @@ export class ProjectListener extends CommonListener {
         throw new Error('Не указан каталог сервиса');
       }
 
-      const name = '_' + payload.name;
+      const dotnet_name = (await settings.get('dotnetcore_name')) as string;
+      const dotnet_port = (await settings.get('dotnetcore_port')) as number;
+
+      const name = dotnet_name;
       const webServer = getDispatcher().appServer();
       // удалим если уже есть с таким именем для пересоздания
       try {
@@ -368,11 +374,11 @@ export class ProjectListener extends CommonListener {
       await webServer.addItem(name, {
         IsActive: 1,
         cmd: 'C:\\Program Files\\dotnet\\dotnet.exe',
-        cmdArgs: `DotNetCore.dll 20001`,
+        cmdArgs: `DotNetCore.dll ` + dotnet_port,
         path: dotnet,
         restart: 1,
         restartMaxCount: 5,
-        checkPort: 20001,
+        checkPort: dotnet_port,
       });
       webServer.startItem(name);
 
@@ -569,13 +575,13 @@ function checkProject(project: Project, index: number | null) {
     }
   }
 
-  if (project.gateway.path && !fs.existsSync(project.gateway.path)) {
+  if (project.gateway?.path && !fs.existsSync(project.gateway.path)) {
     throw new Error(`Некорректный путь ${project.gateway.path}`);
   }
 
   const ports = [];
   ports.push(project.port);
-  ports.push(project.gateway.port);
+  ports.push(project.gateway?.port);
 
   ports.forEach((port: number | null | undefined) => {
     if (port) {
@@ -745,7 +751,7 @@ function generateEnvJson(project: Project, envpath: string) {
   fs.writeFileSync(path.join(envpath, 'env.json'), JSON.stringify(config, null, '\t'));
 }
 
-function generateStackIni(project: Project, pathini: string, binold: string, binnew: string, version: string) {
+async function generateStackIni(project: Project, pathini: string, binold: string, binnew: string, version: string) {
   const data = readSettingsFile(pathini);
 
   data['SQL-mode'].Server = project.sql.server;
@@ -805,6 +811,24 @@ function generateStackIni(project: Project, pathini: string, binold: string, bin
   const uploadPath = settings.get('upload') as string;
   if (uploadPath) {
     data['API'].UploadedFilesPath = uploadPath;
+  }
+
+  if (settings.get('birt') && settings.get('birt_port')) {
+    if (!data['BirtStarter']) {
+      data['BirtStarter'] = {};
+    }
+    if (project.type === StackBackendType.apphost) {
+      data['BirtStarter'].Port = +(settings.get('birt_port') as number);
+    } else {
+      data['BirtStarter'].BSPort = +(settings.get('birt_port') as number);
+    }
+  }
+
+  if (settings.get('dotnetcore') && settings.get('dotnetcore_port')) {
+    if (!data['DotNetCore']) {
+      data['DotNetCore'] = {};
+    }
+    data['DotNetCore'].Port = +(settings.get('dotnetcore_port') as number);
   }
 
   writeSettingsFile(path.join(binnew, 'stack.ini'), data);

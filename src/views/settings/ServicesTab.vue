@@ -1,13 +1,12 @@
 <template>
   <v-container fluid>
-    <v-row no-gutters>
+    <v-row>
       <v-col cols="12">
         <select-folder v-model="settings.share" label="Каталог публикации файлов (/share)" clearable>
           <template #append-outer>
             <v-btn icon tile small @click.stop="$emit('create', 'share')" title="Создать веб сервис">
               <v-icon> mdi-export-variant </v-icon>
             </v-btn>
-            <help-icon>Каталог куда стэк публикует файлы отчетов и прочие выгрузки</help-icon>
           </template>
         </select-folder>
       </v-col>
@@ -17,29 +16,32 @@
             <v-btn icon tile small @click.stop="$emit('create', 'upload')" title="Создать веб сервис">
               <v-icon> mdi-export-variant </v-icon>
             </v-btn>
-            <help-icon>Каталог куда загружаются файлы для подкачек</help-icon>
           </template>
         </select-folder>
       </v-col>
-      <v-col cols="12">
-        <select-folder v-model="settings.birt" label="Каталог Birt" clearable>
+      <v-col cols="10">
+        <select-folder v-model="settings.birt" label="Каталог Birt" clearable />
+      </v-col>
+      <v-col cols="2">
+        <v-text-field v-model="settings.birt_port" label="Порт Birt" type="number" clearable>
           <template #append-outer>
             <v-btn icon tile small @click.stop="$emit('create', 'birt')" title="Создать сервис Birt">
               <v-icon> mdi-export-variant </v-icon>
             </v-btn>
-            <help-icon>Каталог откуда запускается служба отчетов BirtWebReporter</help-icon>
           </template>
-        </select-folder>
+        </v-text-field>
       </v-col>
-      <v-col cols="12">
-        <select-folder v-model="settings.dotnetcore" label="Каталог DotNetCore" clearable>
+      <v-col cols="10">
+        <select-folder v-model="settings.dotnetcore" label="Каталог DotNetCore" clearable />
+      </v-col>
+      <v-col cols="2">
+        <v-text-field v-model="settings.dotnetcore_port" label="Порт DotNetCore" type="number" clearable>
           <template #append-outer>
             <v-btn icon tile small @click.stop="$emit('create', 'dotnetcore')" title="Создать сервис DotNetCore">
               <v-icon> mdi-export-variant </v-icon>
             </v-btn>
-            <help-icon>Каталог построителя библиотеки построения отчетов dotnetcore</help-icon>
           </template>
-        </select-folder>
+        </v-text-field>
       </v-col>
     </v-row>
   </v-container>
