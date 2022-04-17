@@ -58,6 +58,7 @@ app.on('ready', async () => {
 
   appTray.on('click', function (event: any) {
     window.show();
+    window.setTitle(`${app.getName()} ${app.getVersion()}`);
   });
 
   const closeHndl = function (event: any) {
