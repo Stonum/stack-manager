@@ -61,7 +61,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State };
-      }),
+      })
     );
 
     const appServer = getDispatcher().appServer();
@@ -69,7 +69,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State ? 0 : 2 };
-      }),
+      })
     );
 
     return statuses;
@@ -118,7 +118,7 @@ export class ProjectListener extends CommonListener {
         // console.error(e);
       }
     }
-    if (project.gateway.name) {
+    if (project.gateway?.name) {
       try {
         await webServer.deleteItem(project.gateway.name);
       } catch (e: AnyException) {
@@ -916,7 +916,7 @@ function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      }),
+      })
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
