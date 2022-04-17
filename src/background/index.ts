@@ -4,6 +4,7 @@ import path from 'path';
 
 import Window from './window';
 import { MainListener, ProjectListener } from './listeners';
+import upgradeBeforeStart from './upgrade';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -38,6 +39,7 @@ let appTray = null;
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
+  await upgradeBeforeStart();
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
