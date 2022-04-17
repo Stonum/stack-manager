@@ -474,17 +474,22 @@ function getDataFromIni(pathFile: string) {
     }
   }
 
-  for (let i = 1; i < pathlist.length; i++) {
-    const checkString = pathlist[i - 1];
-    let tmpString = pathlist[i];
-    while (tmpString.length > 1) {
-      if (checkString.indexOf(tmpString) >= 0) {
-        result.commonFolder = tmpString;
-        break;
-      }
-      tmpString = tmpString.slice(0, tmpString.length - 1);
-    }
+  // TODO пока убрал определение общей папки по количеству совпадений, т.к. не всегда клиентских каталогов больше 1, поэтому возьмем последний
+  if (pathlist.length) {
+    result.commonFolder = pathlist[pathlist.length - 1];
   }
+  // for (let i = 1; i < pathlist.length; i++) {
+  //   const checkString = pathlist[i - 1];
+  //   let tmpString = pathlist[i];
+  //   while (tmpString.length > 4) {
+  //     // если окажется что у папок из общего только диск, то скипаем
+  //     if (checkString.indexOf(tmpString) >= 0) {
+  //       result.commonFolder = tmpString;
+  //       break;
+  //     }
+  //     tmpString = tmpString.slice(0, tmpString.length - 1);
+  //   }
+  // }
 
   if (result.commonFolder) {
     const srv_index = result.commonFolder.toLowerCase().indexOf('stack.srv');
@@ -982,9 +987,10 @@ function getGatewayFileName(path: string) {
 
 async function fillProjects() {
   const ws = getDispatcher().webServer();
-  const items = await ws.getItems();
+  const as = getDispatcher().appServer();
+  const items = [...(await ws.getItems()), ...(await as.getItems())];
   if (items.length === 0) {
-    throw new Error('Не найдено элементов веб сервера');
+    throw new Error('Не найдено элементов диспетчера');
   }
   const dispdir = settings.get('dispatcher_folder') as string;
 
@@ -1077,6 +1083,33 @@ async function fillProjects() {
   }
 
   projects.set('projects', allProjects);
+
+  // заполним сервисы
+  for (const item of items) {
+    if (item.ShareStaticContent === '1' && item.StaticContentPath && !settings.get('share')) {
+      settings.set('share', item.StaticContentPath);
+      settings.set('share_name', item.Name);
+    }
+    if (item.UploadStaticContent === '1' && item.StaticContentPath && !settings.get('upload')) {
+      settings.set('upload', item.StaticContentPath);
+      settings.set('upload_name', item.Name);
+    }
+    if (item.cmdArgs?.indexOf('DotNetCore.dll') >= 0 && !settings.get('dotnetcore')) {
+      settings.set('dotnetcore', item.path);
+      settings.set('dotnetcore_name', item.Name);
+      if (+item.checkPort > 0) {
+        settings.set('dotnetcore_port', +item.checkPort);
+      }
+    }
+    if (item.cmdArgs?.indexOf('BirtWebReporter.jar') >= 0 && !settings.get('birt')) {
+      settings.set('birt', item.path);
+      settings.set('birt_name', item.Name);
+      if (item.checkPort > 0) {
+        settings.set('birt_port', +item.checkPort);
+      }
+      settings.set('jre', item.cmd);
+    }
+  }
 }
 
 let dispatcher: any;

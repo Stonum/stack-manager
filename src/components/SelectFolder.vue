@@ -19,7 +19,7 @@ export default Vue.extend({
   },
   methods: {
     async onChangeFolder() {
-      const result = await this.$store.dispatch('mainStore/selectDir', { path: this.value.toString() });
+      const result = await this.$store.dispatch('mainStore/selectDir', { path: this.value?.toString() });
       if (result) {
         this.$emit('change', result);
       }

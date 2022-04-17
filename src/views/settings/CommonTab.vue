@@ -11,14 +11,6 @@
       <v-col cols="8">
         <v-text-field v-model="settings.rabbitmq_url" label="RabbitMQ ( адрес : порт )" placeholder="http://<url>:<port>" prepend-icon="mdi-web" clearable />
       </v-col>
-      <v-spacer />
-      <v-col cols="12">
-        <select-folder v-model="settings.dispatcher_folder" label="Каталог службы диспетчера" clearable>
-          <template #append-outer>
-            <help-icon>Каталог службы диспетчера. Нужен для парсинга проектов. Если в команде запуска указан путь типа "../"</help-icon>
-          </template>
-        </select-folder>
-      </v-col>
       <v-col cols="12">
         <select-folder v-model="settings.stackversion" label="Каталог Stack_Version" clearable>
           <template #append-outer>
