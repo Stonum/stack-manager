@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.1](https://git.stack-it.ru/Arshinov_AN/stack-manager/compare/v0.5.0...v0.5.1) (2022-04-17)
+
+
+### Bug Fixes
+
+* исправил удаление проекта при отсутствии гейтвэя ([7cf451e](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/7cf451e6acfb9d86e77da1c74f4944c5a5f860c9))
+
 ## [0.5.0](https://git.stack-it.ru/Arshinov_AN/stack-manager/compare/v0.4.1...v0.5.0) (2022-04-17)
 
 
