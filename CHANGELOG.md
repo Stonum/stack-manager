@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://git.stack-it.ru/Arshinov_AN/stack-manager/compare/v0.4.1...v0.5.0) (2022-04-17)
+
+
+### Features
+
+* добавил проверку используемых портов ([bcd9594](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/bcd95947c784b4d744201202a7a902620f24cecc))
+* добавил разворачивание версии 2109+ ([41305d0](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/41305d08a954079031e1359e5567a9c56ff19f13))
+* добавил git pull ([2858448](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/285844864012a1ec5fb44263c12bfa3135be0005))
+* заполнение проектов при первом входе ([2a62f92](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/2a62f92916562599eaf62a52bfefb695ceba1988))
+
+
+### Bug Fixes
+
+* открытие внешних линков списка изменений во внешнем браузере ([b367061](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/b3670615f1eab661236adf55b275223f804778b5))
+* поправил перезапись папки собранного фронта ([26bc520](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/26bc5200db6947852cf1e20e1d7546e08b80d7f1))
+
 ### 0.4.1 (2022-03-23)
 
 
