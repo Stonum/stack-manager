@@ -736,9 +736,12 @@ async function buildProject(project: Project, oldApps?: ProjectApp[]) {
 function generateEnvJson(project: Project, envpath: string) {
   let envPath = path.join(project.path.front, '.env.local');
   if (!fs.existsSync(envPath)) {
-    envPath = path.join(project.path.front, '.env.example');
-    if (fs.existsSync(envPath)) {
-      throw new Error('Не найден .env файл');
+    envPath = path.join(project.path.front, '.env');
+    if (!fs.existsSync(envPath)) {
+      envPath = path.join(project.path.front, '.env.example');
+      if (!fs.existsSync(envPath)) {
+        throw new Error('Не найден .env файл');
+      }
     }
   }
 
