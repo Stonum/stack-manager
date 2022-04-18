@@ -61,7 +61,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State };
-      }),
+      })
     );
 
     const appServer = getDispatcher().appServer();
@@ -69,7 +69,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State ? 0 : 2 };
-      }),
+      })
     );
 
     return statuses;
@@ -580,8 +580,17 @@ function checkProject(project: Project, index: number | null) {
     }
   }
 
-  if (project.gateway?.path && !fs.existsSync(project.gateway.path)) {
-    throw new Error(`Некорректный путь ${project.gateway.path}`);
+  if (project.type === StackBackendType.apphost) {
+    if (project.gateway?.path && !fs.existsSync(project.gateway.path)) {
+      throw new Error(`Некорректный путь ${project.gateway.path}`);
+    }
+
+    if (project.gateway?.path && !settings.get('jre')) {
+      throw new Error(`Не задан каталг jre в настройках`);
+    }
+    if (!fs.existsSync(settings.get('jre'))) {
+      throw new Error(`Не существующий каталог jre. Проверьте настройки`);
+    }
   }
 
   const ports = [];
@@ -916,7 +925,7 @@ function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      }),
+      })
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
@@ -1107,7 +1116,11 @@ async function fillProjects() {
       if (item.checkPort > 0) {
         settings.set('birt_port', +item.checkPort);
       }
-      settings.set('jre', item.cmd);
+      if (item.cmd) {
+        const ind_jre = item.cmd.indexOf('\\bin\\java');
+        const jre_path = item.cmd.substring(0, ind_jre > 0 ? ind_jre : undefined);
+        settings.set('jre', jre_path);
+      }
     }
   }
 }
