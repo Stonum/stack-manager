@@ -86,7 +86,7 @@ export default Vue.extend({
     if (this.items.length === 0) {
       this.visibleFillDlg = true;
     } else {
-      const interval = +(await this.$store.dispatch('mainStore/getSettings', { key: 'refresh_interval' }));
+      const interval = +(await this.$store.dispatch('mainStore/getSettings', { key: 'refresh_interval' })) || 20000;
       this.timer = setInterval(async () => {
         const isVisible = await this.$store.dispatch('mainStore/getVisibleWindow');
         if (!isVisible) {

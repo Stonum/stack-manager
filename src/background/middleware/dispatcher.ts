@@ -375,7 +375,7 @@ class DispatcherAPI {
   public getParametersRequest(names: string[]) {
     const res = [];
     res.push({
-      params: [1],
+      params: [0],
       Item: [
         {
           ParameterNames: [],
