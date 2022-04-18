@@ -61,7 +61,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State };
-      })
+      }),
     );
 
     const appServer = getDispatcher().appServer();
@@ -69,7 +69,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State ? 0 : 2 };
-      })
+      }),
     );
 
     return statuses;
@@ -240,8 +240,8 @@ export class ProjectListener extends CommonListener {
       }
 
       this.sendInfoMessage(project.name, 'Сборка запущена');
-      // await cmd.exec('npm ci', project.path.front);
-      // await cmd.exec('npm run build', project.path.front);
+      await cmd.exec('npm ci', project.path.front);
+      await cmd.exec('npm run build', project.path.front);
       if (fs.existsSync(path.join(project.path.front, 'dist'))) {
         if (fs.existsSync(path.join(this.staticPath, project.name))) {
           fs.rmSync(path.join(this.staticPath, project.name), { recursive: true, force: true });
@@ -916,7 +916,7 @@ function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      })
+      }),
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
