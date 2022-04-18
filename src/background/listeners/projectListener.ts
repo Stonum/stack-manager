@@ -61,7 +61,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State };
-      })
+      }),
     );
 
     const appServer = getDispatcher().appServer();
@@ -69,7 +69,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State ? 0 : 2 };
-      })
+      }),
     );
 
     return statuses;
@@ -591,6 +591,10 @@ function checkProject(project: Project, index: number | null) {
     if (!fs.existsSync(settings.get('jre'))) {
       throw new Error(`Не существующий каталог jre. Проверьте настройки`);
     }
+
+    if (!settings.get('rabbitmq_url')) {
+      throw new Error(`Не указан адрес RabbitMQ. Проверьте настройки`);
+    }
   }
 
   const ports = [];
@@ -925,7 +929,7 @@ function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      })
+      }),
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
