@@ -11,7 +11,7 @@
 
     <v-list-item-action-text>
       <v-list-item-subtitle class="text-right">
-        <v-btn icon tile small title="Перезапустить" @click="$emit('start', item.name)">
+        <v-btn icon tile small title="Перезапустить" @click="$emit('restart', item.name)">
           <v-icon color="primary"> mdi-restart </v-icon>
         </v-btn>
         <v-btn icon tile small v-if="status === 2" title="Запустить" @click="$emit('start', item.name)">

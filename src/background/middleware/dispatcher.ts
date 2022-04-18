@@ -451,12 +451,12 @@ class ServerAPI {
 
   async stopItem(name: string): Promise<boolean> {
     await this.setParameters(name, { IsActive: 0 });
-    return await this.api.executeMethod(name, 'Stop');
+    return this.api.executeMethod(name, 'Stop');
   }
 
   async startItem(name: string): Promise<boolean> {
     await this.setParameters(name, { IsActive: 1 });
-    return await this.api.executeMethod(name, this.type === 'WebServer' ? 'ReStart' : 'Start');
+    return this.api.executeMethod(name, this.type === 'WebServer' ? 'ReStart' : 'Start');
   }
 
   async restartItem(name: string): Promise<boolean> {

@@ -30,7 +30,7 @@
 
     <v-expansion-panel-content>
       <v-list dense>
-        <app-item v-for="(app, idxtask) in item.apps" :item="app" :key="idxtask" @start="onStart($event)" @stop="onStop($event)" />
+        <app-item v-for="(app, idxtask) in item.apps" :item="app" :key="idxtask" @restart="onRestart($event)" @start="onStart($event)" @stop="onStop($event)" />
       </v-list>
     </v-expansion-panel-content>
   </v-expansion-panel>
@@ -73,9 +73,13 @@ export default Vue.extend({
       await this.projectSendJob({ jobName: 'appStart', projectId: this.id, params: appname });
       this.getAppStatus();
     },
-    async onRestart() {
-      for (const app of this.item.apps) {
-        await this.projectSendJob({ jobName: 'appReStart', projectId: this.id, params: app.name });
+    async onRestart(appname?: string) {
+      if (appname) {
+        await this.projectSendJob({ jobName: 'appReStart', projectId: this.id, params: appname });
+      } else {
+        for (const app of this.item.apps) {
+          await this.projectSendJob({ jobName: 'appReStart', projectId: this.id, params: app.name });
+        }
       }
       this.getAppStatus();
     },
