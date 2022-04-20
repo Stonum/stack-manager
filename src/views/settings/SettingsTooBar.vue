@@ -1,6 +1,5 @@
 <template>
   <app-bar>
-    <v-btn plain to="/changelog">Список изменений</v-btn>
     <v-btn plain @click="$emit('save')">Сохранить настройки</v-btn>
   </app-bar>
 </template>
