@@ -61,7 +61,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State };
-      }),
+      })
     );
 
     const appServer = getDispatcher().appServer();
@@ -69,7 +69,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State ? 0 : 2 };
-      }),
+      })
     );
 
     return statuses;
@@ -845,11 +845,13 @@ async function generateStackIni(project: Project, pathini: string, binold: strin
     }
   }
 
-  if (settings.get('dotnetcore') && settings.get('dotnetcore_port')) {
-    if (!data['DotNetCore']) {
-      data['DotNetCore'] = {};
+  if (project.type === StackBackendType.apphost) {
+    if (settings.get('dotnetcore') && settings.get('dotnetcore_port')) {
+      if (!data['DotNetCore']) {
+        data['DotNetCore'] = {};
+      }
+      data['DotNetCore'].Port = +(settings.get('dotnetcore_port') as number);
     }
-    data['DotNetCore'].Port = +(settings.get('dotnetcore_port') as number);
   }
 
   writeSettingsFile(path.join(binnew, 'stack.ini'), data);
@@ -932,7 +934,7 @@ function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      }),
+      })
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
