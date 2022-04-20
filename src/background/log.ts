@@ -8,9 +8,10 @@ import { settings } from './store';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const isFullLogging = settings.get('fullLogging');
 
-const fileName = `log_${format(new Date(), 'yyyy_MM_dd', { locale: ru })}.log`;
+const folder = path.join(app.getPath('userData'), 'logs');
+const filePath = () => path.join(folder, `log_${format(new Date(), 'yyyy_MM_dd', { locale: ru })}.log`);
 
-log.transports.file.resolvePath = () => path.join(app.getPath('userData'), 'logs', fileName);
+log.transports.file.resolvePath = filePath;
 if (!isDevelopment && !isFullLogging) {
   log.transports.file.level = 'error';
 }
