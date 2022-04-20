@@ -6,11 +6,11 @@ type MainState = Settings;
 const state: MainState = {};
 
 const actions: ActionTree<MainState, any> = {
-  async setSettings({ state }, { key, data }: { key: string; data: any }) {
+  setSettings({ state }, { key, data }: { key: string; data: any }) {
     ipcRenderer.send('main', { message: 'setSettings', key, data });
   },
 
-  async getSettings({ state }, { key }: { key: string }) {
+  getSettings({ state }, { key }: { key: string }) {
     ipcRenderer.send('main', { message: 'getSettings', key });
     return new Promise((resolve) => {
       ipcRenderer.once('getSettings', (event, payload: any) => {
@@ -19,7 +19,7 @@ const actions: ActionTree<MainState, any> = {
     });
   },
 
-  async selectDir({ state }, { path }: { path?: string }) {
+  selectDir({ state }, { path }: { path?: string }) {
     ipcRenderer.send('main', { message: 'selectDir', path });
     return new Promise((resolve) => {
       ipcRenderer.once('selectDir', (event, payload: string) => {
@@ -28,7 +28,7 @@ const actions: ActionTree<MainState, any> = {
     });
   },
 
-  async restartDisp({ state }) {
+  restartDisp({ state }) {
     ipcRenderer.send('main', { message: 'restartDispatcher' });
     return new Promise((resolve) => {
       ipcRenderer.once('restartDispatcher', (event, payload: string) => {
@@ -37,7 +37,7 @@ const actions: ActionTree<MainState, any> = {
     });
   },
 
-  async getChangeLog({ state }) {
+  getChangeLog({ state }) {
     ipcRenderer.send('main', { message: 'getChangeLog' });
     return new Promise((resolve) => {
       ipcRenderer.once('getChangeLog', (event, payload: string) => {
@@ -46,7 +46,7 @@ const actions: ActionTree<MainState, any> = {
     });
   },
 
-  async getVersion({ state }) {
+  getVersion({ state }) {
     ipcRenderer.send('main', { message: 'getVersion' });
     return new Promise((resolve) => {
       ipcRenderer.once('getVersion', (event, payload: string) => {
@@ -55,7 +55,7 @@ const actions: ActionTree<MainState, any> = {
     });
   },
 
-  async getVisibleWindow({ state }) {
+  getVisibleWindow({ state }) {
     ipcRenderer.send('main', { message: 'getVisibleWindow' });
     return new Promise((resolve) => {
       ipcRenderer.once('getVisibleWindow', (event, payload: string) => {
@@ -64,7 +64,7 @@ const actions: ActionTree<MainState, any> = {
     });
   },
 
-  async openURL({ state }, { url }: { url?: string }) {
+  openURL({ state }, { url }: { url?: string }) {
     ipcRenderer.send('main', { message: 'openURL', url });
   },
 };

@@ -92,7 +92,7 @@ export default Vue.extend({
         if (!isVisible) {
           return;
         }
-        this.$store.dispatch('projectStore/getAppStatus');
+        this.getAppStatus();
       }, interval);
     }
   },
