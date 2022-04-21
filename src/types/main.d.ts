@@ -45,6 +45,7 @@ interface ProjectGateway {
   name: string;
   path: string;
   port: number;
+  settings: string;
 }
 interface Project {
   name: string;
@@ -53,7 +54,7 @@ interface Project {
   apps: ProjectApp[];
   port: number | null;
   type: StackBackendType;
-  gateway: ProjectGateway;
+  gateway?: ProjectGateway;
 }
 
 interface DispatcherItem {

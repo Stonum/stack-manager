@@ -48,6 +48,19 @@ export class MainListener extends CommonListener {
     }
   }
 
+  async selectFile(payload: any) {
+    const res = await dialog.showOpenDialog(this.window, {
+      defaultPath: payload.path,
+      filters: [payload.filter],
+      properties: ['openFile'],
+    });
+    if (res && !res.canceled) {
+      return res.filePaths[0];
+    } else {
+      return payload.path || '';
+    }
+  }
+
   async restartDispatcher(payload: any) {
     // попытка остановить
     try {

@@ -34,7 +34,7 @@ export class ProjectListener extends CommonListener {
   getAll() {
     const data = (projects.get('projects', []) as Project[]).map((project: Project) => {
       const apps = [...project.apps];
-      if (project.gateway) {
+      if (project.gateway?.name) {
         apps.unshift({
           name: project.gateway.name,
           port: null,
@@ -417,6 +417,7 @@ async function readProjectFolder(pathDir: string) {
     ini: [] as any[],
     type: StackBackendType.stack,
     gateway: '',
+    application: '',
   };
 
   if (fs.existsSync(path.join(pathDir, 'Stack.Front'))) {
@@ -439,6 +440,10 @@ async function readProjectFolder(pathDir: string) {
     const pathGateWay = path.join(pathDir, 'StackGateway');
     if (fs.existsSync(pathGateWay)) {
       result.gateway = pathGateWay;
+      const settingsFile = path.join(pathGateWay, 'application.yml');
+      if (fs.existsSync(settingsFile)) {
+        result.application = settingsFile;
+      }
     }
   }
   return result;
@@ -459,6 +464,7 @@ function getDataFromIni(pathFile: string) {
   result.version = '';
   result.commonFolder = '';
   result.gateway = '';
+  result.application = '';
 
   const pathlist = [];
 
@@ -505,6 +511,10 @@ function getDataFromIni(pathFile: string) {
   const pathGateWay = path.join(result.version, 'StackGateway');
   if (fs.existsSync(pathGateWay)) {
     result.gateway = pathGateWay;
+    const settingsFile = path.join(pathGateWay, 'application.yml');
+    if (fs.existsSync(settingsFile)) {
+      result.application = settingsFile;
+    }
   }
 
   return result;
@@ -539,11 +549,12 @@ async function addProject(payload: Project) {
     password: payload.sql.password,
   };
 
-  if (project.type === StackBackendType.apphost) {
+  if (project.type === StackBackendType.apphost && payload.gateway) {
     project.gateway = {
       name: project.name + '_gateway',
       path: payload.gateway.path,
       port: payload.gateway.port,
+      settings: payload.gateway.settings,
     };
   }
 
@@ -580,12 +591,12 @@ function checkProject(project: Project, index: number | null) {
     }
   }
 
-  if (project.type === StackBackendType.apphost) {
-    if (project.gateway?.path && !fs.existsSync(project.gateway.path)) {
+  if (project.type === StackBackendType.apphost && project.gateway) {
+    if (project.gateway.path && !fs.existsSync(project.gateway.path)) {
       throw new Error(`Некорректный путь ${project.gateway.path}`);
     }
 
-    if (project.gateway?.path && !settings.get('jre')) {
+    if (project.gateway.path && !settings.get('jre')) {
       throw new Error(`Не задан каталг jre в настройках`);
     }
     if (!fs.existsSync(settings.get('jre'))) {
@@ -597,9 +608,15 @@ function checkProject(project: Project, index: number | null) {
     }
   }
 
+  if (project.type === StackBackendType.apphost && !project.gateway) {
+    throw new Error(`Не заданы настройки StackGateWay`);
+  }
+
   const ports = [];
   ports.push(project.port);
-  ports.push(project.gateway?.port);
+  if (project.gateway) {
+    ports.push(project.gateway.port);
+  }
 
   ports.forEach((port: number | null | undefined) => {
     if (port) {
@@ -668,14 +685,13 @@ async function buildProject(project: Project, oldApps?: ProjectApp[]) {
     generateCredentials(project, pathbin_new);
     const gatewaySettingsPath = generateGatewaySettings(project, pathbin_new);
 
-    try {
-      await webServer.deleteItem(project.gateway.name);
-    } catch (e) {
-      //
-    }
-
     // деплоим гейтвэй
-    if (project.gateway.name) {
+    if (project.gateway?.name) {
+      try {
+        await webServer.deleteItem(project.gateway.name);
+      } catch (e) {
+        //
+      }
       await webServer.addItem(project.gateway.name, {
         IsActive: 1,
         cmd: path.join(settings.get('jre'), 'bin', 'javaw.exe'),
@@ -690,10 +706,11 @@ async function buildProject(project: Project, oldApps?: ProjectApp[]) {
 
   if (!apphost_project) {
     for (const app of project.apps) {
+      const inspect = app.port ? `--inspect=${app.port}` : '';
       await webServer.addItem(app.name, {
         UrlPathPrefix: app.path,
         StackProgramDir: project.path.bin,
-        StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${app.id} -LOADRES --inspect=${app.port || '0000'} -nc ${app.args}`,
+        StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${app.id} -LOADRES ${inspect} -nc ${app.args}`,
         IsActive: 1,
         FunctionName: 'StackAPI_kvplata_v1',
         ResultContentType: 'application/json;charset=utf-8',
@@ -718,7 +735,8 @@ async function buildProject(project: Project, oldApps?: ProjectApp[]) {
       const addParams = app.id === 11075 ? ',очищатьПросроченныеДанные:true' : '';
       const expression = `ЗапуститьОчередьСообщений(@{количествоПотоков:${syncThreadCount},количествоАсинхронныхПотоков:${asyncThreadCount},количествоАсинхронныхРабот:${asyncTaskCount}${addParams}})`;
       const rabbitsettings = `settings_${task?.prefix || app.id}.toml`;
-      const cmdArgs = `--task=${app.id} --inspect=${app.port || '0000'} -r testsrv:9898 -i "stack.ini" -c "credentials.ini" --rabbit="${rabbitsettings}" -f "${expression}"`;
+      const inspect = app.port ? `--inspect=${app.port}` : '';
+      const cmdArgs = `--task=${app.id} ${inspect} -r testsrv:9898 -i "stack.ini" -c "credentials.ini" --rabbit="${rabbitsettings}" -f "${expression}"`;
 
       await webServer.addItem(app.name, {
         IsActive: 1,
@@ -749,7 +767,7 @@ function generateEnvJson(project: Project, envpath: string) {
   const disp = new URL(settings.get('dispatcher_url') as string);
   const config = readIniFile(envPath);
   if (project.type === StackBackendType.apphost) {
-    config['API_HOST'] = `http://${os.hostname().toLowerCase()}:${project.gateway.port}`;
+    config['API_HOST'] = `http://${os.hostname().toLowerCase()}:${project.gateway?.port}`;
   }
   if (project.type === StackBackendType.stack) {
     for (const app of project.apps) {
@@ -910,7 +928,11 @@ function generateCredentials(project: Project, pathnew: string) {
 }
 
 function generateGatewaySettings(project: Project, pathnew: string) {
-  const templateYaml = path.join(project.gateway.path || '', 'application.yml');
+  if (!project.gateway) {
+    return null;
+  }
+
+  const templateYaml = project.gateway.settings;
   if (fs.existsSync(templateYaml)) {
     const dataYaml = readSettingsFile(templateYaml);
     const common = dataYaml[0];

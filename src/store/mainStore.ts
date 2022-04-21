@@ -1,5 +1,6 @@
 import { Module, ActionTree } from 'vuex';
 import { ipcRenderer } from 'electron';
+import { FileFilter } from 'electron/main';
 
 type MainState = Settings;
 
@@ -23,6 +24,15 @@ const actions: ActionTree<MainState, any> = {
     ipcRenderer.send('main', { message: 'selectDir', path });
     return new Promise((resolve) => {
       ipcRenderer.once('selectDir', (event, payload: string) => {
+        resolve(payload);
+      });
+    });
+  },
+
+  selectFile({ state }, { filter, path }: { filter?: FileFilter; path?: string }) {
+    ipcRenderer.send('main', { message: 'selectFile', path, filter });
+    return new Promise((resolve) => {
+      ipcRenderer.once('selectFile', (event, payload: string) => {
         resolve(payload);
       });
     });

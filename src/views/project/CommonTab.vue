@@ -1,45 +1,63 @@
 <template>
   <v-container fluid>
-    <v-row no-gutters>
+    <v-row>
       <v-col cols="3">
-        <v-text-field v-model="project.name" label="Краткое название проекта*" :rules="[rules.required]" @change="$emit('changeName')" />
+        <v-text-field v-model="project.name" label="Краткое название проекта*" :rules="[rules.required]" @change="$emit('changeName')" dense />
       </v-col>
       <v-col cols="12">
-        <select-folder v-model="project.path.git" label="Каталог проекта в git*" :readonly="!isNewProject" @change="$emit('changeProjectFolder')" />
+        <select-folder v-model="project.path.git" label="Каталог проекта в git*" :readonly="!isNewProject" @change="$emit('changeProjectFolder')" dense />
       </v-col>
       <template v-if="project.path.git">
         <v-col cols="12">
-          <v-combobox v-model="project.path.ini" :items="inifiles" label="Путь к stack.ini*" @change="$emit('changeInIFile')" :rules="[rules.required]" />
+          <v-combobox
+            v-model="project.path.ini"
+            :items="inifiles"
+            label="Путь к stack.ini*"
+            prepend-icon="mdi-file-document-outline"
+            @change="$emit('changeInIFile')"
+            :rules="[rules.required]"
+            dense
+          />
         </v-col>
-        <v-col cols="8">
-          <select-folder v-model="project.path.front" label="Каталог Stack.Front" />
+        <template v-if="isAppHost && project.gateway">
+          <v-col cols="5">
+            <select-folder v-model="project.gateway.path" label="StackGateway каталог*" :rules="[rules.required]" dense />
+          </v-col>
+          <v-col cols="6">
+            <select-file
+              v-model="project.gateway.settings"
+              label="файл настроек*"
+              :path="project.gateway.path"
+              :filter="{ name: 'StackGateway settings', extensions: ['yml'] }"
+              :rules="[rules.required]"
+              dense
+            />
+          </v-col>
+          <v-col cols="1">
+            <v-text-field v-model="project.gateway.port" label="порт*" :rules="[rules.required]" type="number" dense />
+          </v-col>
+        </template>
+        <v-col cols="10">
+          <select-folder v-model="project.path.front" label="Stack.Front каталог" dense />
         </v-col>
-        <v-spacer />
+        <v-col cols="2">
+          <v-text-field v-model.number="project.port" label="порт для публикации" type="number" dense />
+        </v-col>
         <v-col cols="3">
-          <v-text-field v-model.number="project.port" label="Порт для публикации Stack.Front" type="number" />
-        </v-col>
-        <v-col v-if="isAppHost" cols="8">
-          <select-folder v-model="project.gateway.path" label="Каталог StackGateway" :rules="[rules.required]" />
-        </v-col>
-        <v-spacer />
-        <v-col v-if="isAppHost" cols="3">
-          <v-text-field v-model="project.gateway.port" label="Порт StackGateway" :rules="[rules.required]" type="number" />
+          <v-text-field v-model="project.sql.server" label="SQL сервер*" :rules="[rules.required]" dense />
         </v-col>
         <v-col cols="3">
-          <v-text-field v-model="project.sql.server" label="SQL сервер*" :rules="[rules.required]" />
-        </v-col>
-        <v-col cols="3" class="ml-2">
-          <v-text-field v-model="project.sql.base" label="База данных*" :rules="[rules.required]" />
+          <v-text-field v-model="project.sql.base" label="База данных*" :rules="[rules.required]" dense />
         </v-col>
         <v-spacer />
         <v-col cols="2">
-          <v-text-field v-model="project.sql.login" label="Логин*" :rules="[rules.required]" />
+          <v-text-field v-model="project.sql.login" label="Логин*" :rules="[rules.required]" dense />
         </v-col>
-        <v-col cols="2" class="ml-2">
-          <v-text-field v-model="project.sql.password" label="Пароль" />
+        <v-col cols="2">
+          <v-text-field v-model="project.sql.password" label="Пароль" dense />
         </v-col>
         <v-col cols="12">
-          <select-folder v-model="project.path.version" label="Каталог версии*" :rules="[rules.required]" />
+          <select-folder v-model="project.path.version" label="Каталог версии*" :rules="[rules.required]" dense />
         </v-col>
       </template>
     </v-row>
