@@ -76,7 +76,7 @@ export async function getFiles(dir: string): Promise<string[]> {
     dirents.map(async (dirent) => {
       const res = path.resolve(dir, dirent.name);
       return dirent.isDirectory() ? await getFiles(res) : res;
-    }),
+    })
   );
   return Array.prototype.concat(...files);
 }
@@ -93,13 +93,19 @@ export async function copyFiles(src: string, desc: string) {
         }
         return fsp.copyFile(file, path.join(folder, fname));
       }
-    }),
+    })
   );
 }
 
 export async function readMarkdownFile(src: string) {
   const md = new MarkdownIt();
-  const strData = fs.readFileSync(src, 'utf8');
+  let strData = fs.readFileSync(src, 'utf8');
+  if (strData) {
+    const regCommitLink = /\(\[\S*\)\)/;
+    strData = strData.replaceAll(regCommitLink, '').trimEnd();
+    const regLink = /\(http\S*\)/;
+    strData = strData.replaceAll(regLink, '').trimEnd();
+  }
   const result = md.render(strData);
   return result;
 }
