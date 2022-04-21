@@ -7,7 +7,7 @@ import toml from 'toml-js';
 import yaml from 'js-yaml';
 
 export function readSettingsFile(filePath: string) {
-  const ext = path.extname(filePath);
+  const ext = path.extname(filePath)?.toLowerCase();
 
   switch (ext) {
     case '.ini':
@@ -22,7 +22,7 @@ export function readSettingsFile(filePath: string) {
 }
 
 export function writeSettingsFile(filePath: string, data: any) {
-  const ext = path.extname(filePath);
+  const ext = path.extname(filePath)?.toLowerCase();
 
   switch (ext) {
     case '.ini':
@@ -76,7 +76,7 @@ export async function getFiles(dir: string): Promise<string[]> {
     dirents.map(async (dirent) => {
       const res = path.resolve(dir, dirent.name);
       return dirent.isDirectory() ? await getFiles(res) : res;
-    })
+    }),
   );
   return Array.prototype.concat(...files);
 }
@@ -93,7 +93,7 @@ export async function copyFiles(src: string, desc: string) {
         }
         return fsp.copyFile(file, path.join(folder, fname));
       }
-    })
+    }),
   );
 }
 
