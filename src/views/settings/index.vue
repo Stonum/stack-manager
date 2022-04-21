@@ -4,10 +4,10 @@
 
     <v-tabs>
       <v-tab>Общие параметры</v-tab>
-      <v-tab-item><common-tab :settings="settings" /></v-tab-item>
+      <v-tab-item class="pt-2"><common-tab :settings="settings" /></v-tab-item>
 
       <v-tab>Сервисы</v-tab>
-      <v-tab-item><services-tab :settings="settings" @create="onCreateService" /></v-tab-item>
+      <v-tab-item class="pt-2"><services-tab :settings="settings" @create="onCreateService" /></v-tab-item>
 
       <v-tab>Задачи</v-tab>
       <v-tab-item><tasks-tab :tasks="tasks" /></v-tab-item>

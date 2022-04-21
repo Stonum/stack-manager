@@ -7,7 +7,7 @@
       <v-icon>mdi-plus</v-icon>
     </v-btn>
 
-    <v-app-bar-title>{{ pageName }}</v-app-bar-title>
+    <v-app-bar-title>{{ title || pageName }}</v-app-bar-title>
 
     <v-spacer></v-spacer>
 
@@ -24,6 +24,9 @@ import Vue from 'vue';
 
 export default Vue.extend({
   name: 'AppBar',
+  props: {
+    title: { type: String },
+  },
   computed: {
     pageName(): string {
       return this.$route.name || '';

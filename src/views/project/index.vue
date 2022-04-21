@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="py-0">
-    <app-bar>
+    <app-bar :title="isNewProject ? `Создание проекта` : 'Рекдатирование проекта'">
       <h4 v-if="appNameChanged && !isNewProject" class="warning--text">Изменено имя приложения, необходимо пересобрать проект</h4>
 
       <v-btn plain :disabled="!valid || loading" :loading="loading" @click="onBuildProject">{{ isNewProject ? 'Сохранить' : 'Пересобрать' }}</v-btn>
@@ -9,7 +9,7 @@
     <v-form v-model="valid" @submit.prevent="$event = {}">
       <v-tabs>
         <v-tab>Общие настройки</v-tab>
-        <v-tab-item>
+        <v-tab-item class="pt-2">
           <common-tab
             :project="project"
             :inifiles="inifiles"
@@ -72,6 +72,7 @@ export default Vue.extend({
         },
         gateway: {
           path: '',
+          settings: '',
           port: 8182,
         },
         type: 0,
@@ -112,8 +113,9 @@ export default Vue.extend({
         this.project.sql.server = data.server;
         this.project.sql.base = data.base;
         this.project.path.version = data.version;
-        if (!this.project.gateway.path && data.gateway) {
+        if (this.project.gateway && !this.project.gateway?.path && data.gateway) {
           this.project.gateway.path = data.gateway;
+          this.project.gateway.settings = data.application || this.project.gateway.settings;
         }
       }
     },
@@ -124,7 +126,10 @@ export default Vue.extend({
         this.project.path.front = data.front;
         this.project.path.ini = this.inifiles[0];
         this.project.type = data.type;
-        this.project.gateway.path = data.gateway;
+        if (this.project.gateway) {
+          this.project.gateway.path = data.gateway;
+          this.project.gateway.settings = data.application;
+        }
         this.onReadIni();
       }
     },
