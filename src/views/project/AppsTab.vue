@@ -17,10 +17,10 @@
         <v-checkbox :key="app.id" v-model="app.selected" :label="app.title" dense hide-details @change="$emit('select', { appId: idx, checked: $event })" />
       </v-col>
       <v-col cols="2">
-        <v-text-field v-model="app.name" dense hide-details @change="$emit('change', app.id)" />
+        <v-text-field v-model="app.name" dense hide-details />
       </v-col>
       <v-col v-if="!type" cols="2">
-        <v-text-field v-model="app.path" dense hide-details @change="$emit('change', app.id)" />
+        <v-text-field v-model="app.path" dense hide-details />
       </v-col>
       <template v-if="type">
         <v-col v-if="type" cols="1">

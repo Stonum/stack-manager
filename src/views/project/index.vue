@@ -1,8 +1,6 @@
 <template>
   <v-container fluid class="py-0">
     <app-bar :title="isNewProject ? `Создание проекта` : 'Рекдатирование проекта'">
-      <h4 v-if="appNameChanged && !isNewProject" class="warning--text">Изменено имя приложения, необходимо пересобрать проект</h4>
-
       <v-btn plain :disabled="!valid || loading" :loading="loading" @click="onBuildProject">{{ isNewProject ? 'Сохранить' : 'Пересобрать' }}</v-btn>
     </app-bar>
 
@@ -22,7 +20,7 @@
 
         <v-tab>Веб приложения</v-tab>
         <v-tab-item>
-          <apps-tab :apps="apps" :type="project.type" :is-new-project="isNewProject" @change="appNameChanged = true" @select="onAppCheck" />
+          <apps-tab :apps="apps" :type="project.type" :is-new-project="isNewProject" @select="onAppCheck" />
         </v-tab-item>
       </v-tabs>
     </v-form>
@@ -91,7 +89,6 @@ export default Vue.extend({
         },
       },
       apps: [] as SelectableApp[],
-      appNameChanged: false,
     };
   },
 
@@ -141,7 +138,6 @@ export default Vue.extend({
         this.apps[appId].name = `api_${this.project.name}_${this.apps[appId].prefix}`;
         this.apps[appId].path = this.isAppHost ? '' : `/api/${this.project.name}/${this.apps[appId].prefix}`;
       }
-      this.appNameChanged = true;
     },
     onChangeName() {
       for (const idx in this.apps) {
@@ -165,7 +161,6 @@ export default Vue.extend({
         } else {
           await this.projectRebuild({ projectId: +this.projectid, params: this.project });
         }
-        this.appNameChanged = false;
         this.$router.go(-1);
       } finally {
         this.loading = false;
