@@ -44,11 +44,6 @@ const actions: ActionTree<ProjectState, any> = {
     return eventResolver('rebuild');
   },
 
-  projectSave(ctx, { projectId, params }: { projectId: number; params: Project }): Promise<any> {
-    ipcRenderer.send('project', { message: 'save', projectId, params });
-    return eventResolver('save');
-  },
-
   getProjects({ state, commit }): Promise<Project[]> {
     ipcRenderer.send('project', { message: 'getAll' });
     return new Promise((resolve) => {

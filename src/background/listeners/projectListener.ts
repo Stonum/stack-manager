@@ -88,7 +88,7 @@ export class ProjectListener extends CommonListener {
 
   async add(payload: any) {
     const allProjects = projects.get('projects', []) as Project[];
-    const project = await addProject(payload.params);
+    const project = prepareProject(payload.params);
     checkProject(project, null);
     allProjects.push(project);
     projects.set('projects', allProjects);
@@ -141,29 +141,13 @@ export class ProjectListener extends CommonListener {
 
     return {};
   }
-  save(payload: any) {
-    const id = payload.projectId;
-    const project = payload.params as Project;
-
-    const data = projects.get('projects', []) as Project[];
-    if (data && data[id]) {
-      checkProject(project, id);
-      data[id] = project;
-      projects.set('projects', data);
-    } else {
-      throw new Error(`Не найден проект с указанным id - ${id}`);
-    }
-
-    this.restartServers();
-    return {};
-  }
 
   async rebuild(payload: any) {
     const id = payload.projectId;
-    const project = payload.params as Project;
 
     const data = projects.get('projects', []) as Project[];
     if (data && data[id]) {
+      const project = prepareProject(payload.params);
       checkProject(project, id);
       await buildProject(project, data[id].apps);
       data[id] = project;
@@ -520,7 +504,7 @@ function getDataFromIni(pathFile: string) {
   return result;
 }
 
-async function addProject(payload: Project) {
+function prepareProject(payload: Project) {
   const project = {} as Project;
   project.name = payload.name;
 
