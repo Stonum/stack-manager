@@ -3,6 +3,7 @@ import CommonListener from './commonListener';
 import { app } from 'electron';
 import path from 'path';
 import fs from 'fs';
+import fsp from 'fs/promises';
 import os from 'os';
 
 import { projects, settings } from '../store';
@@ -61,7 +62,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State };
-      })
+      }),
     );
 
     const appServer = getDispatcher().appServer();
@@ -69,7 +70,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State ? 0 : 2 };
-      })
+      }),
     );
 
     return statuses;
@@ -434,14 +435,14 @@ async function readProjectFolder(pathDir: string) {
 }
 const verpattern = /.+(\\\d\d\.\d\d.+?(\\|$))/i;
 
-function getDataFromIni(pathFile: string) {
+async function getDataFromIni(pathFile: string) {
   if (!pathFile) {
     throw 'Не указан файл';
   }
 
   const result = {} as any;
 
-  const data = readSettingsFile(pathFile);
+  const data = await readSettingsFile(pathFile);
 
   result.server = data['SQL-mode'].Server;
   result.base = data['SQL-mode'].Base;
@@ -666,8 +667,8 @@ async function buildProject(project: Project, oldApps?: ProjectApp[]) {
   }
 
   if (apphost_project) {
-    generateCredentials(project, pathbin_new);
-    const gatewaySettingsPath = generateGatewaySettings(project, pathbin_new);
+    await generateCredentials(project, pathbin_new);
+    const gatewaySettingsPath = await generateGatewaySettings(project, pathbin_new);
 
     // деплоим гейтвэй
     if (project.gateway?.name) {
@@ -704,12 +705,12 @@ async function buildProject(project: Project, oldApps?: ProjectApp[]) {
         FallbackEnabled: 0,
         AllowServiceCommands: 0,
       });
-      webServer.startItem(app.name);
+      await webServer.startItem(app.name);
     }
   }
   if (apphost_project) {
     for (const app of project.apps) {
-      generateTaskSettings(project, app);
+      await generateTaskSettings(project, app);
 
       const task = (settings.get('tasks') as Task[])?.find((task: Task) => task.id === app.id);
       const syncThreadCount = app.syncThreadCount || 20;
@@ -730,12 +731,12 @@ async function buildProject(project: Project, oldApps?: ProjectApp[]) {
         restart: 1,
         restartMaxCount: 5,
       });
-      webServer.startItem(app.name);
+      await webServer.startItem(app.name);
     }
   }
 }
 
-function generateEnvJson(project: Project, envpath: string) {
+async function generateEnvJson(project: Project, envpath: string) {
   let envPath = path.join(project.path.front, '.env.local');
   if (!fs.existsSync(envPath)) {
     envPath = path.join(project.path.front, '.env');
@@ -749,7 +750,7 @@ function generateEnvJson(project: Project, envpath: string) {
 
   const tasks = settings.get('tasks') as Task[];
   const disp = new URL(settings.get('dispatcher_url') as string);
-  const config = readIniFile(envPath);
+  const config = await readIniFile(envPath);
   if (project.type === StackBackendType.apphost) {
     config['API_HOST'] = `http://${os.hostname().toLowerCase()}:${project.gateway?.port}`;
   }
@@ -771,11 +772,11 @@ function generateEnvJson(project: Project, envpath: string) {
     config['API_HOST_UPLOAD'] = disp.origin + '/upload';
   }
 
-  fs.writeFileSync(path.join(envpath, 'env.json'), JSON.stringify(config, null, '\t'));
+  await fsp.writeFile(path.join(envpath, 'env.json'), JSON.stringify(config, null, '\t'));
 }
 
 async function generateStackIni(project: Project, pathini: string, binold: string, binnew: string, version: string) {
-  const data = readSettingsFile(pathini);
+  const data = await readSettingsFile(pathini);
 
   data['SQL-mode'].Server = project.sql.server;
   data['SQL-mode'].Base = project.sql.base;
@@ -856,16 +857,16 @@ async function generateStackIni(project: Project, pathini: string, binold: strin
     }
   }
 
-  writeSettingsFile(path.join(binnew, 'stack.ini'), data);
+  await writeSettingsFile(path.join(binnew, 'stack.ini'), data);
 }
 
-function generateTaskSettings(project: Project, app: ProjectApp) {
+async function generateTaskSettings(project: Project, app: ProjectApp) {
   const commonSettingsPath = path.join(project.path.version, 'Stack.srv', 'Bin', 'ini', 'settings.toml');
 
   let tomlData = {} as any;
 
   if (fs.existsSync(commonSettingsPath)) {
-    tomlData = readSettingsFile(commonSettingsPath);
+    tomlData = await readSettingsFile(commonSettingsPath);
   } else {
     tomlData.RabbitMQrpc = {};
     tomlData.RabbitMQrpc.exchange = '';
@@ -898,27 +899,27 @@ function generateTaskSettings(project: Project, app: ProjectApp) {
   }
 
   const queueSettingsPath = path.join(project.path.bin, `settings_${taskid}.toml`);
-  writeSettingsFile(queueSettingsPath, tomlData);
+  await writeSettingsFile(queueSettingsPath, tomlData);
 }
 
-function generateCredentials(project: Project, pathnew: string) {
+async function generateCredentials(project: Project, pathnew: string) {
   const data = {
     Database: {
       login: project.sql.login,
       password: project.sql.password,
     },
   };
-  writeSettingsFile(path.join(pathnew, 'credentials.ini'), data);
+  await writeSettingsFile(path.join(pathnew, 'credentials.ini'), data);
 }
 
-function generateGatewaySettings(project: Project, pathnew: string) {
+async function generateGatewaySettings(project: Project, pathnew: string) {
   if (!project.gateway) {
     return null;
   }
 
   const templateYaml = project.gateway.settings;
   if (fs.existsSync(templateYaml)) {
-    const dataYaml = readSettingsFile(templateYaml);
+    const dataYaml = await readSettingsFile(templateYaml);
     const common = dataYaml[0];
 
     common.server.port = +project.gateway.port || common.server.port;
@@ -940,7 +941,7 @@ function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      })
+      }),
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
@@ -980,7 +981,7 @@ function generateGatewaySettings(project: Project, pathnew: string) {
       password: project.sql.password,
     };
 
-    writeSettingsFile(path.join(pathnew, 'application.yml'), dataYaml);
+    await writeSettingsFile(path.join(pathnew, 'application.yml'), dataYaml);
     return path.join(pathnew, 'application.yml');
   }
 }
@@ -1043,7 +1044,7 @@ async function fillProjects() {
           args: '',
         };
 
-        const data = getDataFromIni(pathini);
+        const data = await getDataFromIni(pathini);
         const args = parseArgs(item.StackProgramParameters);
 
         project.sql = {

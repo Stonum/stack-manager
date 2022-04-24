@@ -6,56 +6,56 @@ import MarkdownIt from 'markdown-it';
 import toml from 'toml-js';
 import yaml from 'js-yaml';
 
-export function readSettingsFile(filePath: string) {
+export async function readSettingsFile(filePath: string) {
   const ext = path.extname(filePath)?.toLowerCase();
 
   switch (ext) {
     case '.ini':
-      return readIniFile(filePath);
+      return await readIniFile(filePath);
     case '.toml':
-      return readTomlFile(filePath);
+      return await readTomlFile(filePath);
     case '.yml':
-      return readYamlFile(filePath);
+      return await readYamlFile(filePath);
     default:
       throw new Error('unknown extension');
   }
 }
 
-export function writeSettingsFile(filePath: string, data: any) {
+export async function writeSettingsFile(filePath: string, data: any) {
   const ext = path.extname(filePath)?.toLowerCase();
 
   switch (ext) {
     case '.ini':
-      return writeIniFile(filePath, data);
+      return await writeIniFile(filePath, data);
     case '.toml':
-      return writeTomlFile(filePath, data);
+      return await writeTomlFile(filePath, data);
     case '.yml':
-      return writeYamlFile(filePath, data);
+      return await writeYamlFile(filePath, data);
     default:
       throw new Error('unknown extension');
   }
 }
 
-export function readIniFile(filePath: string) {
-  let strData = fs.readFileSync(filePath, 'utf8');
+export async function readIniFile(filePath: string) {
+  let strData = await fsp.readFile(filePath, 'utf8');
   // костыль с обработкой массивов
   strData = strData.replaceAll('PRG=', 'PRG[]=').replaceAll('DB=', 'DB[]=').replaceAll('RS=', 'RS[]=').replaceAll('RPT=', 'RPT[]=');
   let data = ini.parse(strData);
 
   if (data.Include) {
-    const dataInc = readIniFile(path.resolve(path.dirname(filePath), data.Include));
+    const dataInc = await readIniFile(path.resolve(path.dirname(filePath), data.Include));
     data = Object.assign({}, data, dataInc);
   }
   for (const key of Object.keys(data)) {
     if (data[key].Include) {
-      const dataInc = readIniFile(path.resolve(path.dirname(filePath), data[key].Include));
+      const dataInc = await readIniFile(path.resolve(path.dirname(filePath), data[key].Include));
       data = Object.assign({}, data, dataInc);
     }
   }
   return data;
 }
 
-export function writeIniFile(filePath: string, data: any) {
+export async function writeIniFile(filePath: string, data: any) {
   let strData = ini.stringify(data);
   // костыль с обработкой массивов
   strData = strData
@@ -67,11 +67,11 @@ export function writeIniFile(filePath: string, data: any) {
   strData = strData.replaceAll('"', '');
   // костыль с двойными слэшами в путях
   strData = strData.replaceAll('\\\\', '\\');
-  fs.writeFileSync(filePath, strData);
+  await fsp.writeFile(filePath, strData);
 }
 
 export async function getFiles(dir: string): Promise<string[]> {
-  const dirents = await fs.readdirSync(dir, { withFileTypes: true });
+  const dirents = await fsp.readdir(dir, { withFileTypes: true });
   const files = await Promise.all(
     dirents.map(async (dirent) => {
       const res = path.resolve(dir, dirent.name);
@@ -84,12 +84,12 @@ export async function getFiles(dir: string): Promise<string[]> {
 export async function copyFiles(src: string, desc: string) {
   const files = await getFiles(src);
   return Promise.all(
-    files.map((file) => {
+    files.map(async (file) => {
       const folder = path.dirname(file.replace(src, desc));
       const fname = path.basename(file);
       if (!fs.existsSync(path.join(folder, fname))) {
         if (!fs.existsSync(folder)) {
-          fs.mkdirSync(folder, { recursive: true });
+          await fsp.mkdir(folder, { recursive: true });
         }
         return fsp.copyFile(file, path.join(folder, fname));
       }
@@ -99,7 +99,7 @@ export async function copyFiles(src: string, desc: string) {
 
 export async function readMarkdownFile(src: string) {
   const md = new MarkdownIt();
-  let strData = fs.readFileSync(src, 'utf8');
+  let strData = await fsp.readFile(src, 'utf8');
   if (strData) {
     const regCommitLink = /\(\[\S*\)\)/;
     strData = strData.replaceAll(regCommitLink, '').trimEnd();
@@ -110,22 +110,22 @@ export async function readMarkdownFile(src: string) {
   return result;
 }
 
-export function readTomlFile(filePath: string) {
-  let strData = fs.readFileSync(filePath, 'utf8');
+export async function readTomlFile(filePath: string) {
+  let strData = await fsp.readFile(filePath, 'utf8');
   // уберем закомментированные строки ( я нуб, надо удалить пустые строки тоже... )
   strData = strData.replace(/\#(.+)$/gm, 'x').replaceAll('x\\r\\n', '');
   return toml.parse(strData);
 }
 
-export function writeTomlFile(filePath: string, data: any) {
-  fs.writeFileSync(filePath, toml.dump(data));
+export async function writeTomlFile(filePath: string, data: any) {
+  await fsp.writeFile(filePath, toml.dump(data));
 }
 
-export function readYamlFile(filePath: string) {
-  return yaml.loadAll(fs.readFileSync(filePath, 'utf8'));
+export async function readYamlFile(filePath: string) {
+  return yaml.loadAll(await fsp.readFile(filePath, 'utf8'));
 }
 
-export function writeYamlFile(filePath: string, data: any) {
+export async function writeYamlFile(filePath: string, data: any) {
   let stringdata = '';
   for (const doc of data) {
     if (stringdata.length) {
@@ -133,5 +133,5 @@ export function writeYamlFile(filePath: string, data: any) {
     }
     stringdata += yaml.dump(doc);
   }
-  fs.writeFileSync(filePath, stringdata);
+  await fsp.writeFile(filePath, stringdata);
 }

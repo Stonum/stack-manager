@@ -161,7 +161,7 @@ export default Vue.extend({
         } else {
           await this.projectRebuild({ projectId: +this.projectid, params: this.project });
         }
-        this.$router.go(-1);
+        this.$router.push('/');
       } finally {
         this.loading = false;
       }
