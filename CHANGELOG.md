@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.3](https://git.stack-it.ru/Arshinov_AN/stack-manager/compare/v0.5.2...v0.5.3) (2022-04-24)
+
+
+### Features
+
+* выбор настроек гейтвэя ([2b586e2](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/2b586e2c650a00a5acbbe1a41ed8eabef314159d))
+
+
+### Bug Fixes
+
+* исправил  получение состояний приложений ([80cd6c6](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/80cd6c6b79e8c301a695f754d1c3ab451a0f8647))
+* исправил определение расширений конфигов ([666c889](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/666c889d70ce1b8748eecdb90b3c6c893e5c0a77))
+* исправил рестарт для 2109 ([42f1d65](https://git.stack-it.ru/Arshinov_AN/stack-manager/commit/42f1d65ecf6893e06b87701caaae5a1339351c22))
+
 ### [0.5.2](https://git.stack-it.ru/Arshinov_AN/stack-manager/compare/v0.5.1...v0.5.2) (2022-04-18)
 
 
