@@ -16,99 +16,71 @@ const state: ProjectState = {
   apps: [],
 };
 
-const eventResolver = function (name: string): Promise<any> {
-  return new Promise((resolve, reject) => {
-    ipcRenderer.on(name, (event, payload: any | Error): any => {
-      if (payload instanceof Error) {
-        reject(payload);
-      } else {
-        resolve(payload);
-      }
-    });
-  });
-};
-
 const actions: ActionTree<ProjectState, any> = {
   projectAdd(ctx, params: Project): Promise<any> {
-    ipcRenderer.send('project', { message: 'add', params });
-    return eventResolver('add');
+    return ipcRenderer.invoke('project', { message: 'add', params });
   },
 
   projectDelete(ctx, projectId: number): Promise<any> {
-    ipcRenderer.send('project', { message: 'delete', projectId });
-    return eventResolver('delete');
+    return ipcRenderer.invoke('project', { message: 'delete', projectId });
   },
 
   projectRebuild(ctx, { projectId, params }: { projectId: number; params: Project }): Promise<any> {
-    ipcRenderer.send('project', { message: 'rebuild', projectId, params });
-    return eventResolver('rebuild');
+    return ipcRenderer.invoke('project', { message: 'rebuild', projectId, params });
   },
 
-  getProjects({ state, commit }): Promise<Project[]> {
-    ipcRenderer.send('project', { message: 'getAll' });
-    return new Promise((resolve) => {
-      ipcRenderer.on('getAll', (event, payload: Project[]) => {
-        resolve(payload);
-        commit('CLEAR_APPS');
-        if (payload && payload.length) {
-          for (const project of payload) {
-            if (project.apps && project.apps.length) {
-              for (const app of project.apps) {
-                commit('APP_ADD', { name: app.name, status: undefined });
-              }
-            }
+  async getProjects({ state, commit }): Promise<Project[]> {
+    const projects = await ipcRenderer.invoke('project', { message: 'getAll' });
+    commit('CLEAR_APPS');
+    if (projects && projects.length) {
+      for (const project of projects) {
+        if (project.apps && project.apps.length) {
+          for (const app of project.apps) {
+            commit('APP_ADD', { name: app.name, status: undefined });
           }
         }
-      });
-    });
+      }
+    }
+    return projects;
   },
 
-  getAppStatus({ state, commit }) {
+  async getAppStatus({ state, commit }) {
     if (state.apps.length !== 0) {
-      ipcRenderer.send('project', { message: 'getAppStatus' });
-      ipcRenderer.on('getAppStatus', (event, payload: any) => {
-        if (payload?.length) {
-          for (const app of payload) {
-            commit('APP_SET_STATUS', { name: app.name, status: app.status });
-          }
+      const apps = await ipcRenderer.invoke('project', { message: 'getAppStatus' });
+      if (apps.length) {
+        for (const app of apps) {
+          commit('APP_SET_STATUS', { name: app.name, status: app.status });
         }
-      });
+      }
     }
   },
 
   getProject(ctx, projectId: number): Promise<Project> {
-    ipcRenderer.send('project', { message: 'get', projectId });
-    return eventResolver('get');
+    return ipcRenderer.invoke('project', { message: 'get', projectId });
   },
 
   projectSendJob(ctx, { jobName, projectId, params }: { jobName: string; projectId: number; params: any }): Promise<any> {
-    ipcRenderer.send('project', { message: jobName, projectId, params });
-    return eventResolver(jobName);
+    return ipcRenderer.invoke('project', { message: jobName, projectId, params });
   },
 
   readProjectFolder(ctx, path: string): Promise<any> {
-    ipcRenderer.send('project', { message: 'readFolder', path });
-    return eventResolver('readFolder');
+    return ipcRenderer.invoke('project', { message: 'readFolder', path });
   },
 
   readIniFile(ctx, path: string): Promise<any> {
-    ipcRenderer.send('project', { message: 'readIniFile', path });
-    return eventResolver('readIniFile');
+    return ipcRenderer.invoke('project', { message: 'readIniFile', path });
   },
 
   fillProjects(): Promise<boolean> {
-    ipcRenderer.send('project', { message: 'fillProjects' });
-    return eventResolver('fillProjects');
+    return ipcRenderer.invoke('project', { message: 'fillProjects' });
   },
 
   moveProject(ctx, { oldIndex, newIndex }: { oldIndex: number; newIndex: number }): Promise<boolean> {
-    ipcRenderer.send('project', { message: 'moveProject', oldIndex, newIndex });
-    return eventResolver('moveProject');
+    return ipcRenderer.invoke('project', { message: 'moveProject', oldIndex, newIndex });
   },
 
   createStaticApp(ctx, service: string): Promise<boolean> {
-    ipcRenderer.send('project', { message: 'createStaticApp', name: service });
-    return eventResolver('createStaticApp');
+    return ipcRenderer.invoke('project', { message: 'createStaticApp', name: service });
   },
 };
 

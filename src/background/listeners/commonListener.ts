@@ -7,7 +7,7 @@ export default class CommonListener {
   window = new Window();
 
   constructor(_name: string) {
-    ipcMain.on(_name, async (event, payload) => {
+    ipcMain.handle(_name, async (event, payload) => {
       const methodName = payload.message as string;
 
       log.debug(_name, payload);
@@ -15,16 +15,16 @@ export default class CommonListener {
       if (methodName && methodName in this) {
         try {
           //@ts-ignore
-          const result = await this[methodName](payload);
-          event.sender.send(methodName, result);
+          return await this[methodName](payload);
         } catch (e: AnyException) {
           log.error(e);
           this.window.webContents.send('error', e.message || e);
-          event.sender.send(methodName, e);
+          throw e;
         }
       } else {
         log.warn('Unknown method - ', methodName);
       }
+      return null;
     });
   }
 
