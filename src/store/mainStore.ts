@@ -42,6 +42,10 @@ const actions: ActionTree<MainState, any> = {
   openURL({ state }, { url }: { url?: string }) {
     return ipcRenderer.invoke('main', { message: 'openURL', url });
   },
+
+  openPath({ state }, { path }: { path?: string }) {
+    return ipcRenderer.invoke('main', { message: 'openPath', path });
+  },
 };
 
 const mainStore: Module<MainState, any> = {

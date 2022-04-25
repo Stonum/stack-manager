@@ -1,5 +1,14 @@
 <template>
-  <v-text-field :value="value" v-bind="$attrs" prepend-icon="mdi-folder-outline" readonly @click:prepend="onChangeFolder" v-on="$listeners">
+  <v-text-field
+    :value="value"
+    v-bind="$attrs"
+    prepend-icon="mdi-folder-outline"
+    append-icon="mdi-open-in-new"
+    readonly
+    @click:prepend="onChangeFolder"
+    @click:append="onOpenPath"
+    v-on="$listeners"
+  >
     <template v-if="$scopedSlots['append-outer']" #append-outer>
       <slot name="append-outer" />
     </template>
@@ -23,6 +32,9 @@ export default Vue.extend({
       if (result) {
         this.$emit('change', result);
       }
+    },
+    async onOpenPath() {
+      this.$store.dispatch('mainStore/openPath', { path: this.value?.toString() });
     },
   },
 });

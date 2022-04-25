@@ -85,4 +85,10 @@ export class MainListener extends CommonListener {
       shell.openExternal(payload.url);
     }
   }
+
+  openPath(payload: any) {
+    if (payload.path) {
+      shell.openPath(payload.path);
+    }
+  }
 }
