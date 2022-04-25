@@ -11,19 +11,26 @@ export default class StaticServer {
     const server = express();
     const staticPath = path.join(app.getPath('userData'), 'domains', name);
 
-    if (!fs.existsSync(staticPath)) {
-      log.error('Отсутствует каталог для публикации');
-      return;
-    }
+    if (fs.existsSync(staticPath)) {
+      server.use(express.static(staticPath));
 
-    server.use(express.static(staticPath));
-
-    // проброс путей для позадачных каталогов
-    const dirs = fs.readdirSync(staticPath, { withFileTypes: true });
-    for (const dir of dirs) {
-      if (dir.isDirectory()) {
-        server.use(`/${dir.name}/*`, express.static(path.join(staticPath, dir.name)));
+      // проброс путей для позадачных каталогов
+      const dirs = fs.readdirSync(staticPath, { withFileTypes: true });
+      for (const dir of dirs) {
+        if (dir.isDirectory()) {
+          server.use(`/${dir.name}/*`, express.static(path.join(staticPath, dir.name)));
+        }
       }
+    } else {
+      server.get('/', (req, res) => {
+        res.send(`
+          <h1>Ошибка публикации</h1>
+          <p>
+              Отсутствуют данные в каталоге ${staticPath}</br>
+              Выполните пункт меню "Собрать фронт" проекта "${name}"
+          </p>
+        `);
+      });
     }
 
     log.debug(`Server ${name} is starting...`);
