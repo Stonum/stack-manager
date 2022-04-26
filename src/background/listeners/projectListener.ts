@@ -7,7 +7,7 @@ import fsp from 'fs/promises';
 import os from 'os';
 
 import { projects, settings } from '../store';
-import { getFiles, copyFiles, readSettingsFile, writeSettingsFile, parseArgs, readIniFile } from '../utils';
+import { getFiles, copyFiles, readSettingsFile, writeSettingsFile, parseArgs, readIniFile, writeIniFile } from '../utils';
 
 import Dispatcher from '../middleware/dispatcher';
 import StaticServer from '../middleware/express';
@@ -734,9 +734,15 @@ async function buildProject(project: Project, oldApps?: ProjectApp[]) {
       await webServer.startItem(app.name);
     }
   }
+
+  if (project.path.front && fs.existsSync(project.path.front)) {
+    if (!fs.existsSync(path.join(project.path.front, '.env.local'))) {
+      await generateEnvLocal(project);
+    }
+  }
 }
 
-async function generateEnvJson(project: Project, envpath: string) {
+async function generateEnvLocal(project: Project) {
   let envPath = path.join(project.path.front, '.env.local');
   if (!fs.existsSync(envPath)) {
     envPath = path.join(project.path.front, '.env');
@@ -748,11 +754,30 @@ async function generateEnvJson(project: Project, envpath: string) {
     }
   }
 
+  const config = await getEnvConfig(project, envPath);
+
+  await writeIniFile(path.join(project.path.front, '.env.local'), config);
+}
+
+async function generateEnvJson(project: Project, envpath: string) {
+  const envPath = path.join(project.path.front, '.env.local');
+  if (!fs.existsSync(envPath)) {
+    await generateEnvLocal(project);
+  }
+  const config = await getEnvConfig(project, envPath);
+
+  await fsp.writeFile(path.join(envpath, 'env.json'), JSON.stringify(config, null, '\t'));
+}
+
+async function getEnvConfig(project: Project, envPath: string) {
   const tasks = settings.get('tasks') as Task[];
   const disp = new URL(settings.get('dispatcher_url') as string);
   const config = await readIniFile(envPath);
   if (project.type === StackBackendType.apphost) {
     config['API_HOST'] = `http://${os.hostname().toLowerCase()}:${project.gateway?.port}`;
+  } else {
+    delete config['API_HOST'];
+    delete config['API_HOST_AUTH'];
   }
   if (project.type === StackBackendType.stack) {
     for (const app of project.apps) {
@@ -771,8 +796,7 @@ async function generateEnvJson(project: Project, envpath: string) {
   if (uploadPath) {
     config['API_HOST_UPLOAD'] = disp.origin + '/upload';
   }
-
-  await fsp.writeFile(path.join(envpath, 'env.json'), JSON.stringify(config, null, '\t'));
+  return config;
 }
 
 async function generateStackIni(project: Project, pathini: string, binold: string, binnew: string, version: string) {
