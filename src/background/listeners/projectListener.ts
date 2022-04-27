@@ -386,6 +386,10 @@ export class ProjectListener extends CommonListener {
       }
 
       await cmd.exec('git pull', project.path.git);
+      // если фронт лежит не в папке проекта, обновим гит отдельно
+      if (project.path.front && path.dirname(project.path.front) !== path.normalize(project.path.git)) {
+        await cmd.exec('git pull', project.path.git);
+      }
     } else {
       throw new Error(`Не найден проект с указанным id - ${id}`);
     }
