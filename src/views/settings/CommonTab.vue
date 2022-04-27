@@ -12,7 +12,7 @@
         <v-text-field v-model="settings.rabbitmq_url" label="RabbitMQ ( адрес : порт )" placeholder="http://<url>:<port>" prepend-icon="mdi-web" clearable dense />
       </v-col>
       <v-col cols="12">
-        <select-folder v-model="settings.stackversion" label="Каталог Stack_Version" clearable dense>
+        <select-folder v-model="settings.stackversion" label="Локальный каталог Stack.Version" clearable dense>
           <template #append-outer>
             <help-icon
               >Локальный каталог для версий. Сюда будет копироваться каталог версии. Если не указан, будем использовать ссылку на каталог версии указанной при создании</help-icon
@@ -21,7 +21,7 @@
         </select-folder>
       </v-col>
       <v-col cols="12">
-        <select-folder v-model="settings.bin" label="Каталог bin" clearable dense>
+        <select-folder v-model="settings.bin" label="Общий каталог bin" clearable dense>
           <template #append-outer>
             <help-icon>Общий каталог где будут создаваться папки для запуска веб сервиса. Если не заполнен, создаем в bin проекта</help-icon>
           </template>
