@@ -24,8 +24,13 @@ export class MainListener extends CommonListener {
 
   setSettings(payload: any) {
     if (payload.key) {
+      // иногда перетирает список задач пустым массивом
+      if (payload.key === 'tasks' && !payload.data?.length) {
+        return '';
+      }
       settings.set(payload.key, payload.data || '');
     }
+    return '';
   }
 
   getVersion() {
@@ -70,9 +75,9 @@ export class MainListener extends CommonListener {
       console.log(e);
     }
     this.sendInfoMessage('DispatcherService', 'Запуск службы');
-    const res = await cmd.execSudo('net start DispatcherService');
+    await cmd.execSudo('net start DispatcherService');
     this.sendInfoMessage('DispatcherService', 'Служба запущена');
-    return res;
+    return true;
   }
 
   async getChangeLog() {
