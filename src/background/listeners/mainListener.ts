@@ -7,6 +7,7 @@ import Window from '../window';
 import { settings } from '../store';
 import cmd from '../cmd';
 import { readMarkdownFile } from '../utils';
+import Dispatcher from '../middleware/dispatcher';
 
 export class MainListener extends CommonListener {
   window = new Window();

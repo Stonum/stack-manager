@@ -4,7 +4,7 @@
       <v-card fluid :elevation="0">
         <v-tabs hide-slider :height="tabHeaderHight" v-model="activeTab">
           <v-tab @click="onClickTab" key="msg">Сообщения</v-tab>
-          <!-- <v-tab @click="onClickTab" key="disp">События диспетчера</v-tab> -->
+          <v-tab @click="onClickTab" key="disp">События диспетчера</v-tab>
 
           <v-spacer />
           <v-btn color="primary" icon @click="onClickUpDown">
@@ -17,7 +17,7 @@
             <message-list :items="messages" :height="tabBodyHeight" />
           </v-tab-item>
           <v-tab-item key="disp">
-            <!-- <message-list :items="messages" :height="tabBodyHeight" /> -->
+            <message-list :items="events" :height="tabBodyHeight" />
           </v-tab-item>
         </v-tabs-items>
       </v-card>
@@ -45,6 +45,11 @@ export default Vue.extend({
   computed: {
     messages(): Message[] {
       return this.$store.getters['mainStore/getMessages']().sort((a: Message, b: Message) => {
+        return a.time < b.time ? 1 : -1;
+      });
+    },
+    events(): Message[] {
+      return this.$store.getters['projectStore/getEvents']().sort((a: Message, b: Message) => {
         return a.time < b.time ? 1 : -1;
       });
     },

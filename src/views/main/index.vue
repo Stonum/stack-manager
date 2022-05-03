@@ -44,7 +44,6 @@ export default Vue.extend({
       delIndex: null as number | null,
       delName: null as string | null,
       loading: false,
-      timer: null as any,
     };
   },
   methods: {
@@ -87,19 +86,6 @@ export default Vue.extend({
       this.visibleFillDlg = true;
     } else {
       this.getAppStatus();
-      const interval = +(await this.$store.dispatch('mainStore/getSettings', { key: 'refresh_interval' })) || 20000;
-      this.timer = setInterval(async () => {
-        const isVisible = await this.$store.dispatch('mainStore/getVisibleWindow');
-        if (!isVisible) {
-          return;
-        }
-        this.getAppStatus();
-      }, interval);
-    }
-  },
-  beforeDestroy() {
-    if (this.timer) {
-      clearInterval(this.timer);
     }
   },
 });

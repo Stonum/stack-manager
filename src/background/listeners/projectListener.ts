@@ -62,7 +62,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State };
-      })
+      }),
     );
 
     const appServer = getDispatcher().appServer();
@@ -70,10 +70,22 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State ? 0 : 2 };
-      })
+      }),
     );
 
     return statuses;
+  }
+
+  async getEvents() {
+    const webServer = getDispatcher().eventServer();
+    const events = await webServer.getItems();
+    return events.map((event: any) => {
+      return {
+        type: event.EventType === '1' ? 'error' : 'info',
+        text: event.EventMessage,
+        time: new Date(+event.EventDateTime * 1000),
+      };
+    });
   }
 
   get(payload: any) {
@@ -969,7 +981,7 @@ async function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      })
+      }),
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';

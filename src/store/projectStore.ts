@@ -4,6 +4,7 @@ import { ipcRenderer } from 'electron';
 interface ProjectState {
   projects: Project[];
   apps: AppState[];
+  events: Message[];
 }
 
 interface AppState {
@@ -14,6 +15,7 @@ interface AppState {
 const state: ProjectState = {
   projects: [],
   apps: [],
+  events: [],
 };
 
 const actions: ActionTree<ProjectState, any> = {
@@ -53,6 +55,10 @@ const actions: ActionTree<ProjectState, any> = {
         }
       }
     }
+  },
+
+  async getEvents({ state, commit }) {
+    state.events = await ipcRenderer.invoke('project', { message: 'getEvents' });
   },
 
   getProject(ctx, projectId: number): Promise<Project> {
@@ -100,6 +106,9 @@ const getters: GetterTree<ProjectState, any> = {
       default:
         return 'error';
     }
+  },
+  getEvents: (state: ProjectState) => () => {
+    return state.events;
   },
 };
 

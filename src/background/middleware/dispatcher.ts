@@ -39,6 +39,10 @@ export default class Dispatcher {
     return new ServerAPI(this, 'ProgramSpys');
   }
 
+  public eventServer() {
+    return new EventsAPI(this);
+  }
+
   private async authenticate() {
     this.token = null;
     const response = await this._sendRequest({ secret: this.secret });
@@ -462,5 +466,99 @@ class ServerAPI {
   async restartItem(name: string): Promise<boolean> {
     await this.stopItem(name);
     return this.startItem(name);
+  }
+}
+
+class EventsAPI {
+  private dispatcher: Dispatcher;
+  private type: string;
+
+  constructor(dispatcher: Dispatcher) {
+    this.dispatcher = dispatcher;
+    this.type = 'EventList';
+  }
+
+  async getItems(): Promise<DispatcherItem[]> {
+    const res = await this.getRecords();
+    return res;
+  }
+
+  public async getRecords(params?: string): Promise<DispatcherItem[]> {
+    const count = await this.getCount();
+    const selection = await this.getSelections(count);
+    return selection;
+  }
+
+  public async getCount() {
+    const request = [];
+    request.push({ [this.type]: this.getCountRequest() });
+
+    const result = (await this.dispatcher.sendRequest(request))[0];
+    if (result && result[this.type] && result[this.type][0]) {
+      return JSON.parse(result[this.type][0].Count.result);
+    }
+    return 0;
+  }
+
+  public getCountRequest() {
+    const res = [];
+    res.push({ Count: [] });
+    return res;
+  }
+
+  public async getSelections(count: number) {
+    let index = 0;
+    const end = Math.min(count, 100);
+
+    const resObj = { [this.type]: [] as object[] };
+    for (index; index < end; index++) {
+      const res = this.getEvent(index);
+      resObj[this.type].push(res);
+    }
+    const result = this.parseResult((await this.dispatcher.sendRequest([resObj]))[0][this.type]);
+
+    return result;
+  }
+
+  public getEvent(idx: number) {
+    let res = { type: 'property' };
+    res = Object.assign({ params: [idx] }, res, {});
+    res = Object.assign(res, {}, this.getMethod('EventMessage'));
+    res = Object.assign(res, {}, this.getMethod('EventCode'));
+    res = Object.assign(res, {}, this.getMethod('EventType'));
+    res = Object.assign(res, {}, this.getMethod('EventDateTime'));
+
+    return res;
+  }
+
+  public getMethod(name: string, param?: string) {
+    let res = {};
+    if (param) {
+      res = Object.assign(res, {}, { params: [param], [name]: [] });
+      return res;
+    } else {
+      return { [name]: [] };
+    }
+  }
+
+  public parseResult(res: any) {
+    const result: any[] = [];
+    let index = 0;
+    res.forEach((service: object) => {
+      result.push(Object.assign({ $номерЗаписи: ++index }, {}, this.parseEventsMethods(service)));
+    });
+    return result;
+  }
+
+  public parseEventsMethods(service: any) {
+    let res = {};
+    if (service) {
+      for (const property in service) {
+        if (service[property] && service[property].result) {
+          res = Object.assign(res, {}, { [property]: service[property].result });
+        }
+      }
+    }
+    return res;
   }
 }
