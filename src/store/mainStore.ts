@@ -1,10 +1,14 @@
-import { Module, ActionTree } from 'vuex';
+import { Module, MutationTree, GetterTree, ActionTree } from 'vuex';
 import { ipcRenderer } from 'electron';
 import { FileFilter } from 'electron/main';
 
-type MainState = Settings;
+type MainState = {
+  messages: Message[];
+};
 
-const state: MainState = {};
+const state: MainState = {
+  messages: [],
+};
 
 const actions: ActionTree<MainState, any> = {
   setSettings({ state }, { key, data }: { key: string; data: any }) {
@@ -48,10 +52,24 @@ const actions: ActionTree<MainState, any> = {
   },
 };
 
+const getters: GetterTree<MainState, any> = {
+  getMessages: (state: MainState) => () => {
+    return state.messages;
+  },
+};
+
+const mutations: MutationTree<MainState> = {
+  MESSAGE_ADD(state: MainState, msg: Message) {
+    state.messages.push({ ...msg, time: new Date() });
+  },
+};
+
 const mainStore: Module<MainState, any> = {
   namespaced: true,
   state,
   actions,
+  mutations,
+  getters,
 };
 
 export default mainStore;

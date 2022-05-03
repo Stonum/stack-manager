@@ -1,12 +1,11 @@
 <template>
-  <v-snackbar v-model="visible" color="error" @click.native="visible = false" :timeout="10000">
+  <v-snackbar v-model="visible" color="error" @click.native="visible = false" absolute style="z-index: 100" :timeout="10000">
     {{ text }}
   </v-snackbar>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { ipcRenderer } from 'electron';
 
 export default Vue.extend({
   name: 'Toast',
@@ -17,9 +16,11 @@ export default Vue.extend({
     };
   },
   created() {
-    ipcRenderer.on('error', (event, payload: any) => {
-      this.visible = true;
-      this.text = payload;
+    this.$store.subscribe((mutatipn) => {
+      if (mutatipn.type === 'mainStore/MESSAGE_ADD' && mutatipn.payload?.type === 'error') {
+        this.visible = true;
+        this.text = mutatipn.payload?.text;
+      }
     });
   },
 });

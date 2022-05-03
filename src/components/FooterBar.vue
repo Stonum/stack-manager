@@ -1,0 +1,72 @@
+<template>
+  <v-footer app padless fixed>
+    <v-container fluid class="pb-0">
+      <v-card fluid :elevation="0">
+        <v-tabs hide-slider :height="tabHeaderHight" v-model="activeTab">
+          <v-tab @click="onClickTab" key="msg">Сообщения</v-tab>
+          <!-- <v-tab @click="onClickTab" key="disp">События диспетчера</v-tab> -->
+
+          <v-spacer />
+          <v-btn color="primary" icon @click="onClickUpDown">
+            <v-icon>{{ updownicon }}</v-icon>
+          </v-btn>
+        </v-tabs>
+
+        <v-tabs-items v-model="activeTab" :style="`height: ${tabBodyHeight}px`">
+          <v-tab-item key="msg">
+            <message-list :items="messages" :height="tabBodyHeight" />
+          </v-tab-item>
+          <v-tab-item key="disp">
+            <!-- <message-list :items="messages" :height="tabBodyHeight" /> -->
+          </v-tab-item>
+        </v-tabs-items>
+      </v-card>
+    </v-container>
+  </v-footer>
+</template>
+
+<script lang="ts">
+import Vue from 'vue';
+import MessageList from './MessageList.vue';
+
+export default Vue.extend({
+  name: 'FooterBar',
+  components: { MessageList },
+  data() {
+    const tabHeaderHight = 35;
+    const tabBodyMaxHeight = tabHeaderHight * 8 - tabHeaderHight;
+    return {
+      tabHeaderHight,
+      tabBodyMaxHeight,
+      tabBodyHeight: 0,
+      activeTab: null,
+    };
+  },
+  computed: {
+    messages(): Message[] {
+      return this.$store.getters['mainStore/getMessages']().sort((a: Message, b: Message) => {
+        return a.time < b.time ? 1 : -1;
+      });
+    },
+    collapsedFooter(): boolean {
+      return this.tabBodyHeight === 0;
+    },
+    updownicon(): string {
+      return this.collapsedFooter ? 'mdi-chevron-up' : 'mdi-chevron-down';
+    },
+  },
+  methods: {
+    onClickTab() {
+      this.tabBodyHeight = this.collapsedFooter ? this.tabBodyMaxHeight : this.tabBodyHeight;
+      this.$emit('change', this.tabHeaderHight + this.tabBodyHeight);
+    },
+    onClickUpDown() {
+      this.tabBodyHeight = this.collapsedFooter ? this.tabBodyMaxHeight : 0;
+      this.$emit('change', this.tabHeaderHight + this.tabBodyHeight);
+    },
+  },
+  created() {
+    this.$emit('change', this.tabHeaderHight + this.tabBodyHeight);
+  },
+});
+</script>

@@ -66,3 +66,5 @@ interface DispatcherItem {
   StackProgramParameters: string;
   [parameter: string]: string | number;
 }
+
+type Message = { type: string; text: string; time: Date };
