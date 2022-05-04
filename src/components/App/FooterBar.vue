@@ -3,8 +3,8 @@
     <v-container fluid class="pb-0">
       <v-card fluid :elevation="0">
         <v-tabs hide-slider :height="tabHeaderHight" v-model="activeTab">
-          <v-tab @click="onClickTab" key="msg">Сообщения</v-tab>
-          <v-tab @click="onClickTab" key="disp">События диспетчера</v-tab>
+          <v-tab @click="onClickTab(0)">Сообщения</v-tab>
+          <v-tab @click="onClickTab(1)">События диспетчера</v-tab>
 
           <v-spacer />
           <v-btn color="primary" icon @click="onClickUpDown">
@@ -13,10 +13,10 @@
         </v-tabs>
 
         <v-tabs-items v-model="activeTab" :style="`height: ${tabBodyHeight}px`">
-          <v-tab-item key="msg">
+          <v-tab-item>
             <message-list :items="messages" :height="tabBodyHeight" />
           </v-tab-item>
-          <v-tab-item key="disp">
+          <v-tab-item>
             <message-list :items="events" :height="tabBodyHeight" />
           </v-tab-item>
         </v-tabs-items>
@@ -59,9 +59,10 @@ export default Vue.extend({
     },
   },
   methods: {
-    onClickTab() {
-      this.tabBodyHeight = this.collapsedFooter ? this.tabBodyMaxHeight : this.tabBodyHeight;
-      this.$emit('change', this.tabHeaderHight + this.tabBodyHeight);
+    onClickTab(tab: number) {
+      if (this.collapsedFooter || tab === this.activeTab) {
+        this.onClickUpDown();
+      }
     },
     onClickUpDown() {
       this.tabBodyHeight = this.collapsedFooter ? this.tabBodyMaxHeight : 0;
