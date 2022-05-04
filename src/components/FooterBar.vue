@@ -49,9 +49,7 @@ export default Vue.extend({
       });
     },
     events(): Message[] {
-      return this.$store.getters['projectStore/getEvents']().sort((a: Message, b: Message) => {
-        return a.time < b.time ? 1 : -1;
-      });
+      return this.$store.getters['projectStore/getEvents']();
     },
     collapsedFooter(): boolean {
       return this.tabBodyHeight === 0;
