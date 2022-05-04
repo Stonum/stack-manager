@@ -62,7 +62,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State };
-      })
+      }),
     );
 
     const appServer = getDispatcher().appServer();
@@ -70,7 +70,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State ? 0 : 2 };
-      })
+      }),
     );
 
     return statuses;
@@ -105,7 +105,9 @@ export class ProjectListener extends CommonListener {
     checkProject(project, null);
     allProjects.push(project);
     projects.set('projects', allProjects);
+    this.sendInfoMessage(project.name, 'Сборка backend запущена');
     await buildProject(project);
+    this.sendInfoMessage(project.name, 'Сборка backend завершена');
     return project;
   }
 
@@ -162,7 +164,9 @@ export class ProjectListener extends CommonListener {
     if (data && data[id]) {
       const project = prepareProject(payload.params);
       checkProject(project, id);
+      this.sendInfoMessage(project.name, 'Сборка backend запущена');
       await buildProject(project, data[id].apps);
+      this.sendInfoMessage(project.name, 'Сборка backend завершена');
       data[id] = project;
       projects.set('projects', data);
     } else {
@@ -236,7 +240,7 @@ export class ProjectListener extends CommonListener {
         throw new Error(`Не найден указанный каталог Stack.Front`);
       }
 
-      this.sendInfoMessage(project.name, 'Сборка запущена');
+      this.sendInfoMessage(project.name, 'Сборка frontend запущена');
       if (fs.existsSync(path.join(project.path.front, 'node_modules'))) {
         await cmd.exec('npm ci --progress=false', project.path.front);
       } else {
@@ -249,7 +253,7 @@ export class ProjectListener extends CommonListener {
         }
         await copyFiles(path.join(project.path.front, 'dist'), path.join(this.staticPath, project.name));
         await generateEnvJson(project, path.join(this.staticPath, project.name));
-        this.sendInfoMessage(project.name, 'Сборка завершена');
+        this.sendInfoMessage(project.name, 'Сборка frontend завершена');
       } else {
         this.sendInfoMessage(project.name, `Не найден dist каталог`);
         throw new Error(`Не найден dist каталог`);
@@ -985,7 +989,7 @@ async function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      })
+      }),
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
