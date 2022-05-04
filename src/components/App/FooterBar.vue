@@ -27,7 +27,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import MessageList from './MessageList.vue';
+import MessageList from '../MessageList/MessageList.vue';
 
 export default Vue.extend({
   name: 'FooterBar',

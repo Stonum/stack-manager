@@ -15,12 +15,12 @@ import Vue from 'vue';
 
 import SelectFolder from '@/components/SelectFolder.vue';
 import SelectFile from '@/components/SelectFile.vue';
-import AppBar from '@/components/AppBar.vue';
+import AppBar from '@/components/App/AppBar.vue';
 import YesNoDialog from '@/components/YesNoDialog.vue';
 import HelpIcon from '@/components/HelpIcon.vue';
 
-import Toast from '@/components/Toast.vue';
-import FooterBar from '@/components/FooterBar.vue';
+import Toast from '@/components/App/Toast.vue';
+import FooterBar from '@/components/App/FooterBar.vue';
 
 import VueScroll from 'vuescroll';
 
