@@ -102,7 +102,7 @@ export default Vue.extend({
   },
 
   methods: {
-    ...mapActions('projectStore', ['readIniFile', 'readProjectFolder', 'projectAdd', 'projectRebuild', 'getProject']),
+    ...mapActions('projectStore', ['readIniFile', 'readProjectFolder', 'projectAdd', 'projectRebuild', 'getProject', 'getEvents']),
 
     async onReadIni() {
       const data = await this.readIniFile(this.project.path.ini);
@@ -161,6 +161,7 @@ export default Vue.extend({
         } else {
           await this.projectRebuild({ projectId: +this.projectid, params: this.project });
         }
+        this.getEvents();
         this.$router.push('/');
       } finally {
         this.loading = false;
