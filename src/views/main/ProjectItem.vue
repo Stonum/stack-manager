@@ -70,16 +70,18 @@ export default Vue.extend({
     },
   },
   methods: {
-    ...mapActions('projectStore', ['projectSendJob', 'getAppStatus']),
+    ...mapActions('projectStore', ['projectSendJob', 'getAppStatus', 'getEvents']),
     ...mapActions('mainStore', ['openURL']),
 
     async onStop(appname?: string) {
       await this.projectSendJob({ jobName: 'appStop', projectId: this.id, params: appname });
       this.getAppStatus();
+      this.getEvents();
     },
     async onStart(appname?: string) {
       await this.projectSendJob({ jobName: 'appStart', projectId: this.id, params: appname });
       this.getAppStatus();
+      this.getEvents();
     },
     async onRestart(appname?: string) {
       const idx = this.runningActions.push(true) - 1;
@@ -94,6 +96,7 @@ export default Vue.extend({
       } finally {
         this.$set(this.runningActions, idx, false);
         this.getAppStatus();
+        this.getEvents();
       }
     },
 

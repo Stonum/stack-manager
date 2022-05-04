@@ -47,7 +47,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    ...mapActions('projectStore', ['getProjects', 'projectDelete', 'moveProject', 'getAppStatus']),
+    ...mapActions('projectStore', ['getProjects', 'projectDelete', 'moveProject', 'getAppStatus', 'getEvents']),
 
     async onRefresh() {
       this.loading = true;
@@ -70,6 +70,7 @@ export default Vue.extend({
         await this.projectDelete(id);
         this.items = await this.getProjects();
       }
+      this.getEvents();
     },
     async onEdit(id: number) {
       this.$router.push(`/project/${id}`);
