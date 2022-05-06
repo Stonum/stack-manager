@@ -29,4 +29,10 @@ setTimeout(async function start() {
   setTimeout(start, interval);
 }, interval);
 
+// раз в час проверяем наличие обновлений
+store.dispatch('mainStore/checkForUpdates');
+setInterval(() => {
+  store.dispatch('mainStore/checkForUpdates');
+}, 60 * 60);
+
 export default store;

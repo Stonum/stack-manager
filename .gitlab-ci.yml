@@ -9,3 +9,6 @@ build:
       - $CI_PROJECT_DIR/dist_electron/*.*
   script:
     - npm install && npm run electron:build
+  only:
+    - tags
+    - main

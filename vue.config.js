@@ -21,6 +21,7 @@ module.exports = {
           oneClick: false,
           perMachine: true,
         },
+        publish: [{ provider: 'generic', url: process.env.UPDATE_URL }],
       },
     },
   },

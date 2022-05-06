@@ -1,4 +1,5 @@
 import { dialog, app, shell } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import path from 'path';
 
 import CommonListener from './commonListener';
@@ -10,9 +11,22 @@ import { readMarkdownFile } from '../utils';
 
 export class MainListener extends CommonListener {
   window = new Window();
+  update_url = process.env.UPDATE_URL;
 
   constructor() {
     super('main');
+
+    autoUpdater.autoDownload = false;
+    if (this.update_url) {
+      autoUpdater.setFeedURL({
+        provider: 'generic',
+        url: this.update_url,
+      });
+    }
+
+    autoUpdater.on('error', (error) => {
+      this.window.webContents.send('error', (error.stack || error).toString());
+    });
   }
 
   getSettings(payload: any) {
@@ -95,5 +109,27 @@ export class MainListener extends CommonListener {
     if (payload.path) {
       shell.openPath(payload.path);
     }
+  }
+
+  async checkForUpdates() {
+    return new Promise((resolve) => {
+      autoUpdater.checkForUpdates();
+      autoUpdater.once('update-available', () => {
+        this.sendInfoMessage('Updater', 'update is available');
+        resolve(true);
+      });
+
+      autoUpdater.once('update-not-available', () => {
+        this.sendInfoMessage('Updater', 'update is not available');
+        resolve(false);
+      });
+    });
+  }
+
+  downloadAndInstallUpdate() {
+    autoUpdater.downloadUpdate();
+    autoUpdater.once('update-downloaded', () => {
+      autoUpdater.quitAndInstall();
+    });
   }
 }

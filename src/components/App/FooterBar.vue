@@ -7,6 +7,9 @@
           <v-tab @click="onClickTab(1)">События диспетчера</v-tab>
 
           <v-spacer />
+          <v-btn v-if="updateIsAvailable" :loading="isUpdating" color="primary" icon @click="onUpdate" title="Установить обновление">
+            <v-icon> mdi-cloud-download-outline </v-icon>
+          </v-btn>
           <v-btn color="primary" icon @click="onClickUpDown">
             <v-icon>{{ updownicon }}</v-icon>
           </v-btn>
@@ -27,6 +30,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { mapActions } from 'vuex';
+
 import MessageList from '../MessageList/MessageList.vue';
 
 export default Vue.extend({
@@ -40,6 +45,7 @@ export default Vue.extend({
       tabBodyMaxHeight,
       tabBodyHeight: 0,
       activeTab: null,
+      isUpdating: false,
     };
   },
   computed: {
@@ -57,6 +63,9 @@ export default Vue.extend({
     updownicon(): string {
       return this.collapsedFooter ? 'mdi-chevron-up' : 'mdi-chevron-down';
     },
+    updateIsAvailable(): boolean {
+      return this.$store.getters['mainStore/getUpdateAvailable']();
+    },
   },
   methods: {
     onClickTab(tab: number) {
@@ -67,6 +76,11 @@ export default Vue.extend({
     onClickUpDown() {
       this.tabBodyHeight = this.collapsedFooter ? this.tabBodyMaxHeight : 0;
       this.$emit('change', this.tabHeaderHight + this.tabBodyHeight);
+    },
+    async onUpdate() {
+      this.isUpdating = true;
+      await this.$store.dispatch('mainStore/downloadAndInstallUpdate');
+      this.isUpdating = false;
     },
   },
   created() {

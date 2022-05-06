@@ -388,7 +388,7 @@ export class ProjectListener extends CommonListener {
       webServer.startItem(name);
 
       if (!fs.existsSync('C:\\Program Files\\dotnet\\dotnet.exe')) {
-        exec('\\\\FSRV\\KVP_VERSION\\Test\\dotnetcore\\dotnet-runtime-5.0.12-win-x64.exe');
+        exec(process.env.DOTNET_PATH || '');
       }
 
       this.sendInfoMessage(name, `Веб сервис создан`);

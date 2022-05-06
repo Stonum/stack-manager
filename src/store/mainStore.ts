@@ -4,10 +4,12 @@ import { FileFilter } from 'electron/main';
 
 type MainState = {
   messages: Message[];
+  updateIsAvailable: boolean;
 };
 
 const state: MainState = {
   messages: [],
+  updateIsAvailable: false,
 };
 
 const actions: ActionTree<MainState, any> = {
@@ -50,17 +52,35 @@ const actions: ActionTree<MainState, any> = {
   openPath({ state }, { path }: { path?: string }) {
     return ipcRenderer.invoke('main', { message: 'openPath', path });
   },
+
+  async checkForUpdates({ state, commit }) {
+    const res = await ipcRenderer.invoke('main', { message: 'checkForUpdates' });
+    if (res) {
+      commit('SET_AVAILABLE_UPDATE', res);
+    }
+    return res;
+  },
+
+  downloadAndInstallUpdate({ state }) {
+    return ipcRenderer.invoke('main', { message: 'downloadAndInstallUpdate' });
+  },
 };
 
 const getters: GetterTree<MainState, any> = {
   getMessages: (state: MainState) => () => {
     return state.messages;
   },
+  getUpdateAvailable: (state: MainState) => () => {
+    return state.updateIsAvailable;
+  },
 };
 
 const mutations: MutationTree<MainState> = {
   MESSAGE_ADD(state: MainState, msg: Message) {
     state.messages.push({ ...msg, time: new Date() });
+  },
+  SET_AVAILABLE_UPDATE(state: MainState, value: boolean) {
+    state.updateIsAvailable = value;
   },
 };
 
