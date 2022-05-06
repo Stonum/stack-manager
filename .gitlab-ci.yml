@@ -1,5 +1,5 @@
 stages:
-  - build
+ # - build
   
 build:
   image: slauta93/electron-builder-win
