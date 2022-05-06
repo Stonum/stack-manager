@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.5](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.3...v0.5.5) (2022-05-06)
+
+
+### Features
+
+* добавил проверку обновлений и их установку ([17ee90d](https://git.stack-it.ru/clients/stack-manager/commit/17ee90dbe559ee62685d2c8f8635f07bfefbddaa)), closes [#3](https://git.stack-it.ru/clients/stack-manager/issues/3)
+* добавил сообщение при отсутствии собранного фронта в каталоге ([152fe5d](https://git.stack-it.ru/clients/stack-manager/commit/152fe5dee9a68440bf75526dff2ae71d722e3fbc))
+* добавил футер с системными сообщениями и ошибками ([80a1fcd](https://git.stack-it.ru/clients/stack-manager/commit/80a1fcd0b411fd4c60496eb93740fd05eac6ccec))
+* открытие папки в проводнике ([442bf72](https://git.stack-it.ru/clients/stack-manager/commit/442bf725513530bd75b96d89e18e1581c1ef926b))
+* создание .env.local если отсутствует ([3ae9ed4](https://git.stack-it.ru/clients/stack-manager/commit/3ae9ed4a63a98c672e954b750e43dd9a3b3564d5)), closes [#11](https://git.stack-it.ru/clients/stack-manager/issues/11)
+
+
+### Bug Fixes
+
+* поправил затирание списка задач ([069bda4](https://git.stack-it.ru/clients/stack-manager/commit/069bda45a552b67e250adb06ba22defc218b4f93))
+
 ### [0.5.3](https://github.com/Stonum/stack-manager/compare/v0.5.2...v0.5.3) (2022-04-24)
 
 

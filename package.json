@@ -1,11 +1,10 @@
 {
   "name": "stack-manager",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "author": {
     "name": "stonum",
     "email": "lexxarsh@gmail.com"
   },
-
   "private": true,
   "scripts": {
     "electron:serve": "vue-cli-service electron:serve",
