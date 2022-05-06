@@ -1,0 +1,11 @@
+stages:
+  - build
+  
+build:
+  image: slauta93/electron-builder-win
+  stage: build
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR/dist_electron/*.*
+  script:
+    - npm install && npm run build
