@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.6](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.5...v0.5.6) (2022-05-08)
+
+
+### Bug Fixes
+
+* исправил получение записей вебсервера ([028d100](https://git.stack-it.ru/clients/stack-manager/commit/028d100cdb2388197d6eefc83d38eaf79f2305e7)), closes [#2](https://git.stack-it.ru/clients/stack-manager/issues/2)
+* исправлена замена stack.exe при пересборке ([8efa09b](https://git.stack-it.ru/clients/stack-manager/commit/8efa09b137e60769d5a24187f93614ef6e11f3d8)), closes [#1](https://git.stack-it.ru/clients/stack-manager/issues/1)
+* проверка обновлений раз в сутки ([ca67613](https://git.stack-it.ru/clients/stack-manager/commit/ca67613416ceb6ae63583bbfedffb1b6c9719226))
+
 ### [0.5.5](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.3...v0.5.5) (2022-05-06)
 
 
