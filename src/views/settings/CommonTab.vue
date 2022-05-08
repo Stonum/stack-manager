@@ -40,6 +40,9 @@
       <v-col cols="12">
         <v-switch v-model="settings.fullLogging" label="Полное логирование ( включает логирование всех запросов после перезапуска )" dense />
       </v-col>
+      <v-col cols="12">
+        <v-switch v-model="settings.colorBlindMode" label="Режим цветовой слепоты" dense />
+      </v-col>
     </v-row>
   </v-container>
 </template>

@@ -43,6 +43,7 @@ export default Vue.extend({
         dotnetcore_port: '',
         fullLogging: '',
         refresh_interval: 0,
+        colorBlindMode: '',
       } as Settings,
       tasks: [] as Task[],
     };

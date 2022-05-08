@@ -1,10 +1,13 @@
 import { Module, MutationTree, GetterTree, ActionTree } from 'vuex';
 import { ipcRenderer } from 'electron';
 
+import store from '.';
+
 interface ProjectState {
   projects: Project[];
   apps: AppState[];
   events: Message[];
+  colorBlindMode: boolean;
 }
 
 interface AppState {
@@ -16,6 +19,7 @@ const state: ProjectState = {
   projects: [],
   apps: [],
   events: [],
+  colorBlindMode: false,
 };
 
 const actions: ActionTree<ProjectState, any> = {
@@ -97,14 +101,16 @@ const getters: GetterTree<ProjectState, any> = {
   },
   getAppColor: (state: ProjectState, getters) => (name: string) => {
     const status = getters.getAppStatus(name);
+    const colorBlindMode = store.getters['mainStore/getSettings']('colorBlindMode');
+
     switch (status) {
       case 0:
-        return 'green';
+        return colorBlindMode ? 'blue' : 'green';
       case 1:
         return 'warning';
 
       default:
-        return 'error';
+        return colorBlindMode ? 'yellow' : 'error';
     }
   },
   getEvents: (state: ProjectState) => () => {
@@ -124,6 +130,9 @@ const mutations: MutationTree<ProjectState> = {
     if (app) {
       app.status = status;
     }
+  },
+  SET_BLIND_MODE(state: ProjectState, mode: boolean) {
+    state.colorBlindMode = mode;
   },
 };
 

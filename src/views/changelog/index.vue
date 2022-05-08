@@ -17,7 +17,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    ...mapActions('mainStore', ['openURL']),
+    ...mapActions('mainStore', ['openURL', 'getChangeLog']),
 
     onClick(payload: any) {
       payload.preventDefault();
@@ -27,7 +27,7 @@ export default Vue.extend({
     },
   },
   async mounted() {
-    this.html = await this.$store.dispatch('mainStore/getChangeLog');
+    this.html = await this.getChangeLog();
   },
 });
 </script>

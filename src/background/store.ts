@@ -23,6 +23,7 @@ const defSettings = {
   birt_port: 20777,
   dotnetcore_name: '_dotnetcore',
   dotnetcore_port: 20001,
+  colorBlindMode: false,
 };
 
 export const settings = new Store({ name: 'settings', cwd: 'config', defaults: defSettings });

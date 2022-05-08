@@ -9,6 +9,11 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({ modules: { mainStore, projectStore } });
 
+// предзаполним стор нужными настройками
+['colorBlindMode', 'refresh_interval', 'tasks'].forEach((key: string) => {
+  store.dispatch('mainStore/getSettings', { key });
+});
+
 ipcRenderer.on('error', (event, payload: any) => {
   store.commit('mainStore/MESSAGE_ADD', { type: 'error', text: payload });
 });
@@ -23,9 +28,10 @@ setTimeout(async function start() {
     setTimeout(start, 1000);
     return;
   }
-  interval = +(await store.dispatch('mainStore/getSettings', { key: 'refresh_interval' })) || 20000;
+  interval = +store.getters['mainStore/getSettings']('refresh_interval') || 20000;
   await store.dispatch('projectStore/getAppStatus');
   await store.dispatch('projectStore/getEvents');
+
   setTimeout(start, interval);
 }, interval);
 

@@ -79,7 +79,6 @@ export default Vue.extend({
       valid: false,
       inspectport: 0,
       loading: false,
-      tasks: [] as Task[],
       inifiles: [],
       version: '',
       visibleDialog: false,
@@ -180,8 +179,8 @@ export default Vue.extend({
       }
     }
 
-    this.tasks = await this.$store.dispatch('mainStore/getSettings', { key: 'tasks' });
-    this.tasks.forEach((task: Task) => {
+    const tasks = this.$store.getters['mainStore/getSettings']('tasks');
+    tasks.forEach((task: Task) => {
       const app = this.project.apps.find((app) => app.id === task.id);
       if (app) {
         this.apps.push({ ...task, ...app, selected: true });

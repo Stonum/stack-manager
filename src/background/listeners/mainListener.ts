@@ -47,10 +47,6 @@ export class MainListener extends CommonListener {
     return '';
   }
 
-  getVersion() {
-    return app.getVersion();
-  }
-
   getVisibleWindow() {
     return this.window.isVisible();
   }

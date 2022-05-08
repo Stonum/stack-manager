@@ -3,22 +3,26 @@ import { ipcRenderer } from 'electron';
 import { FileFilter } from 'electron/main';
 
 type MainState = {
+  settings: Settings;
   messages: Message[];
   updateIsAvailable: boolean;
 };
 
 const state: MainState = {
+  settings: {},
   messages: [],
   updateIsAvailable: false,
 };
 
 const actions: ActionTree<MainState, any> = {
   setSettings({ state }, { key, data }: { key: string; data: any }) {
+    state.settings[key] = data;
     ipcRenderer.invoke('main', { message: 'setSettings', key, data });
   },
 
-  getSettings({ state }, { key }: { key: string }) {
-    return ipcRenderer.invoke('main', { message: 'getSettings', key });
+  async getSettings({ state }, { key }: { key: string }) {
+    state.settings[key] = await ipcRenderer.invoke('main', { message: 'getSettings', key });
+    return state.settings[key];
   },
 
   selectDir({ state }, { path }: { path?: string }) {
@@ -35,10 +39,6 @@ const actions: ActionTree<MainState, any> = {
 
   getChangeLog({ state }) {
     return ipcRenderer.invoke('main', { message: 'getChangeLog' });
-  },
-
-  getVersion({ state }) {
-    return ipcRenderer.invoke('main', { message: 'getVersion' });
   },
 
   getVisibleWindow({ state }) {
@@ -72,6 +72,9 @@ const getters: GetterTree<MainState, any> = {
   },
   getUpdateAvailable: (state: MainState) => () => {
     return state.updateIsAvailable;
+  },
+  getSettings: (state: MainState) => (key: string) => {
+    return state.settings[key];
   },
 };
 
