@@ -30,7 +30,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { mapActions } from 'vuex';
 
 import MessageList from '../MessageList/MessageList.vue';
 
@@ -80,7 +79,6 @@ export default Vue.extend({
     async onUpdate() {
       this.isUpdating = true;
       await this.$store.dispatch('mainStore/downloadAndInstallUpdate');
-      this.isUpdating = false;
     },
   },
   created() {

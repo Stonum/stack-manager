@@ -7,11 +7,20 @@ const axios = Axios.create({
 });
 
 export default class Dispatcher {
+  static token = null as string | null;
+
   private url: URL;
   private secret: string;
   private token: string | null;
 
   constructor(url: string, secret: string) {
+    if (!url) {
+      throw new Error('Не указан адрес диспетчера');
+    }
+    if (!secret) {
+      throw new Error('Не указан пароль для диспетчера');
+    }
+
     if (url.indexOf('://') < 0) {
       url = 'http://' + url;
     }
@@ -24,7 +33,7 @@ export default class Dispatcher {
     }
 
     this.secret = secret;
-    this.token = null;
+    this.token = Dispatcher.token;
   }
 
   get isAuth() {
@@ -47,6 +56,7 @@ export default class Dispatcher {
     this.token = null;
     const response = await this._sendRequest({ secret: this.secret });
     this.token = response['S-Session-Token'] || null;
+    Dispatcher.token = this.token;
     if (this.token === null) {
       throw { message: 'Не удалось авторизоваться в службе диспетчера', code: 500 };
     } else {

@@ -64,7 +64,7 @@ interface DispatcherItem {
   FunctionName: string;
   UrlPathPrefix: string;
   StackProgramParameters: string;
-  [parameter: string]: string | number;
+  [parameter: string]: string;
 }
 
 type Message = { type: string; text: string; time: Date };

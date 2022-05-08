@@ -62,7 +62,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State };
-      }),
+      })
     );
 
     const appServer = getDispatcher().appServer();
@@ -70,7 +70,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State ? 0 : 2 };
-      }),
+      })
     );
 
     return statuses;
@@ -989,7 +989,7 @@ async function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      }),
+      })
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
@@ -1177,7 +1177,7 @@ async function fillProjects() {
     if (item.cmdArgs?.indexOf('BirtWebReporter.jar') >= 0 && !settings.get('birt')) {
       settings.set('birt', item.path);
       settings.set('birt_name', item.Name);
-      if (item.checkPort > 0) {
+      if (+item.checkPort > 0) {
         settings.set('birt_port', +item.checkPort);
       }
       if (item.cmd) {
@@ -1189,22 +1189,9 @@ async function fillProjects() {
   }
 }
 
-let dispatcher: any;
 function getDispatcher() {
-  if (dispatcher && dispatcher.isAuth) {
-    return dispatcher;
-  }
-
   const address = settings.get('dispatcher_url') as string;
   const secret = settings.get('dispatcher_password') as string;
 
-  if (!address) {
-    throw new Error('Не указан адрес диспетчера');
-  }
-  if (!secret) {
-    throw new Error('Не указан пароль для диспетчера');
-  }
-
-  dispatcher = new Dispatcher(address, secret);
-  return dispatcher;
+  return new Dispatcher(address, secret);
 }
