@@ -76,7 +76,7 @@ export async function getFiles(dir: string): Promise<string[]> {
     dirents.map(async (dirent) => {
       const res = path.resolve(dir, dirent.name);
       return dirent.isDirectory() ? await getFiles(res) : res;
-    })
+    }),
   );
   return Array.prototype.concat(...files);
 }
@@ -87,13 +87,12 @@ export async function copyFiles(src: string, desc: string) {
     files.map(async (file) => {
       const folder = path.dirname(file.replace(src, desc));
       const fname = path.basename(file);
-      if (!fs.existsSync(path.join(folder, fname))) {
-        if (!fs.existsSync(folder)) {
-          await fsp.mkdir(folder, { recursive: true });
-        }
-        return fsp.copyFile(file, path.join(folder, fname));
+
+      if (!fs.existsSync(folder)) {
+        await fsp.mkdir(folder, { recursive: true });
       }
-    })
+      return fsp.copyFile(file, path.join(folder, fname));
+    }),
   );
 }
 
