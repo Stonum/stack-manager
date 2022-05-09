@@ -16,3 +16,11 @@ $btn-font-sizes: (
 
 // Инпуты
 $input-font-size: 14px;
+
+// Табы без спецэффектов
+.v-tabs-items {
+  .v-window-item {
+    -webkit-transition: none;
+    transition: none;
+  }
+}
