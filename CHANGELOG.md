@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.7](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.6...v0.5.7) (2022-05-12)
+
+
+### Features
+
+* режим цветовой слепоты ([396204d](https://git.stack-it.ru/clients/stack-manager/commit/396204d5a2c274271a58c7cd97c9cbd262809ec6)), closes [#6](https://git.stack-it.ru/clients/stack-manager/issues/6)
+
+
+### Bug Fixes
+
+* в случае ошибки диспетчера, увеличиваем интервал обновлений до минуты ([0427760](https://git.stack-it.ru/clients/stack-manager/commit/0427760e0ce618389bbaaad12836efedac1b770e))
+* для режима цветовой слепоты синим делаем остановленные задачи ([fb2b94e](https://git.stack-it.ru/clients/stack-manager/commit/fb2b94ebe35eb4f88e91625d25e2b95e32006c0c))
+* простановка типа проекта ([90c2bfa](https://git.stack-it.ru/clients/stack-manager/commit/90c2bfa843908da54c0fcd7a4ee1e9c909b4d589))
+
 ### [0.5.6](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.5...v0.5.6) (2022-05-08)
 
 
