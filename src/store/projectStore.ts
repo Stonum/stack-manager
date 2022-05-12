@@ -105,12 +105,12 @@ const getters: GetterTree<ProjectState, any> = {
 
     switch (status) {
       case 0:
-        return colorBlindMode ? 'blue' : 'green';
+        return 'green';
       case 1:
         return 'warning';
 
       default:
-        return colorBlindMode ? 'yellow' : 'error';
+        return colorBlindMode ? 'blue' : 'error';
     }
   },
   getEvents: (state: ProjectState) => () => {
