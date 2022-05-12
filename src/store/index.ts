@@ -29,8 +29,13 @@ setTimeout(async function start() {
     return;
   }
   interval = +store.getters['mainStore/getSettings']('refresh_interval') || 20000;
-  await store.dispatch('projectStore/getAppStatus');
-  await store.dispatch('projectStore/getEvents');
+  try {
+    await store.dispatch('projectStore/getAppStatus');
+    await store.dispatch('projectStore/getEvents');
+  } catch (e: AnyException) {
+    // в случае ошибки увеличиваем интервал, т.к. возможно диспетчер лежит
+    interval = 60 * 1000;
+  }
 
   setTimeout(start, interval);
 }, interval);
