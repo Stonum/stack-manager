@@ -7,6 +7,9 @@ export default class Window extends BrowserWindow {
 
   constructor() {
     if (!Window.current) {
+      createProtocol('app');
+      const icon = path.join(__dirname, '../build/icon.png');
+
       // Create the browser window.
       super({
         title: `${app.getName()} ${app.getVersion()}`,
@@ -14,21 +17,23 @@ export default class Window extends BrowserWindow {
         height: 720,
         resizable: false,
         webPreferences: {
-          // Use pluginOptions.nodeIntegration, leave this alone
-          // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
           nodeIntegration: true,
           contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
         },
-        icon: path.join(__dirname, '../build/icon.png'),
+        icon,
+        show: false,
       });
 
       Window.current = this;
+
+      this.webContents.once('dom-ready', () => {
+        this.show();
+      });
 
       if (process.env.WEBPACK_DEV_SERVER_URL) {
         // Load the url of the dev server if in development mode
         this.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
       } else {
-        createProtocol('app');
         // Load the index.html when not in development
         this.loadURL('app://./index.html');
       }
