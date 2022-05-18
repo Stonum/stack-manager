@@ -62,7 +62,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State };
-      })
+      }),
     );
 
     const appServer = getDispatcher().appServer();
@@ -70,7 +70,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State ? 0 : 2 };
-      })
+      }),
     );
 
     return statuses;
@@ -692,10 +692,13 @@ async function buildProject(project: Project, oldApps?: ProjectApp[]) {
 
   if (apphost_project) {
     await generateCredentials(project, pathbin_new);
-    const gatewaySettingsPath = await generateGatewaySettings(project, pathbin_new);
 
     // деплоим гейтвэй
     if (project.gateway?.name) {
+      const path_gateway = path.join(pathbin_new, 'StackGateway');
+      await copyFiles(project.gateway.path, path_gateway);
+      const gatewaySettingsPath = await generateGatewaySettings(project, path_gateway);
+
       try {
         await webServer.deleteItem(project.gateway.name);
       } catch (e) {
@@ -704,8 +707,8 @@ async function buildProject(project: Project, oldApps?: ProjectApp[]) {
       await webServer.addItem(project.gateway.name, {
         IsActive: 1,
         cmd: path.join(settings.get('jre'), 'bin', 'javaw.exe'),
-        cmdArgs: `-jar ${getGatewayFileName(project.gateway.path)} --spring.config.location=classpath:/application.yml,classpath:file:${gatewaySettingsPath}`,
-        path: project.gateway.path,
+        cmdArgs: `-jar ${getGatewayFileName(path_gateway)} --spring.config.location=classpath:/application.yml,classpath:file:${gatewaySettingsPath}`,
+        path: path_gateway,
         restart: 1,
         restartMaxCount: 5,
       });
@@ -989,7 +992,7 @@ async function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      })
+      }),
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
