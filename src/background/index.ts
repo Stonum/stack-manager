@@ -8,6 +8,11 @@ import upgradeBeforeStart from './upgrade';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+  process.exit(0);
+}
+
 app.setAppUserModelId(app.getName());
 
 // Scheme must be registered before the app is ready
@@ -46,6 +51,20 @@ app.on('ready', async () => {
   }
 
   const window = new Window();
+
+  app.on('second-instance', () => {
+    if (window) {
+      // Focus on the main window if the user tried to open another
+      if (window.isMinimized()) {
+        window.restore();
+      }
+      if (!window.isVisible()) {
+        window.show();
+      }
+
+      window.focus();
+    }
+  });
 
   // регистрируем слушателей для общения фронта с бэком
   new MainListener();
