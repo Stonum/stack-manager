@@ -62,7 +62,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State };
-      }),
+      })
     );
 
     const appServer = getDispatcher().appServer();
@@ -70,7 +70,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State ? 0 : 2 };
-      }),
+      })
     );
 
     return statuses;
@@ -605,6 +605,10 @@ function checkProject(project: Project, index: number | null) {
       throw new Error(`Некорректный путь ${project.gateway.path}`);
     }
 
+    if (project.gateway.settings && !fs.existsSync(project.gateway.settings)) {
+      throw new Error(`Некорректный путь ${project.gateway.settings}`);
+    }
+
     if (project.gateway.path && !settings.get('jre')) {
       throw new Error(`Не задан каталг jre в настройках`);
     }
@@ -992,7 +996,7 @@ async function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      }),
+      })
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
