@@ -165,7 +165,7 @@ export class ProjectListener extends CommonListener {
       const project = prepareProject(payload.params);
       checkProject(project, id);
       this.sendInfoMessage(project.name, 'Сборка backend запущена');
-      await buildProject(project, data[id].apps);
+      await buildProject(project, data[id]);
       this.sendInfoMessage(project.name, 'Сборка backend завершена');
       data[id] = project;
       projects.set('projects', data);
@@ -643,15 +643,22 @@ function checkProject(project: Project, index: number | null) {
   });
 }
 
-async function buildProject(project: Project, oldApps?: ProjectApp[]) {
+async function buildProject(project: Project, oldProject?: Project) {
   const apphost_project = project.type === StackBackendType.apphost;
   const webServer = apphost_project ? getDispatcher().appServer() : getDispatcher().webServer();
 
   // удалим старые приложения если есть
-  if (oldApps) {
-    for (const app of oldApps) {
+  if (oldProject) {
+    for (const app of oldProject?.apps) {
       try {
         await webServer.deleteItem(app.name);
+      } catch (e) {
+        //
+      }
+    }
+    if (oldProject.gateway?.name) {
+      try {
+        await webServer.deleteItem(oldProject.gateway.name);
       } catch (e) {
         //
       }
