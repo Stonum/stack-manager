@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.8](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.7...v0.5.8) (2022-05-19)
+
+
+### Features
+
+* копирование gateway в каталог <project>\StackGateway ([4cf409f](https://git.stack-it.ru/clients/stack-manager/commit/4cf409f65dd90a59350be20075df17b00321a10d))
+
+
+### Bug Fixes
+
+* добавил проверку наличия application.yml ([2389948](https://git.stack-it.ru/clients/stack-manager/commit/238994864cca12db68d77254969771fc9395f3d2))
+* запрет запуска нескольких окон приложения ([b908b0f](https://git.stack-it.ru/clients/stack-manager/commit/b908b0fd4f55eb8d57d675c78c4e2ccd8b700d44))
+* исправил удаление gateway при смене имени проекта ([26e8b51](https://git.stack-it.ru/clients/stack-manager/commit/26e8b5158396ab6a44d9d9aa09b9d86833d82429))
+
 ### [0.5.7](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.6...v0.5.7) (2022-05-12)
 
 
