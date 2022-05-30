@@ -62,7 +62,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State };
-      })
+      }),
     );
 
     const appServer = getDispatcher().appServer();
@@ -70,7 +70,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.State ? 0 : 2 };
-      })
+      }),
     );
 
     return statuses;
@@ -814,7 +814,7 @@ async function getEnvConfig(project: Project, envPath: string) {
   if (project.type === StackBackendType.apphost) {
     config['API_HOST'] = `http://${os.hostname().toLowerCase()}:${project.gateway?.port}`;
   } else {
-    delete config['API_HOST'];
+    // delete config['API_HOST'];
     delete config['API_HOST_AUTH'];
   }
   if (project.type === StackBackendType.stack) {
@@ -1003,7 +1003,7 @@ async function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      })
+      }),
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
