@@ -98,9 +98,11 @@ export default class Dispatcher {
         return response.data;
       })
       .catch((error: any) => {
-        log.error('dispatcher', 'res', JSON.stringify(error).substring(0, 100));
+        log.error('dispatcher', 'err', JSON.stringify(error).substring(0, 100));
         if (error.response?.data) {
           return error.response.data;
+        } else {
+          throw error;
         }
       });
 
