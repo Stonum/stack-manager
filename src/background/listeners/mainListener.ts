@@ -48,7 +48,7 @@ export class MainListener extends CommonListener {
   }
 
   getVisibleWindow() {
-    return this.window.isVisible();
+    return this.window.isVisible() || !this.window.isMinimized();
   }
 
   async selectDir(payload: any) {
