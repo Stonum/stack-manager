@@ -829,13 +829,16 @@ async function getEnvConfig(project: Project, envPath: string) {
   const tasks = settings.get('tasks') as Task[];
   const disp = new URL(settings.get('dispatcher_url') as string);
   const config = await readIniFile(envPath);
-  if (project.type === StackBackendType.apphost) {
+
+  const isAppHost = project.type === StackBackendType.apphost;
+
+  if (isAppHost) {
     config['API_HOST'] = `http://${os.hostname().toLowerCase()}:${project.gateway?.port}`;
   } else {
     // delete config['API_HOST'];
     delete config['API_HOST_AUTH'];
   }
-  if (project.type === StackBackendType.stack) {
+  if (!isAppHost) {
     for (const app of project.apps) {
       const prefix = tasks.find((task) => {
         return task.id === app.id;
@@ -846,11 +849,11 @@ async function getEnvConfig(project: Project, envPath: string) {
 
   const sharePath = settings.get('share') as string;
   if (sharePath) {
-    config['API_HOST_SHARE'] = disp.origin + '/share';
+    config['API_HOST_SHARE'] = (isAppHost ? config['API_HOST'] : disp.origin) + '/share';
   }
   const uploadPath = settings.get('upload') as string;
   if (uploadPath) {
-    config['API_HOST_UPLOAD'] = disp.origin + '/upload';
+    config['API_HOST_UPLOAD'] = (isAppHost ? config['API_HOST'] : disp.origin) + '/upload';
   }
   return config;
 }
@@ -1026,6 +1029,9 @@ async function generateGatewaySettings(project: Project, pathnew: string) {
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
     common.stack.queue.service.exchangeOut = os.hostname + '_' + project.name + '_service_to_backend';
+
+    common.stack.http.uploadDir = settings.get('upload');
+    common.stack.http.shareDir = settings.get('share');
 
     const rabbithost = new URL(settings.get('rabbitmq_url'));
     if (rabbithost) {
