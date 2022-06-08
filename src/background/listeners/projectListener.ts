@@ -63,7 +63,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.IsActive ? +app.State : -1 };
-      })
+      }),
     );
 
     const appServer = getDispatcher().appServer();
@@ -71,7 +71,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.IsActive ? (+app.State ? 0 : 2) : -1 };
-      })
+      }),
     );
 
     return statuses;
@@ -583,14 +583,13 @@ function prepareProject(payload: Project, oldProject?: Project) {
   project.apps = [];
 
   for (const app of payload.apps) {
-    const isActive = !!oldProject?.apps.find((item: ProjectApp) => item.id === app.id)?.active;
     project.apps.push({
       id: app.id,
       port: app.port,
       name: app.name,
       path: app.path,
       args: app.args,
-      active: isActive,
+      active: app.active,
     });
   }
 
@@ -1022,7 +1021,7 @@ async function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      })
+      }),
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
@@ -1123,6 +1122,7 @@ async function fillProjects() {
           id: 0,
           port: 0,
           args: '',
+          active: !!+item.IsActive,
         };
 
         const data = await getDataFromIni(pathini);

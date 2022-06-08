@@ -151,7 +151,7 @@ export default Vue.extend({
 
       for (const app of this.apps) {
         if (app.selected) {
-          this.project.apps.push({ id: app.id, port: app.port, name: app.name, path: app.path, args: '' });
+          this.project.apps.push({ id: app.id, port: app.port, name: app.name, path: app.path, args: '', active: app.active });
         }
       }
       try {
@@ -185,7 +185,7 @@ export default Vue.extend({
       if (app) {
         this.apps.push({ ...task, ...app, selected: true });
       } else {
-        this.apps.push({ ...task, name: '', path: '', port: null, args: '', selected: this.isNewProject ? task.selected : false });
+        this.apps.push({ ...task, name: '', path: '', port: null, args: '', active: true, selected: this.isNewProject ? task.selected : false });
       }
     });
   },
