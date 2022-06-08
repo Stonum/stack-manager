@@ -30,6 +30,18 @@ export default async function upgradeBeforeStart() {
     projects.set('projects', allProjects);
   }
 
+  // добавил флаг активности приложений
+  if (verToNumber(version) < verToNumber('0.5.9')) {
+    for (const project of allProjects) {
+      if (project.apps) {
+        project.apps = project.apps.map((app: ProjectApp) => {
+          return { ...app, active: true };
+        });
+      }
+    }
+    projects.set('projects', allProjects);
+  }
+
   if (version !== currentVer) {
     settings.set('version', currentVer);
   }

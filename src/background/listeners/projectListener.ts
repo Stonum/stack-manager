@@ -42,6 +42,7 @@ export class ProjectListener extends CommonListener {
           path: '',
           id: 0,
           args: '',
+          active: true,
         });
       }
       return {
@@ -61,16 +62,16 @@ export class ProjectListener extends CommonListener {
     let apps = await webServer.getItems();
     statuses.push(
       ...apps.map((app: any) => {
-        return { name: app.Name, status: +app.State };
-      }),
+        return { name: app.Name, status: +app.IsActive ? +app.State : -1 };
+      })
     );
 
     const appServer = getDispatcher().appServer();
     apps = await appServer.getItems();
     statuses.push(
       ...apps.map((app: any) => {
-        return { name: app.Name, status: +app.State ? 0 : 2 };
-      }),
+        return { name: app.Name, status: +app.IsActive ? (+app.State ? 0 : 2) : -1 };
+      })
     );
 
     return statuses;
@@ -162,7 +163,7 @@ export class ProjectListener extends CommonListener {
 
     const data = projects.get('projects', []) as Project[];
     if (data && data[id]) {
-      const project = prepareProject(payload.params);
+      const project = prepareProject(payload.params, data[id]);
       checkProject(project, id);
       this.sendInfoMessage(project.name, 'Сборка backend запущена');
       await buildProject(project, data[id]);
@@ -203,10 +204,16 @@ export class ProjectListener extends CommonListener {
   async appStart(payload: any) {
     const id = payload.projectId;
     const allProjects = projects.get('projects', []) as Project[];
-    const apphost_project = (allProjects[id]?.type || StackBackendType.stack) === StackBackendType.apphost;
+    const project = allProjects[id];
+    const apphost_project = (project?.type || StackBackendType.stack) === StackBackendType.apphost;
 
     const webServer = apphost_project ? getDispatcher().appServer() : getDispatcher().webServer();
     const res = await webServer.startItem(payload.params);
+
+    project.apps = project.apps.map((app: ProjectApp) => {
+      return { ...app, active: app.name == payload.params ? true : app.active };
+    });
+    projects.set('projects', allProjects);
     return res;
   }
   async appReStart(payload: any) {
@@ -221,10 +228,16 @@ export class ProjectListener extends CommonListener {
   async appStop(payload: any) {
     const id = payload.projectId;
     const allProjects = projects.get('projects', []) as Project[];
-    const apphost_project = (allProjects[id]?.type || StackBackendType.stack) === StackBackendType.apphost;
+    const project = allProjects[id];
+    const apphost_project = (project?.type || StackBackendType.stack) === StackBackendType.apphost;
 
     const webServer = apphost_project ? getDispatcher().appServer() : getDispatcher().webServer();
     const res = await webServer.stopItem(payload.params);
+
+    project.apps = project.apps.map((app: ProjectApp) => {
+      return { ...app, active: app.name == payload.params ? false : app.active };
+    });
+    projects.set('projects', allProjects);
     return res;
   }
 
@@ -529,7 +542,7 @@ async function getDataFromIni(pathFile: string) {
   return result;
 }
 
-function prepareProject(payload: Project) {
+function prepareProject(payload: Project, oldProject?: Project) {
   const project = {} as Project;
   project.name = payload.name;
 
@@ -570,12 +583,14 @@ function prepareProject(payload: Project) {
   project.apps = [];
 
   for (const app of payload.apps) {
+    const isActive = !!oldProject?.apps.find((item: ProjectApp) => item.id === app.id)?.active;
     project.apps.push({
       id: app.id,
       port: app.port,
       name: app.name,
       path: app.path,
       args: app.args,
+      active: isActive,
     });
   }
 
@@ -734,7 +749,7 @@ async function buildProject(project: Project, oldProject?: Project) {
         UrlPathPrefix: app.path,
         StackProgramDir: project.path.bin,
         StackProgramParameters: `-u:${project.sql.login} -p:${project.sql.password} -t:${app.id} -LOADRES ${inspect} -nc ${app.args}`,
-        IsActive: 1,
+        IsActive: app.active ? 1 : 0,
         FunctionName: 'StackAPI_kvplata_v1',
         ResultContentType: 'application/json;charset=utf-8',
         UseComStack: 1,
@@ -743,7 +758,9 @@ async function buildProject(project: Project, oldProject?: Project) {
         FallbackEnabled: 0,
         AllowServiceCommands: 0,
       });
-      await webServer.startItem(app.name);
+      if (app.active) {
+        await webServer.startItem(app.name);
+      }
     }
   }
   if (apphost_project) {
@@ -762,14 +779,16 @@ async function buildProject(project: Project, oldProject?: Project) {
       const cmdArgs = `--task=${app.id} ${inspect} -r testsrv:9898 -i "stack.ini" -c "credentials.ini" --rabbit="${rabbitsettings}" -f "${expression}"`;
 
       await webServer.addItem(app.name, {
-        IsActive: 1,
+        IsActive: app.active ? 1 : 0,
         cmd: path.join(project.path.bin, 'app_host.exe'),
         cmdArgs,
         path: project.path.bin,
         restart: 1,
         restartMaxCount: 5,
       });
-      await webServer.startItem(app.name);
+      if (app.active) {
+        await webServer.startItem(app.name);
+      }
     }
   }
 
@@ -1003,7 +1022,7 @@ async function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      }),
+      })
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';

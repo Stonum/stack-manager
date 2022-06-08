@@ -90,7 +90,9 @@ export default Vue.extend({
           await this.projectSendJob({ jobName: 'appReStart', projectId: this.id, params: appname });
         } else {
           for (const app of this.item.apps) {
-            await this.projectSendJob({ jobName: 'appReStart', projectId: this.id, params: app.name });
+            if (app.active) {
+              await this.projectSendJob({ jobName: 'appReStart', projectId: this.id, params: app.name });
+            }
           }
         }
       } finally {

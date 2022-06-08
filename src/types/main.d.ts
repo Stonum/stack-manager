@@ -23,6 +23,7 @@ interface ProjectApp {
   syncThreadCount?: number;
   asyncThreadCount?: number;
   asyncTaskCount?: number;
+  active: boolean;
 }
 
 interface ProjectSQLSettings {

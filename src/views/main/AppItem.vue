@@ -11,13 +11,13 @@
 
     <v-list-item-action-text>
       <v-list-item-subtitle class="text-right">
-        <v-btn icon tile small title="Перезапустить" @click="$emit('restart', item.name)">
+        <v-btn icon tile small v-if="status === 0 || status === 1" title="Перезапустить" @click="$emit('restart', item.name)">
           <v-icon color="primary"> mdi-restart </v-icon>
         </v-btn>
-        <v-btn icon tile small v-if="status === 2" title="Запустить" @click="$emit('start', item.name)">
+        <v-btn icon tile small v-if="status > 1 || status < 0" title="Запустить" @click="$emit('start', item.name)">
           <v-icon color="primary"> mdi-play </v-icon>
         </v-btn>
-        <v-btn icon tile small v-if="status !== 2" title="Остановить" @click="$emit('stop', item.name)">
+        <v-btn icon tile small v-if="status === 0 || status === 1" title="Остановить" @click="$emit('stop', item.name)">
           <v-icon color="error"> mdi-stop </v-icon>
         </v-btn>
       </v-list-item-subtitle>

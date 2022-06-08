@@ -476,8 +476,8 @@ class ServerAPI {
   }
 
   async restartItem(name: string): Promise<boolean> {
-    await this.stopItem(name);
-    return this.startItem(name);
+    await this.api.executeMethod(name, 'Stop');
+    return this.api.executeMethod(name, this.type === 'WebServer' ? 'ReStart' : 'Start');
   }
 }
 
