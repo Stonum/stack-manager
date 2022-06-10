@@ -104,15 +104,14 @@ const getters: GetterTree<ProjectState, any> = {
     const colorBlindMode = store.getters['mainStore/getSettings']('colorBlindMode');
 
     switch (status) {
-      case -1:
-        return '#D3D3D3';
       case 0:
         return 'green';
       case 1:
         return 'warning';
-
-      default:
+      case 2:
         return colorBlindMode ? 'blue' : 'error';
+      default:
+        return '#D3D3D3';
     }
   },
   getEvents: (state: ProjectState) => () => {

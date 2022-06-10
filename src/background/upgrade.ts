@@ -35,7 +35,7 @@ export default async function upgradeBeforeStart() {
     for (const project of allProjects) {
       if (project.apps) {
         project.apps = project.apps.map((app: ProjectApp) => {
-          return { ...app, active: true };
+          return { ...app, active: Object.prototype.hasOwnProperty.call(app, 'active') ? app.active : true };
         });
       }
     }
