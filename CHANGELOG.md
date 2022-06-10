@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.9](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.8...v0.5.9) (2022-06-10)
+
+
+### Features
+
+* для гейтвэя теперь выбираем только каталог, файл настроек ищется как application.yml в папке ([1cdaa64](https://git.stack-it.ru/clients/stack-manager/commit/1cdaa64cdba45fca7f7cc2248bec662dde32447b))
+* для app_host шара и аплоад через gateway ([5365c86](https://git.stack-it.ru/clients/stack-manager/commit/5365c86fd920c7043533eed35c27c1b87b972e7e))
+* сохраняем признак что задача принудительно выключена и не стартуем ее при пересборке ([f7d5b44](https://git.stack-it.ru/clients/stack-manager/commit/f7d5b44b39e981b14b1e8fb32fe62e7f61b62ddc))
+
 ### [0.5.8](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.7...v0.5.8) (2022-05-19)
 
 
