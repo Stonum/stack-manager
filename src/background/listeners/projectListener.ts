@@ -63,7 +63,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.IsActive ? +app.State : -1 };
-      })
+      }),
     );
 
     const appServer = getDispatcher().appServer();
@@ -71,7 +71,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.IsActive ? (+app.State ? 0 : 2) : -1 };
-      })
+      }),
     );
 
     return statuses;
@@ -576,7 +576,6 @@ function prepareProject(payload: Project, oldProject?: Project) {
       name: project.name + '_gateway',
       path: payload.gateway.path,
       port: payload.gateway.port,
-      settings: payload.gateway.settings,
     };
   }
 
@@ -619,8 +618,14 @@ function checkProject(project: Project, index: number | null) {
       throw new Error(`Некорректный путь ${project.gateway.path}`);
     }
 
-    if (project.gateway.settings && !fs.existsSync(project.gateway.settings)) {
-      throw new Error(`Некорректный путь ${project.gateway.settings}`);
+    const application = path.join(project.gateway.path, 'application.yml');
+    if (application && !fs.existsSync(application)) {
+      throw new Error(`Не найден файл настроек ${application}`);
+    }
+
+    const jre = path.join(project.gateway.path, getGatewayFileName(project.gateway.path));
+    if (application && !fs.existsSync(jre)) {
+      throw new Error(`Не найден файл jar файл ${jre}`);
     }
 
     if (project.gateway.path && !settings.get('jre')) {
@@ -847,13 +852,21 @@ async function getEnvConfig(project: Project, envPath: string) {
     }
   }
 
+  // с версии 1.0.0 стало просто /share а было /gateway/share
+  let staticPrefix = isAppHost ? config['API_HOST'] : disp.origin;
+  if (project.gateway?.path) {
+    const harFile = getGatewayFileName(project.gateway.path);
+    if (isAppHost && harFile && harFile.indexOf('0.0.3') > 0) {
+      staticPrefix += '/gateway';
+    }
+  }
   const sharePath = settings.get('share') as string;
   if (sharePath) {
-    config['API_HOST_SHARE'] = (isAppHost ? config['API_HOST'] : disp.origin) + '/share';
+    config['API_HOST_SHARE'] = staticPrefix + '/share';
   }
   const uploadPath = settings.get('upload') as string;
   if (uploadPath) {
-    config['API_HOST_UPLOAD'] = (isAppHost ? config['API_HOST'] : disp.origin) + '/upload';
+    config['API_HOST_UPLOAD'] = staticPrefix + '/upload';
   }
   return config;
 }
@@ -1000,7 +1013,7 @@ async function generateGatewaySettings(project: Project, pathnew: string) {
     return null;
   }
 
-  const templateYaml = project.gateway.settings;
+  const templateYaml = path.join(project.gateway.path, 'application.yml');
   if (fs.existsSync(templateYaml)) {
     const dataYaml = await readSettingsFile(templateYaml);
     const common = dataYaml[0];
@@ -1024,7 +1037,7 @@ async function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      })
+      }),
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';

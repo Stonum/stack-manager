@@ -10,16 +10,6 @@ export default async function upgradeBeforeStart() {
 
   const allProjects = projects.get('projects', []) as Project[];
 
-  // добавились настройки гейтвэя
-  if (verToNumber(version) < verToNumber('0.5.3')) {
-    for (const project of allProjects) {
-      if (project.gateway?.path && !project.gateway.settings) {
-        project.gateway.settings = path.join(project.gateway.path, 'application.yml');
-      }
-    }
-    projects.set('projects', allProjects);
-  }
-
   // у старых проектов без типа надо проставить значение
   if (verToNumber(version) < verToNumber('0.5.7')) {
     for (const project of allProjects) {

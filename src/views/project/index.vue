@@ -28,7 +28,7 @@
     <yes-no-dialog
       v-if="visibleDialog"
       header="Версия в stack.ini отличается от текущей. Изменить?"
-      :text="`${this.project.path.version} -> ${this.version}`"
+      :text="`${project.path.version} -> ${version}`"
       :width="700"
       @click="
         project.path.version = $event ? version : project.path.version;
@@ -70,7 +70,6 @@ export default Vue.extend({
         },
         gateway: {
           path: '',
-          settings: '',
           port: 8182,
         },
         type: 0,
@@ -111,7 +110,6 @@ export default Vue.extend({
         this.project.path.version = data.version;
         if (this.project.gateway && !this.project.gateway?.path && data.gateway) {
           this.project.gateway.path = data.gateway;
-          this.project.gateway.settings = data.application || this.project.gateway.settings;
         }
       }
     },
@@ -124,7 +122,6 @@ export default Vue.extend({
         this.project.type = data.type;
         if (this.project.gateway) {
           this.project.gateway.path = data.gateway;
-          this.project.gateway.settings = data.application;
         }
         this.onReadIni();
       }

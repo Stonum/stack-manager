@@ -20,18 +20,8 @@
           />
         </v-col>
         <template v-if="isAppHost && project.gateway">
-          <v-col cols="5">
+          <v-col cols="11">
             <select-folder v-model="project.gateway.path" label="StackGateway каталог*" :rules="[rules.required]" dense />
-          </v-col>
-          <v-col cols="6">
-            <select-file
-              v-model="project.gateway.settings"
-              label="файл настроек*"
-              :path="project.gateway.path"
-              :filter="{ name: 'StackGateway settings', extensions: ['yml'] }"
-              :rules="[rules.required]"
-              dense
-            />
           </v-col>
           <v-col cols="1">
             <v-text-field v-model="project.gateway.port" label="порт*" :rules="[rules.required]" type="number" dense />
