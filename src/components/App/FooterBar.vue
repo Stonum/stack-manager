@@ -7,9 +7,11 @@
           <v-tab @click="onClickTab(1)">События диспетчера</v-tab>
 
           <v-spacer />
-          <v-btn v-if="updateIsAvailable" :loading="isUpdating" color="primary" icon @click="onUpdate" title="Установить обновление">
-            <v-icon> mdi-cloud-download-outline </v-icon>
+          <v-btn v-if="updateIsAvailable" :loading="isUpdating" color="primary" plain @click="onUpdate" title="Установить обновление">
+            Доступно обновление версии
+            <v-icon class="ml-2"> mdi-cloud-download-outline </v-icon>
           </v-btn>
+
           <v-btn color="primary" icon @click="onClickUpDown">
             <v-icon>{{ updownicon }}</v-icon>
           </v-btn>
@@ -78,7 +80,11 @@ export default Vue.extend({
     },
     async onUpdate() {
       this.isUpdating = true;
-      await this.$store.dispatch('mainStore/downloadAndInstallUpdate');
+      try {
+        await this.$store.dispatch('mainStore/downloadAndInstallUpdate');
+      } finally {
+        this.isUpdating = false;
+      }
     },
   },
   created() {
