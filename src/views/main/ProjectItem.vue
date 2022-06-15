@@ -29,7 +29,7 @@
     </v-card-title>
 
     <v-card-subtitle>
-      <a v-if="item.port" class="text-subtitle-1 px-2" :href="projectUrl" @click.stop="onOpenUrl">{{ projectUrl }}</a>
+      <a v-if="item.port" class="text-subtitle-1" :href="projectUrl" @click.stop="onOpenUrl">{{ projectUrl }}</a>
     </v-card-subtitle>
 
     <v-card-actions>
