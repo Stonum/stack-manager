@@ -63,7 +63,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.IsActive ? +app.State : -1 };
-      }),
+      })
     );
 
     const appServer = getDispatcher().appServer();
@@ -71,7 +71,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.IsActive ? (+app.State ? 0 : 2) : -1 };
-      }),
+      })
     );
 
     return statuses;
@@ -421,7 +421,7 @@ export class ProjectListener extends CommonListener {
       await cmd.exec('git pull', project.path.git);
       // если фронт лежит не в папке проекта, обновим гит отдельно
       if (project.path.front && path.dirname(project.path.front) !== path.normalize(project.path.git)) {
-        await cmd.exec('git pull', project.path.git);
+        await cmd.exec('git pull', project.path.front);
       }
     } else {
       throw new Error(`Не найден проект с указанным id - ${id}`);
@@ -1037,7 +1037,7 @@ async function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      }),
+      })
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
