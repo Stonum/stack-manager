@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.10](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.9...v0.5.10) (2022-06-15)
+
+
+### Features
+
+* переделал интерфейс на карточки вместо экспандов ([2e1969f](https://git.stack-it.ru/clients/stack-manager/commit/2e1969f51c7ca02b7b999cf4b4c38c92c2d22b4e))
+
+
+### Bug Fixes
+
+* обновление папки фронта, если разные каталоги с проектом ([06817cb](https://git.stack-it.ru/clients/stack-manager/commit/06817cb147be0d8a6aa674bd1adc9355662c62f6))
+
 ### [0.5.9](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.8...v0.5.9) (2022-06-10)
 
 
