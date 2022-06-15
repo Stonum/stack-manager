@@ -69,8 +69,8 @@ export default Vue.extend({
       this.delIndex = null;
       if (answer && id !== null) {
         await this.projectDelete(id);
-        this.items = await this.getProjects();
       }
+      this.onRefresh();
       this.getEvents();
     },
     async onEdit(id: number) {
@@ -86,8 +86,6 @@ export default Vue.extend({
     await this.onRefresh();
     if (this.items.length === 0) {
       this.visibleFillDlg = true;
-    } else {
-      this.getAppStatus();
     }
   },
 });
