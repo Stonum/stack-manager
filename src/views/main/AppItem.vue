@@ -1,6 +1,6 @@
 <template>
   <v-list-item dense>
-    <v-list-item-icon>
+    <v-list-item-icon class="mr-1">
       <v-icon small :color="color"> mdi-circle </v-icon>
     </v-list-item-icon>
 

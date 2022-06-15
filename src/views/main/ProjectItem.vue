@@ -1,44 +1,43 @@
 <template>
-  <v-expansion-panel>
-    <v-expansion-panel-header style="padding: 0">
-      <v-app-bar flat color="rgba(0, 0, 0, 0)">
-        <v-progress-circular class="mr-3" :size="20" :width="isRunning ? 2 : 0" color="primary" :indeterminate="isRunning" />
+  <v-card class="flex-grow-1">
+    <v-card-title>
+      {{ item.name }}
 
-        <v-toolbar-title>
-          {{ item.name }} <a v-if="item.port" class="text-subtitle-1 px-2" :href="projectUrl" @click.stop="onOpenUrl">{{ projectUrl }}</a>
-        </v-toolbar-title>
+      <v-spacer />
 
-        <v-spacer />
+      <!-- <v-icon v-for="(app, idxtask) in item.apps" :key="idxtask" small :color="appColor(app.name)"> mdi-circle </v-icon> -->
+      <v-progress-circular class="mr-3" :size="20" :width="isRunning ? 2 : 0" color="primary" :indeterminate="isRunning" />
 
-        <v-icon v-for="(app, idxtask) in item.apps" :key="idxtask" small :color="appColor(app.name)"> mdi-circle </v-icon>
+      <v-menu bottom left offset-y>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn icon v-bind="attrs" v-on="on">
+            <v-icon>mdi-dots-vertical</v-icon>
+          </v-btn>
+        </template>
 
-        <v-menu bottom left offset-y>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn icon v-bind="attrs" v-on="on">
-              <v-icon>mdi-dots-vertical</v-icon>
-            </v-btn>
-          </template>
+        <v-list>
+          <v-list-item v-for="(item, i) in projectActions" :key="i" @click="item.method">
+            <v-list-item-action>
+              <v-icon :color="item.color">{{ item.icon }}</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>{{ item.name }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </v-card-title>
 
-          <v-list>
-            <v-list-item v-for="(item, i) in projectActions" :key="i" @click="item.method">
-              <v-list-item-action>
-                <v-icon :color="item.color">{{ item.icon }}</v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>{{ item.name }}</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </v-app-bar>
-    </v-expansion-panel-header>
+    <v-card-subtitle>
+      <a v-if="item.port" class="text-subtitle-1 px-2" :href="projectUrl" @click.stop="onOpenUrl">{{ projectUrl }}</a>
+    </v-card-subtitle>
 
-    <v-expansion-panel-content>
+    <v-card-actions>
       <v-list dense>
         <app-item v-for="(app, idxtask) in item.apps" :item="app" :key="idxtask" @restart="onRestart($event)" @start="onStart($event)" @stop="onStop($event)" />
       </v-list>
-    </v-expansion-panel-content>
-  </v-expansion-panel>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script lang="ts">

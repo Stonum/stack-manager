@@ -4,16 +4,17 @@
 
     <v-progress-linear v-if="loading" indeterminate />
     <p style="text-align: center" v-else-if="!items.length">Проектов пока нет.</p>
-    <v-expansion-panels v-else>
-      <v-container fluid>
-        <v-draggable v-model="items" @change="onMoveProject">
-          <template v-for="(item, idx) in items">
-            <project-item :item="item" :key="idx" :id="idx" @delete="onDelete(idx)" @edit="onEdit(idx)" />
-          </template>
-        </v-draggable>
-      </v-container>
-      <yes-no-dialog v-if="visibleDeleteDlg" :header="`Удалить проект ${delName}?`" @click="onDelete(delIndex, $event)" />
-    </v-expansion-panels>
+    <v-container v-else fluid>
+      <v-draggable v-model="items" @change="onMoveProject" class="row">
+        <template v-for="(item, idx) in items">
+          <v-col cols="3" :key="idx" class="d-flex">
+            <project-item :item="item" :id="idx" @delete="onDelete(idx)" @edit="onEdit(idx)" />
+          </v-col>
+        </template>
+      </v-draggable>
+    </v-container>
+    <yes-no-dialog v-if="visibleDeleteDlg" :header="`Удалить проект ${delName}?`" @click="onDelete(delIndex, $event)" />
+
     <fill-projects-dialog
       v-if="visibleFillDlg"
       @close="
