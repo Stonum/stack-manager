@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.11](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.10...v0.5.11) (2022-06-20)
+
+
+### Bug Fixes
+
+* исправил обновление статусов после удаления проекта ([220fd6c](https://git.stack-it.ru/clients/stack-manager/commit/220fd6c7094291d945f375a485c38df27a09d61d))
+* поправил пути до статики в env для stackgateway 0.0.3 ([436d0e6](https://git.stack-it.ru/clients/stack-manager/commit/436d0e628f5332d3688158d59625eea59b95825d))
+
 ### [0.5.10](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.9...v0.5.10) (2022-06-15)
 
 
