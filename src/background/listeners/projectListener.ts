@@ -857,7 +857,7 @@ async function getEnvConfig(project: Project, envPath: string) {
   if (project.gateway?.path) {
     const harFile = getGatewayFileName(project.gateway.path);
     if (isAppHost && harFile && harFile.indexOf('0.0.3') > 0) {
-      staticPrefix += '/gateway';
+      staticPrefix += '/stackgateway';
     }
   }
   const sharePath = settings.get('share') as string;
