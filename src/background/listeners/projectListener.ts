@@ -7,12 +7,11 @@ import fsp from 'fs/promises';
 import os from 'os';
 
 import { projects, settings } from '../store';
-import { getFiles, copyFiles, readSettingsFile, writeSettingsFile, parseArgs, readIniFile, writeIniFile } from '../utils';
+import { getFiles, copyFiles, readSettingsFile, writeSettingsFile, parseArgs, readIniFile, writeIniFile, shrinkListFolders } from '../utils';
 
 import Dispatcher from '../middleware/dispatcher';
 import StaticServer from '../middleware/express';
 import cmd from '../cmd';
-import { exec } from 'sudo-prompt';
 
 enum StackBackendType {
   stack = 0,
@@ -24,12 +23,17 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 export class ProjectListener extends CommonListener {
   private servers = [] as StaticServer[];
   private staticPath = path.join(app.getPath('userData'), 'domains');
+  private workspacePath = path.join(app.getPath('userData'), 'workspaces');
 
   constructor() {
     super('project');
 
     // стартанем статику при старте слушателя
     this.restartServers();
+
+    if (!fs.existsSync(this.workspacePath)) {
+      fs.mkdirSync(this.workspacePath);
+    }
   }
 
   getAll() {
@@ -167,6 +171,10 @@ export class ProjectListener extends CommonListener {
       checkProject(project, id);
       this.sendInfoMessage(project.name, 'Сборка backend запущена');
       await buildProject(project, data[id]);
+      // TOOD - что-то сделать чтобы избавиться от копипасты
+      const wsPath = path.join(this.workspacePath, `${project.name}.code-workspace`);
+      await genewateWorkspaceFile(project, wsPath);
+      // ********* //
       this.sendInfoMessage(project.name, 'Сборка backend завершена');
       data[id] = project;
       projects.set('projects', data);
@@ -216,6 +224,7 @@ export class ProjectListener extends CommonListener {
     projects.set('projects', allProjects);
     return res;
   }
+
   async appReStart(payload: any) {
     const id = payload.projectId;
     const allProjects = projects.get('projects', []) as Project[];
@@ -225,6 +234,7 @@ export class ProjectListener extends CommonListener {
     const res = await webServer.restartItem(payload.params);
     return res;
   }
+
   async appStop(payload: any) {
     const id = payload.projectId;
     const allProjects = projects.get('projects', []) as Project[];
@@ -401,7 +411,7 @@ export class ProjectListener extends CommonListener {
       webServer.startItem(name);
 
       if (!fs.existsSync('C:\\Program Files\\dotnet\\dotnet.exe')) {
-        exec(process.env.DOTNET_PATH || '');
+        cmd.execSudo(process.env.DOTNET_PATH || '');
       }
 
       this.sendInfoMessage(name, `Веб сервис создан`);
@@ -420,9 +430,26 @@ export class ProjectListener extends CommonListener {
 
       await cmd.exec('git pull', project.path.git);
       // если фронт лежит не в папке проекта, обновим гит отдельно
-      if (project.path.front && path.dirname(project.path.front) !== path.normalize(project.path.git)) {
+      if (project.path.front && path.resolve(path.dirname(project.path.front)) !== path.resolve(project.path.git)) {
         await cmd.exec('git pull', project.path.front);
       }
+    } else {
+      throw new Error(`Не найден проект с указанным id - ${id}`);
+    }
+  }
+
+  async openWorkspace(payload: any) {
+    const id = payload.projectId;
+    const allProjects = projects.get('projects', []) as Project[];
+    if (allProjects[id]) {
+      const project = allProjects[id];
+      const wsPath = path.join(this.workspacePath, `${project.name}.code-workspace`);
+
+      if (!fs.existsSync(wsPath)) {
+        await genewateWorkspaceFile(project, wsPath);
+      }
+
+      cmd.exec(`code ${wsPath}`);
     } else {
       throw new Error(`Не найден проект с указанным id - ${id}`);
     }
@@ -827,7 +854,7 @@ async function generateEnvJson(project: Project, envpath: string) {
   }
   const config = await getEnvConfig(project, envPath);
 
-  await fsp.writeFile(path.join(envpath, 'env.json'), JSON.stringify(config, null, '\t'));
+  await writeSettingsFile(path.join(envpath, 'env.json'), config);
 }
 
 async function getEnvConfig(project: Project, envPath: string) {
@@ -1107,6 +1134,73 @@ function getGatewayFileName(path: string) {
       .map((e) => e.name)
       .pop() || 'stackgateway-0.0.3.jar'
   );
+}
+
+async function genewateWorkspaceFile(project: Project, wsPath: string) {
+  let config = {} as any;
+  if (fs.existsSync(wsPath)) {
+    config = await readSettingsFile(wsPath);
+  }
+
+  config.folders = [];
+
+  // если фронт каталог лежит в папке проекта, то добавляем его в workspace
+  if (project.path.front && path.resolve(path.dirname(project.path.front)) === path.resolve(project.path.git)) {
+    config.folders.push({ path: project.path.front });
+  }
+
+  const pathIni = path.join(project.path.bin, 'stack.ini');
+  if (fs.existsSync(pathIni)) {
+    const appPath = (await readSettingsFile(pathIni)).AppPath || {};
+    const folders = [];
+    for (const f of Object.keys(appPath)) {
+      folders.push(...appPath[f]);
+    }
+    const folders_shrinked = shrinkListFolders(folders);
+    for (const f of folders_shrinked) {
+      config.folders.push({
+        path: f,
+        name: `${path.basename(path.dirname(f))} -> ${path.basename(f)}`,
+      });
+    }
+  }
+
+  config.settings = {
+    'files.exclude': {
+      '**/Update': true,
+      '**/Bin': true,
+      '**/BinLite': true,
+    },
+    'search.exclude': {
+      '**/.git': true,
+      '**/node_modules': true,
+      '**/.tmp': true,
+    },
+    'editor.formatOnSave': false,
+  };
+
+  const debugs = [];
+  for (const app of project.apps) {
+    if (app.port) {
+      debugs.push({
+        type: 'stack',
+        request: 'attach',
+        name: app.name,
+        address: 'localhost',
+        port: app.port,
+        localRoot: path.join(project.path.version, 'Stack.srv'),
+        remoteRoot: path.join(project.path.version, 'Stack.srv'),
+      });
+    }
+  }
+
+  if (debugs.length) {
+    config.launch = {};
+    config.launch.version = '0.2.0';
+    config.launch.configurations = debugs;
+  }
+
+  return await writeSettingsFile(wsPath, config);
 }
 
 async function fillProjects() {

@@ -1,4 +1,4 @@
-import { dialog, app, shell } from 'electron';
+import { dialog, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
 

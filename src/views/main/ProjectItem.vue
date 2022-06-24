@@ -1,11 +1,10 @@
 <template>
   <v-card class="flex-grow-1">
-    <v-card-title>
+    <v-card-title class="pb-0">
       {{ item.name }}
 
       <v-spacer />
 
-      <!-- <v-icon v-for="(app, idxtask) in item.apps" :key="idxtask" small :color="appColor(app.name)"> mdi-circle </v-icon> -->
       <v-progress-circular class="mr-3" :size="20" :width="isRunning ? 2 : 0" color="primary" :indeterminate="isRunning" />
 
       <v-menu bottom left offset-y>
@@ -15,7 +14,7 @@
           </v-btn>
         </template>
 
-        <v-list>
+        <v-list class="pa-0">
           <v-list-item v-for="(item, i) in projectActions" :key="i" @click="item.method">
             <v-list-item-action>
               <v-icon :color="item.color">{{ item.icon }}</v-icon>
@@ -28,15 +27,28 @@
       </v-menu>
     </v-card-title>
 
-    <v-card-subtitle>
-      <a v-if="item.port" class="text-subtitle-1" :href="projectUrl" @click.stop="onOpenUrl">{{ projectUrl }}</a>
-    </v-card-subtitle>
+    <v-card-title class="py-0">
+      <v-btn icon tile :title="projectUrl" @click="onOpenUrl">
+        <v-icon color="primary">mdi-web</v-icon>
+      </v-btn>
+      <v-btn icon tile title="Workspace" @click="onOpenWorkspace">
+        <v-icon color="blue">mdi-microsoft-visual-studio-code</v-icon>
+      </v-btn>
+      <v-spacer />
+      <v-btn icon tile title="Обновить гит" @click="onGitPull">
+        <v-icon color="accent">mdi-briefcase-download</v-icon>
+      </v-btn>
+      <v-btn icon tile title="Собрать фронт" @click="onBuildFront">
+        <v-icon color="accent">mdi-code-tags-check</v-icon>
+      </v-btn>
+      <v-btn icon tile title="Перезапустить" @click="onRestart">
+        <v-icon color="primary">mdi-restart</v-icon>
+      </v-btn>
+    </v-card-title>
 
-    <v-card-actions>
-      <v-list dense>
-        <app-item v-for="(app, idxtask) in item.apps" :item="app" :key="idxtask" @restart="onRestart($event)" @start="onStart($event)" @stop="onStop($event)" />
-      </v-list>
-    </v-card-actions>
+    <v-list dense>
+      <app-item v-for="(app, idxtask) in item.apps" :item="app" :key="idxtask" @restart="onRestart($event)" @start="onStart($event)" @stop="onStop($event)" />
+    </v-list>
   </v-card>
 </template>
 
@@ -124,14 +136,15 @@ export default Vue.extend({
       this.openURL({ url: this.projectUrl });
     },
 
+    onOpenWorkspace() {
+      this.projectSendJob({ jobName: 'openWorkspace', projectId: this.id });
+    },
+
     appColor(name: string | undefined) {
       return this.$store.getters['projectStore/getAppColor'](name);
     },
   },
   mounted() {
-    this.projectActions.push({ name: 'Обновить гит', icon: 'mdi-briefcase-download', color: 'accent', method: this.onGitPull });
-    this.projectActions.push({ name: 'Собрать фронт', icon: 'mdi-code-tags-check', color: 'accent', method: this.onBuildFront });
-    this.projectActions.push({ name: 'Перезапустить', icon: 'mdi-restart', color: 'primary', method: this.onRestart });
     this.projectActions.push({
       name: 'Редактировать',
       icon: 'mdi-pencil',

@@ -16,6 +16,9 @@ export async function readSettingsFile(filePath: string) {
       return await readTomlFile(filePath);
     case '.yml':
       return await readYamlFile(filePath);
+    case '.json':
+    case '.code-workspace':
+      return await readJsonFile(filePath);
     default:
       throw new Error('unknown extension');
   }
@@ -31,6 +34,9 @@ export async function writeSettingsFile(filePath: string, data: any) {
       return await writeTomlFile(filePath, data);
     case '.yml':
       return await writeYamlFile(filePath, data);
+    case '.json':
+    case '.code-workspace':
+      return await writeJsonFile(filePath, data);
     default:
       throw new Error('unknown extension');
   }
@@ -133,4 +139,12 @@ export async function writeYamlFile(filePath: string, data: any) {
     stringdata += yaml.dump(doc);
   }
   await fsp.writeFile(filePath, stringdata);
+}
+
+export async function readJsonFile(filePath: string) {
+  return JSON.parse(await fsp.readFile(filePath, 'utf8'));
+}
+
+export async function writeJsonFile(filePath: string, data: any) {
+  return fsp.writeFile(filePath, JSON.stringify(data, null, '\t'));
 }
