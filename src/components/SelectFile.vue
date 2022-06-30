@@ -17,7 +17,7 @@ export default Vue.extend({
   },
   props: {
     value: { type: String, required: true },
-    filter: { type: Object as PropType<FileFilter> },
+    filter: { type: Object as PropType<FileFilter>, default: {} },
   },
   methods: {
     async onChangeFolder() {

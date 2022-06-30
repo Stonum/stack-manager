@@ -1,7 +1,7 @@
 <template>
   <v-menu open-on-hover left bottom offset-y offset-overflow>
     <template v-slot:activator="data">
-      <v-btn icon v-on="data.on" class="pb-3">
+      <v-btn icon class="pb-3" v-on="data.on">
         <v-icon>mdi-help-circle-outline</v-icon>
       </v-btn>
     </template>

@@ -19,7 +19,7 @@
           </v-row>
         </v-container>
         <v-card-actions>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-btn color="primary" :loading="loading" text @click="onClickFill"> Да </v-btn>
           <v-btn color="primary" :disabled="loading" text @click="$emit('close')"> Нет </v-btn>
         </v-card-actions>
@@ -44,6 +44,11 @@ export default Vue.extend({
       } as Settings,
     };
   },
+  async mounted() {
+    for (const key of Object.keys(this.settings) as string[]) {
+      this.settings[key] = await this.$store.dispatch('mainStore/getSettings', { key });
+    }
+  },
   methods: {
     async onClickFill() {
       for (const key of Object.keys(this.settings) as string[]) {
@@ -57,11 +62,6 @@ export default Vue.extend({
         this.loading = false;
       }
     },
-  },
-  async mounted() {
-    for (const key of Object.keys(this.settings) as string[]) {
-      this.settings[key] = await this.$store.dispatch('mainStore/getSettings', { key });
-    }
   },
 });
 </script>

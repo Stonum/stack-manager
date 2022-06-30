@@ -65,10 +65,10 @@ export async function writeIniFile(filePath: string, data: any) {
   let strData = ini.stringify(data);
   // костыль с обработкой массивов
   strData = strData
-    .replaceAll(/PRG\[\]\=/g, 'PRG=')
-    .replaceAll(/DB\[\]\=/g, 'DB=')
-    .replaceAll(/RS\[\]\=/g, 'RS=')
-    .replaceAll(/RPT\[\]\=/g, 'RPT=');
+    .replaceAll(/PRG\[\]=/g, 'PRG=')
+    .replaceAll(/DB\[\]=/g, 'DB=')
+    .replaceAll(/RS\[\]=/g, 'RS=')
+    .replaceAll(/RPT\[\]=/g, 'RPT=');
   // костыль с кавычками в путях
   strData = strData.replaceAll('"', '');
   // костыль с двойными слэшами в путях
@@ -82,7 +82,7 @@ export async function getFiles(dir: string): Promise<string[]> {
     dirents.map(async (dirent) => {
       const res = path.resolve(dir, dirent.name);
       return dirent.isDirectory() ? await getFiles(res) : res;
-    }),
+    })
   );
   return Array.prototype.concat(...files);
 }
@@ -98,7 +98,7 @@ export async function copyFiles(src: string, desc: string) {
         await fsp.mkdir(folder, { recursive: true });
       }
       return fsp.copyFile(file, path.join(folder, fname));
-    }),
+    })
   );
 }
 
@@ -118,7 +118,7 @@ export async function readMarkdownFile(src: string) {
 export async function readTomlFile(filePath: string) {
   let strData = await fsp.readFile(filePath, 'utf8');
   // уберем закомментированные строки ( я нуб, надо удалить пустые строки тоже... )
-  strData = strData.replace(/\#(.+)$/gm, 'x').replaceAll('x\\r\\n', '');
+  strData = strData.replace(/#(.+)$/gm, 'x').replaceAll('x\\r\\n', '');
   return toml.parse(strData);
 }
 

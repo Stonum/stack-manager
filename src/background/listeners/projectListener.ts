@@ -67,7 +67,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.IsActive ? +app.State : -1 };
-      }),
+      })
     );
 
     const appServer = getDispatcher().appServer();
@@ -75,7 +75,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.IsActive ? (+app.State ? 0 : 2) : -1 };
-      }),
+      })
     );
 
     return statuses;
@@ -1064,7 +1064,7 @@ async function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      }),
+      })
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';

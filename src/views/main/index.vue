@@ -3,12 +3,12 @@
     <main-tool-bar @refresh="onRefresh" />
 
     <v-progress-linear v-if="loading" indeterminate />
-    <p style="text-align: center" v-else-if="!items.length">Проектов пока нет.</p>
+    <p v-else-if="!items.length" style="text-align: center">Проектов пока нет.</p>
     <v-container v-else fluid>
-      <v-draggable v-model="items" @change="onMoveProject" class="row">
+      <v-draggable v-model="items" class="row" @change="onMoveProject">
         <template v-for="(item, idx) in items">
-          <v-col cols="3" :key="idx" class="d-flex">
-            <project-item :item="item" :id="idx" @delete="onDelete(idx)" @edit="onEdit(idx)" />
+          <v-col :key="idx" cols="3" class="d-flex">
+            <project-item :id="idx" :item="item" @delete="onDelete(idx)" @edit="onEdit(idx)" />
           </v-col>
         </template>
       </v-draggable>
@@ -47,6 +47,12 @@ export default Vue.extend({
       loading: false,
     };
   },
+  async mounted() {
+    await this.onRefresh();
+    if (this.items.length === 0) {
+      this.visibleFillDlg = true;
+    }
+  },
   methods: {
     ...mapActions('projectStore', ['getProjects', 'projectDelete', 'moveProject', 'getAppStatus', 'getEvents']),
 
@@ -81,12 +87,6 @@ export default Vue.extend({
         this.moveProject(payload.moved);
       }
     },
-  },
-  async mounted() {
-    await this.onRefresh();
-    if (this.items.length === 0) {
-      this.visibleFillDlg = true;
-    }
   },
 });
 </script>

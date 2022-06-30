@@ -5,7 +5,7 @@
         <v-card-title> {{ header }} </v-card-title>
         <v-card-text v-if="text"> {{ text }} </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-btn color="primary" text @click="$emit('click', true)"> Да </v-btn>
           <v-btn color="primary" text @click="$emit('click', false)"> Нет </v-btn>
         </v-card-actions>
@@ -21,7 +21,7 @@ export default Vue.extend({
   name: 'YesNoDialog',
   props: {
     header: { type: String, required: true },
-    text: { type: String },
+    text: { type: String, default: '' },
     width: { type: Number, default: 290 },
   },
   data() {

@@ -2,12 +2,12 @@
   <v-footer app padless fixed>
     <v-container fluid class="pb-0">
       <v-card fluid :elevation="0">
-        <v-tabs hide-slider :height="tabHeaderHight" v-model="activeTab">
+        <v-tabs v-model="activeTab" hide-slider :height="tabHeaderHight">
           <v-tab @click="onClickTab(0)">Сообщения</v-tab>
           <v-tab @click="onClickTab(1)">События диспетчера</v-tab>
 
           <v-spacer />
-          <v-btn v-if="updateIsAvailable" :loading="isUpdating" color="primary" plain @click="onUpdate" title="Установить обновление">
+          <v-btn v-if="updateIsAvailable" :loading="isUpdating" color="primary" plain title="Установить обновление" @click="onUpdate">
             Доступно обновление версии
             <v-icon class="ml-2"> mdi-cloud-download-outline </v-icon>
           </v-btn>
@@ -68,6 +68,9 @@ export default Vue.extend({
       return this.$store.getters['mainStore/getUpdateAvailable']();
     },
   },
+  created() {
+    this.$emit('change', this.tabHeaderHight + this.tabBodyHeight);
+  },
   methods: {
     onClickTab(tab: number) {
       if (this.collapsedFooter || tab === this.activeTab) {
@@ -86,9 +89,6 @@ export default Vue.extend({
         this.isUpdating = false;
       }
     },
-  },
-  created() {
-    this.$emit('change', this.tabHeaderHight + this.tabBodyHeight);
   },
 });
 </script>

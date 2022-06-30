@@ -13,7 +13,7 @@
       <v-col cols="2"> Доп. аргументы </v-col>
     </v-row>
     <v-row v-for="(app, idx) in apps" :key="app.id">
-      <v-col cols="4" :key="app.id">
+      <v-col :key="app.id" cols="4">
         <v-checkbox :key="app.id" v-model="app.selected" :label="app.title" dense hide-details @change="$emit('select', { appId: idx, checked: $event })" />
       </v-col>
       <v-col cols="2">

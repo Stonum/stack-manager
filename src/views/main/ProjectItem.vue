@@ -15,12 +15,12 @@
         </template>
 
         <v-list class="pa-0">
-          <v-list-item v-for="(item, i) in projectActions" :key="i" @click="item.method">
+          <v-list-item v-for="(action, i) in projectActions" :key="i" @click="action.method">
             <v-list-item-action>
-              <v-icon :color="item.color">{{ item.icon }}</v-icon>
+              <v-icon :color="action.color">{{ action.icon }}</v-icon>
             </v-list-item-action>
             <v-list-item-content>
-              <v-list-item-title>{{ item.name }}</v-list-item-title>
+              <v-list-item-title>{{ action.name }}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -47,7 +47,7 @@
     </v-card-title>
 
     <v-list dense>
-      <app-item v-for="(app, idxtask) in item.apps" :item="app" :key="idxtask" @restart="onRestart($event)" @start="onStart($event)" @stop="onStop($event)" />
+      <app-item v-for="(app, idxtask) in item.apps" :key="idxtask" :item="app" @restart="onRestart($event)" @start="onStart($event)" @stop="onStop($event)" />
     </v-list>
   </v-card>
 </template>
@@ -80,6 +80,26 @@ export default Vue.extend({
       return this.runningActions.some((running: boolean) => running);
     },
   },
+
+  mounted() {
+    this.projectActions.push({
+      name: 'Редактировать',
+      icon: 'mdi-pencil',
+      color: 'primary',
+      method: () => {
+        this.$emit('edit');
+      },
+    });
+    this.projectActions.push({
+      name: 'Удалить',
+      icon: 'mdi-delete',
+      color: 'error',
+      method: () => {
+        this.$emit('delete');
+      },
+    });
+  },
+
   methods: {
     ...mapActions('projectStore', ['projectSendJob', 'getAppStatus', 'getEvents']),
     ...mapActions('mainStore', ['openURL']),
@@ -143,24 +163,6 @@ export default Vue.extend({
     appColor(name: string | undefined) {
       return this.$store.getters['projectStore/getAppColor'](name);
     },
-  },
-  mounted() {
-    this.projectActions.push({
-      name: 'Редактировать',
-      icon: 'mdi-pencil',
-      color: 'primary',
-      method: () => {
-        this.$emit('edit');
-      },
-    });
-    this.projectActions.push({
-      name: 'Удалить',
-      icon: 'mdi-delete',
-      color: 'error',
-      method: () => {
-        this.$emit('delete');
-      },
-    });
   },
 });
 </script>

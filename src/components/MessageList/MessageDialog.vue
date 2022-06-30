@@ -4,7 +4,7 @@
       <v-card-title :class="msgColor">
         {{ item.type.substring(0, 1).toUpperCase() + item.type.substring(1).toLowerCase() }}
 
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn icon @click="$emit('change', false)">
           <v-icon>mdi-close</v-icon>
         </v-btn>

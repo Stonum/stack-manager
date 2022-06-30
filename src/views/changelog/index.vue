@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <app-bar />
-    <div v-html="html" @click.stop="onClick" />
+    <div @click.stop="onClick" v-html="html" />
   </v-container>
 </template>
 
@@ -16,6 +16,9 @@ export default Vue.extend({
       html: null,
     };
   },
+  async mounted() {
+    this.html = await this.getChangeLog();
+  },
   methods: {
     ...mapActions('mainStore', ['openURL', 'getChangeLog']),
 
@@ -25,9 +28,6 @@ export default Vue.extend({
         this.openURL({ url: payload.target.href });
       }
     },
-  },
-  async mounted() {
-    this.html = await this.getChangeLog();
   },
 });
 </script>

@@ -10,7 +10,8 @@
     "electron:serve": "vue-cli-service electron:serve",
     "electron:build": "vue-cli-service electron:build",
     "release-path": "standard-version",
-    "release-minor": "standard-version --release-as minor"
+    "release-minor": "standard-version --release-as minor",
+    "lint": "vue-cli-service lint"
   },
   "main": "background.js",
   "dependencies": {

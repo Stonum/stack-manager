@@ -48,6 +48,12 @@ export default Vue.extend({
       tasks: [] as Task[],
     };
   },
+  async mounted() {
+    for (const key of Object.keys(this.settings) as string[]) {
+      this.settings[key] = await this.$store.dispatch('mainStore/getSettings', { key });
+    }
+    this.tasks = await this.$store.dispatch('mainStore/getSettings', { key: 'tasks' });
+  },
   methods: {
     onClickSave() {
       for (const key of Object.keys(this.settings) as string[]) {
@@ -62,12 +68,6 @@ export default Vue.extend({
       }
       await this.$store.dispatch('projectStore/createStaticApp', service);
     },
-  },
-  async mounted() {
-    for (const key of Object.keys(this.settings) as string[]) {
-      this.settings[key] = await this.$store.dispatch('mainStore/getSettings', { key });
-    }
-    this.tasks = await this.$store.dispatch('mainStore/getSettings', { key: 'tasks' });
   },
 });
 </script>

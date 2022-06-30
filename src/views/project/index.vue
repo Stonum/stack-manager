@@ -50,7 +50,7 @@ interface SelectableApp extends ProjectApp, Task {}
 export default Vue.extend({
   name: 'Project',
   components: { CommonTab, AppsTab },
-  props: { projectid: String },
+  props: { projectid: { type: String, required: true } },
   data() {
     return {
       project: {
@@ -97,6 +97,28 @@ export default Vue.extend({
     isAppHost(): boolean {
       return this.project.type === 1;
     },
+  },
+
+  async created() {
+    if (+this.projectid !== -1) {
+      this.project = await this.getProject(+this.projectid);
+
+      const data = await this.readIniFile(this.project.path.ini);
+      if (data.version.toString().toLowerCase() !== this.project.path.version.toLowerCase()) {
+        this.version = data.version;
+        this.visibleDialog = true;
+      }
+    }
+
+    const tasks = this.$store.getters['mainStore/getSettings']('tasks');
+    tasks.forEach((task: Task) => {
+      const app = this.project.apps.find((app) => app.id === task.id);
+      if (app) {
+        this.apps.push({ ...task, ...app, selected: true });
+      } else {
+        this.apps.push({ ...task, name: '', path: '', port: null, args: '', active: true, selected: this.isNewProject ? task.selected : false });
+      }
+    });
   },
 
   methods: {
@@ -163,28 +185,6 @@ export default Vue.extend({
         this.loading = false;
       }
     },
-  },
-
-  async created() {
-    if (+this.projectid !== -1) {
-      this.project = await this.getProject(+this.projectid);
-
-      const data = await this.readIniFile(this.project.path.ini);
-      if (data.version.toString().toLowerCase() !== this.project.path.version.toLowerCase()) {
-        this.version = data.version;
-        this.visibleDialog = true;
-      }
-    }
-
-    const tasks = this.$store.getters['mainStore/getSettings']('tasks');
-    tasks.forEach((task: Task) => {
-      const app = this.project.apps.find((app) => app.id === task.id);
-      if (app) {
-        this.apps.push({ ...task, ...app, selected: true });
-      } else {
-        this.apps.push({ ...task, name: '', path: '', port: null, args: '', active: true, selected: this.isNewProject ? task.selected : false });
-      }
-    });
   },
 });
 </script>

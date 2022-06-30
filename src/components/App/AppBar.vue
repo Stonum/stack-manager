@@ -9,7 +9,7 @@
 
     <v-app-bar-title>{{ title || pageName }}</v-app-bar-title>
 
-    <v-spacer></v-spacer>
+    <v-spacer />
 
     <slot />
 
@@ -25,7 +25,7 @@ import Vue from 'vue';
 export default Vue.extend({
   name: 'AppBar',
   props: {
-    title: { type: String },
+    title: { type: String, default: '' },
   },
   computed: {
     pageName(): string {

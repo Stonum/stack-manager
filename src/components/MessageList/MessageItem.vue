@@ -2,7 +2,7 @@
   <div>
     <message-dialog v-if="visibleDialog" v-model="visibleDialog" :item="item" />
     <v-list-item dense>
-      <v-list-item-icon @click="visibleDialog = true" style="cursor: pointer">
+      <v-list-item-icon style="cursor: pointer" @click="visibleDialog = true">
         <v-icon :color="msgColor">{{ msgIcon }}</v-icon>
       </v-list-item-icon>
       <v-list-item-content>

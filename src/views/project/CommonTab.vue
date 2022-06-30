@@ -2,10 +2,10 @@
   <v-container fluid>
     <v-row>
       <v-col cols="3">
-        <v-text-field v-model="project.name" label="Краткое название проекта*" :rules="[rules.required]" @change="$emit('changeName')" dense />
+        <v-text-field v-model="project.name" label="Краткое название проекта*" :rules="[rules.required]" dense @change="$emit('changeName')" />
       </v-col>
       <v-col cols="12">
-        <select-folder v-model="project.path.git" label="Каталог проекта в git*" :readonly="!isNewProject" @change="$emit('changeProjectFolder')" dense />
+        <select-folder v-model="project.path.git" label="Каталог проекта в git*" :readonly="!isNewProject" dense @change="$emit('changeProjectFolder')" />
       </v-col>
       <template v-if="project.path.git">
         <v-col cols="12">
@@ -14,9 +14,9 @@
             :items="inifiles"
             label="Путь к stack.ini*"
             prepend-icon="mdi-file-document-outline"
-            @change="$emit('changeInIFile')"
             :rules="[rules.required]"
             dense
+            @change="$emit('changeInIFile')"
           />
         </v-col>
         <template v-if="isAppHost && project.gateway">

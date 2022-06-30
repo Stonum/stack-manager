@@ -2,7 +2,7 @@
   <v-list :style="`height: ${height}px`">
     <vue-scroll>
       <template v-for="(item, idx) in items">
-        <message-item :item="item" :key="idx" />
+        <message-item :key="idx" :item="item" />
       </template>
     </vue-scroll>
   </v-list>
