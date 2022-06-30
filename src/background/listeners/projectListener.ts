@@ -67,7 +67,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.IsActive ? +app.State : -1 };
-      })
+      }),
     );
 
     const appServer = getDispatcher().appServer();
@@ -75,7 +75,7 @@ export class ProjectListener extends CommonListener {
     statuses.push(
       ...apps.map((app: any) => {
         return { name: app.Name, status: +app.IsActive ? (+app.State ? 0 : 2) : -1 };
-      })
+      }),
     );
 
     return statuses;
@@ -1064,7 +1064,7 @@ async function generateGatewaySettings(project: Project, pathnew: string) {
             useAsyncCache: false,
           },
         ];
-      })
+      }),
     );
 
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
@@ -1160,7 +1160,7 @@ async function genewateWorkspaceFile(project: Project, wsPath: string) {
     for (const f of folders_shrinked) {
       config.folders.push({
         path: f,
-        name: `${path.basename(path.dirname(f))} -> ${path.basename(f)}`,
+        name: `${path.basename(f)}<-${path.basename(path.dirname(f))}`,
       });
     }
   }
@@ -1188,8 +1188,6 @@ async function genewateWorkspaceFile(project: Project, wsPath: string) {
         name: app.name,
         address: 'localhost',
         port: app.port,
-        localRoot: path.join(project.path.version, 'Stack.srv'),
-        remoteRoot: path.join(project.path.version, 'Stack.srv'),
       });
     }
   }
