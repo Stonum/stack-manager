@@ -1,5 +1,9 @@
 <template>
-  <v-text-field v-bind="$attrs" :label="inputLabel" :rules="inputRules" dense v-on="$listeners" />
+  <v-text-field v-bind="$attrs" :label="inputLabel" :rules="inputRules" dense v-on="$listeners">
+    <template v-if="$scopedSlots['append-outer']" #append-outer>
+      <slot name="append-outer" />
+    </template>
+  </v-text-field>
 </template>
 
 <script lang="ts">

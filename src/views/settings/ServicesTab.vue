@@ -4,7 +4,7 @@
       <v-col cols="12">
         <base-input-folder v-model="settings.share" label="Каталог публикации файлов (/share)" clearable>
           <template #append-outer>
-            <v-btn icon tile small title="Создать веб сервис" @click.stop="$emit('create', 'share')">
+            <v-btn icon tile small class="pb-3" title="Создать веб сервис" @click.stop="$emit('create', 'share')">
               <v-icon> mdi-export-variant </v-icon>
             </v-btn>
           </template>
@@ -13,7 +13,7 @@
       <v-col cols="12">
         <base-input-folder v-model="settings.upload" label="Каталог загрузки файлов (/upload)" clearable>
           <template #append-outer>
-            <v-btn icon tile small title="Создать веб сервис" @click.stop="$emit('create', 'upload')">
+            <v-btn icon tile small class="pb-3" title="Создать веб сервис" @click.stop="$emit('create', 'upload')">
               <v-icon> mdi-export-variant </v-icon>
             </v-btn>
           </template>
@@ -25,7 +25,7 @@
       <v-col cols="2">
         <base-input v-model="settings.birt_port" label="Порт Birt" type="number" clearable>
           <template #append-outer>
-            <v-btn icon tile small title="Создать сервис Birt" @click.stop="$emit('create', 'birt')">
+            <v-btn icon tile small class="pb-3" title="Создать сервис Birt" @click.stop="$emit('create', 'birt')">
               <v-icon> mdi-export-variant </v-icon>
             </v-btn>
           </template>
@@ -37,7 +37,7 @@
       <v-col cols="2">
         <base-input v-model="settings.dotnetcore_port" label="Порт DotNetCore" type="number" clearable>
           <template #append-outer>
-            <v-btn icon tile small title="Создать сервис DotNetCore" @click.stop="$emit('create', 'dotnetcore')">
+            <v-btn icon tile small class="pb-3" title="Создать сервис DotNetCore" @click.stop="$emit('create', 'dotnetcore')">
               <v-icon> mdi-export-variant </v-icon>
             </v-btn>
           </template>
