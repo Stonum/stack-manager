@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.11...v0.6.0) (2022-07-01)
+
+
+### Features
+
+* отображение количества сообщений, и возможность их очистить ([61921e0](https://git.stack-it.ru/clients/stack-manager/commit/61921e0e7559885f5427518fe334793f79b24524))
+* реализовал генерацию рабочей области VsCode и ее открытие по проекту ([a4c7169](https://git.stack-it.ru/clients/stack-manager/commit/a4c71690dd7be31160c66ecf6e6ff27aa8d256c4))
+* события диспетчера отображаем только за текущие сутки ([850eec4](https://git.stack-it.ru/clients/stack-manager/commit/850eec4ddde98b77deae226924d961b8ca6bc1b0))
+
+
+### Bug Fixes
+
+* исправил проверку версии для инст проектов ([ce7b12a](https://git.stack-it.ru/clients/stack-manager/commit/ce7b12a8b4ff22feeed39d91c62c530dbab022a2))
+* сворачивание папок для вокрспэйса ([94d649a](https://git.stack-it.ru/clients/stack-manager/commit/94d649a4dcfd3bfbdeb4bf3088bf84eb500ff1c7))
+
 ### [0.5.11](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.10...v0.5.11) (2022-06-20)
 
 
