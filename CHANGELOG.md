@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.1](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.0...v0.6.1) (2022-07-01)
+
+
+### Bug Fixes
+
+* вернул кнопки создания сервисов и справочные иконки ([e90f4c5](https://git.stack-it.ru/clients/stack-manager/commit/e90f4c54f9d75ec7a0b46c963013541829d38066))
+
 ## [0.6.0](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.11...v0.6.0) (2022-07-01)
 
 
