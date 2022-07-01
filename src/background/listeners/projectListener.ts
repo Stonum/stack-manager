@@ -84,13 +84,18 @@ export class ProjectListener extends CommonListener {
   async getEvents() {
     const webServer = getDispatcher().eventServer();
     const events = await webServer.getItems();
-    return events.map((event: any) => {
-      return {
-        type: event.EventType === '1' ? 'error' : 'info',
-        text: event.EventMessage,
-        time: new Date(+event.EventDateTime * 1000),
-      };
-    });
+
+    const date = new Date().setHours(0, 0, 0, 0);
+
+    return events
+      .filter((event: any) => +event.EventDateTime * 1000 > date)
+      .map((event: any) => {
+        return {
+          type: event.EventType === '1' ? 'error' : 'info',
+          text: event.EventMessage,
+          time: new Date(+event.EventDateTime * 1000),
+        };
+      });
   }
 
   get(payload: any) {
