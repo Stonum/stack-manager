@@ -64,6 +64,10 @@ const actions: ActionTree<MainState, any> = {
   downloadAndInstallUpdate({ state }) {
     return ipcRenderer.invoke('main', { message: 'downloadAndInstallUpdate' });
   },
+
+  clearMessages({ state }) {
+    state.messages = [];
+  },
 };
 
 const getters: GetterTree<MainState, any> = {

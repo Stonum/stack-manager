@@ -3,8 +3,15 @@
     <v-container fluid class="pb-0">
       <v-card fluid :elevation="0">
         <v-tabs v-model="activeTab" hide-slider :height="tabHeaderHight">
-          <v-tab @click="onClickTab(0)">Сообщения</v-tab>
-          <v-tab @click="onClickTab(1)">События диспетчера</v-tab>
+          <v-tab @click="onClickTab(0)">
+            <v-badge :value="messagesCount" color="primary" :content="messagesCount"> Сообщения </v-badge>
+            <v-btn plain icon title="Очистить список сообщений" class="ml-3" color="error" @click.stop="onClearMessages">
+              <v-icon>mdi-delete-circle-outline</v-icon>
+            </v-btn>
+          </v-tab>
+          <v-tab @click="onClickTab(1)">
+            <v-badge :value="eventsCount" color="primary" :content="eventsCount"> События диспетчера </v-badge>
+          </v-tab>
 
           <v-spacer />
           <v-btn v-if="updateIsAvailable" :loading="isUpdating" color="primary" plain title="Установить обновление" @click="onUpdate">
@@ -39,7 +46,7 @@ export default Vue.extend({
   name: 'AppFooter',
   components: { MessageList },
   data() {
-    const tabHeaderHight = 35;
+    const tabHeaderHight = 40;
     const tabBodyMaxHeight = tabHeaderHight * 8 - tabHeaderHight;
     return {
       tabHeaderHight,
@@ -55,8 +62,14 @@ export default Vue.extend({
         return a.time < b.time ? 1 : -1;
       });
     },
+    messagesCount(): number {
+      return this.messages.length;
+    },
     events(): Message[] {
       return this.$store.getters['projectStore/getEvents']();
+    },
+    eventsCount(): number {
+      return this.events.length;
     },
     collapsedFooter(): boolean {
       return this.tabBodyHeight === 0;
@@ -88,6 +101,9 @@ export default Vue.extend({
       } finally {
         this.isUpdating = false;
       }
+    },
+    onClearMessages() {
+      this.$store.dispatch('mainStore/clearMessages');
     },
   },
 });
