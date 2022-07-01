@@ -560,6 +560,10 @@ async function getDataFromIni(pathFile: string) {
   if (!result.version) {
     result.version = result.commonFolder;
   }
+  // если найденный каталог не попадает под паттерн версии то зануляем, ибо нашли что-то не то
+  if (!result.version.match(verpattern)) {
+    result.version = '';
+  }
 
   // поищем гейтвэй
   const pathGateWay = path.join(result.version, 'StackGateway');

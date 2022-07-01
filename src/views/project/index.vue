@@ -104,7 +104,7 @@ export default Vue.extend({
       this.project = await this.getProject(+this.projectid);
 
       const data = await this.readIniFile(this.project.path.ini);
-      if (data.version.toString().toLowerCase() !== this.project.path.version.toLowerCase()) {
+      if (data.version && data.version.toString().toLowerCase() !== this.project.path.version.toLowerCase()) {
         this.version = data.version;
         this.visibleDialog = true;
       }
