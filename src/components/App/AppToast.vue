@@ -8,7 +8,7 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'Toast',
+  name: 'AppToast',
   data() {
     return {
       visible: false,

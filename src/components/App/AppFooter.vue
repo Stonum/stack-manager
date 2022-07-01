@@ -36,7 +36,7 @@ import Vue from 'vue';
 import MessageList from '../MessageList/MessageList.vue';
 
 export default Vue.extend({
-  name: 'FooterBar',
+  name: 'AppFooter',
   components: { MessageList },
   data() {
     const tabHeaderHight = 35;

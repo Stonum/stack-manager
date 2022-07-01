@@ -1,6 +1,6 @@
 <template>
   <div>
-    <message-dialog v-if="visibleDialog" v-model="visibleDialog" :item="item" />
+    <message-list-dialog v-if="visibleDialog" v-model="visibleDialog" :item="item" />
     <v-list-item dense>
       <v-list-item-icon style="cursor: pointer" @click="visibleDialog = true">
         <v-icon :color="msgColor">{{ msgIcon }}</v-icon>
@@ -24,11 +24,11 @@
 import Vue, { PropType } from 'vue';
 import { format } from 'date-fns';
 
-import MessageDialog from './MessageDialog.vue';
+import MessageListDialog from './MessageListDialog.vue';
 
 export default Vue.extend({
-  name: 'MessageItem',
-  components: { MessageDialog },
+  name: 'MessageListItem',
+  components: { MessageListDialog },
   props: {
     item: { type: Object as PropType<Message>, required: true },
   },

@@ -2,52 +2,53 @@
   <v-container fluid>
     <v-row>
       <v-col cols="3">
-        <v-text-field v-model="project.name" label="Краткое название проекта*" :rules="[rules.required]" dense @change="$emit('changeName')" />
+        <base-input v-model="project.name" label="Краткое название проекта" required @change="$emit('changeName')" />
       </v-col>
       <v-col cols="12">
-        <select-folder v-model="project.path.git" label="Каталог проекта в git*" :readonly="!isNewProject" dense @change="$emit('changeProjectFolder')" />
+        <base-input-folder v-model="project.path.git" label="Каталог проекта в git" :readonly="!isNewProject" @change="$emit('changeProjectFolder')" />
       </v-col>
       <template v-if="project.path.git">
         <v-col cols="12">
-          <v-combobox
+          <base-combobox
+            v-if="isNewProject"
             v-model="project.path.ini"
             :items="inifiles"
-            label="Путь к stack.ini*"
+            label="Путь к stack.ini"
             prepend-icon="mdi-file-document-outline"
-            :rules="[rules.required]"
-            dense
+            required
             @change="$emit('changeInIFile')"
           />
+          <base-input-file v-else v-model="project.path.ini" label="Путь к stack.ini" required @change="$emit('changeInIFile')" />
         </v-col>
         <template v-if="isAppHost && project.gateway">
           <v-col cols="11">
-            <select-folder v-model="project.gateway.path" label="StackGateway каталог*" :rules="[rules.required]" dense />
+            <base-input-folder v-model="project.gateway.path" label="StackGateway каталог" required />
           </v-col>
           <v-col cols="1">
-            <v-text-field v-model="project.gateway.port" label="порт*" :rules="[rules.required]" type="number" dense />
+            <base-input v-model="project.gateway.port" label="порт" required type="number" />
           </v-col>
         </template>
         <v-col cols="10">
-          <select-folder v-model="project.path.front" label="Stack.Front каталог" dense />
+          <base-input-folder v-model="project.path.front" label="Stack.Front каталог" />
         </v-col>
         <v-col cols="2">
-          <v-text-field v-model.number="project.port" label="порт для публикации" type="number" dense />
+          <base-input v-model.number="project.port" label="порт для публикации" type="number" />
         </v-col>
         <v-col cols="3">
-          <v-text-field v-model="project.sql.server" label="SQL сервер*" :rules="[rules.required]" dense />
+          <base-input-history v-model="project.sql.server" label="SQL сервер" required :history-id="`${project.name}-server`" />
         </v-col>
         <v-col cols="3">
-          <v-text-field v-model="project.sql.base" label="База данных*" :rules="[rules.required]" dense />
+          <base-input-history v-model="project.sql.base" label="База данных" :history-id="`${project.name}-base`" required />
         </v-col>
         <v-spacer />
         <v-col cols="2">
-          <v-text-field v-model="project.sql.login" label="Логин*" :rules="[rules.required]" dense />
+          <base-input v-model="project.sql.login" label="Логин" required />
         </v-col>
         <v-col cols="2">
-          <v-text-field v-model="project.sql.password" label="Пароль" dense />
+          <base-input v-model="project.sql.password" label="Пароль" />
         </v-col>
         <v-col cols="12">
-          <select-folder v-model="project.path.version" label="Каталог версии*" :rules="[rules.required]" dense />
+          <base-input-folder v-model="project.path.version" label="Каталог версии" required />
         </v-col>
       </template>
     </v-row>
@@ -67,11 +68,6 @@ export default Vue.extend({
   data() {
     return {
       inspectport: 0,
-      rules: {
-        required: (value: string): boolean | string => {
-          return !!value || 'Поле не может быть пустым';
-        },
-      },
     };
   },
   computed: {

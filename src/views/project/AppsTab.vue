@@ -14,30 +14,30 @@
     </v-row>
     <v-row v-for="(app, idx) in apps" :key="app.id">
       <v-col :key="app.id" cols="4">
-        <v-checkbox :key="app.id" v-model="app.selected" :label="app.title" dense hide-details @change="$emit('select', { appId: idx, checked: $event })" />
+        <base-checkbox :key="app.id" v-model="app.selected" :label="app.title" hide-details @change="$emit('select', { appId: idx, checked: $event })" />
       </v-col>
       <v-col cols="2">
-        <v-text-field v-model="app.name" dense hide-details />
+        <base-input v-model="app.name" hide-details />
       </v-col>
       <v-col v-if="!type" cols="2">
-        <v-text-field v-model="app.path" dense hide-details />
+        <base-input v-model="app.path" hide-details />
       </v-col>
       <template v-if="type">
         <v-col v-if="type" cols="1">
-          <v-text-field v-model="app.syncThreadCount" type="number" dense hide-details />
+          <base-input v-model="app.syncThreadCount" type="number" hide-details />
         </v-col>
         <v-col v-if="type" cols="1">
-          <v-text-field v-model="app.asyncThreadCount" type="number" dense hide-details />
+          <base-input v-model="app.asyncThreadCount" type="number" hide-details />
         </v-col>
         <v-col v-if="type" cols="1">
-          <v-text-field v-model="app.asyncTaskCount" type="number" dense hide-details />
+          <base-input v-model="app.asyncTaskCount" type="number" hide-details />
         </v-col>
       </template>
       <v-col cols="1">
-        <v-text-field v-model="app.port" type="number" dense hide-details />
+        <base-input v-model="app.port" type="number" hide-details />
       </v-col>
       <v-col cols="2">
-        <v-text-field v-model="app.args" dense hide-details />
+        <base-input v-model="app.args" hide-details />
       </v-col>
     </v-row>
   </v-container>

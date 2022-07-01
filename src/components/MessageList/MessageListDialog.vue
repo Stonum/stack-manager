@@ -18,7 +18,7 @@
 import Vue, { PropType } from 'vue';
 
 export default Vue.extend({
-  name: 'MessageDialog',
+  name: 'MessageListDialog',
   model: {
     prop: 'value',
     event: 'change',

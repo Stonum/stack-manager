@@ -7,13 +7,13 @@
     </v-row>
     <v-row v-for="task in tasks" :key="task.id" dense>
       <v-col cols="4">
-        <v-checkbox :key="task.id" v-model="task.selected" :label="task.title" dense hide-details />
+        <base-checkbox :key="task.id" v-model="task.selected" :label="task.title" hide-details />
       </v-col>
       <v-col cols="1">
-        <v-text-field v-model="task.port" type="number" dense hide-details />
+        <base-input v-model="task.port" type="number" hide-details />
       </v-col>
       <v-col cols="1">
-        <v-text-field v-model="task.prefix" dense hide-details />
+        <base-input v-model="task.prefix" hide-details />
       </v-col>
     </v-row>
   </v-container>

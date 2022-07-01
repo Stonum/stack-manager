@@ -1,5 +1,5 @@
 <template>
-  <v-text-field
+  <base-input
     :value="value"
     v-bind="$attrs"
     prepend-icon="mdi-folder-outline"
@@ -12,13 +12,14 @@
     <template v-if="$scopedSlots['append-outer']" #append-outer>
       <slot name="append-outer" />
     </template>
-  </v-text-field>
+  </base-input>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
 export default Vue.extend({
+  name: 'BaseInputFolder',
   model: {
     prop: 'value',
     event: 'change',
