@@ -833,9 +833,7 @@ async function buildProject(project: Project, oldProject?: Project) {
   }
 
   if (project.path.front && fs.existsSync(project.path.front)) {
-    if (!fs.existsSync(path.join(project.path.front, '.env.local'))) {
-      await generateEnvLocal(project);
-    }
+    await generateEnvLocal(project);
   }
 }
 
@@ -871,22 +869,33 @@ async function getEnvConfig(project: Project, envPath: string) {
   const disp = new URL(settings.get('dispatcher_url') as string);
   const config = await readIniFile(envPath);
 
+  // чистим лишние ключи из конфига
+  const keys = ['BACKEND_STATE_INTERVAL', 'ASYNC_JOBS_INTERVAL', 'CLIENT_DIR', 'API_HOST_TIMEOUT'];
+  for (const key in Object.keys(config)) {
+    if (keys.indexOf(key) === -1) {
+      delete config[key];
+    }
+  }
+
   const isAppHost = project.type === StackBackendType.apphost;
+
+  const taskPrefix = (id: number) => {
+    return tasks.find((task) => {
+      return task.id === id;
+    })?.prefix;
+  };
 
   if (isAppHost) {
     config['API_HOST'] = `http://${os.hostname().toLowerCase()}:${project.gateway?.port}`;
-  } else {
-    // delete config['API_HOST'];
-    delete config['API_HOST_AUTH'];
   }
   if (!isAppHost) {
     for (const app of project.apps) {
-      const prefix = tasks.find((task) => {
-        return task.id === app.id;
-      })?.prefix;
+      const prefix = taskPrefix(app.id);
       config['API_HOST_' + prefix?.toUpperCase()] = disp.origin + app.path;
     }
   }
+
+  config.BUNDLES = project.apps.map((app) => taskPrefix(app.id)).join(',');
 
   // с версии 1.0.0 стало просто /share а было /gateway/share
   let staticPrefix = isAppHost ? config['API_HOST'] : disp.origin;
