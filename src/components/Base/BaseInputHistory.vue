@@ -30,12 +30,13 @@ export default Vue.extend({
   },
   methods: {
     onChange(val: string) {
-      if (val && this.items.indexOf(val) === -1) {
+      const value = val.trim();
+      if (value && this.items.indexOf(value) === -1) {
         // Новое значение добавляем в начало
-        this.items.unshift(val);
+        this.items.unshift(value);
         this.storage.setItem(this.historyId, JSON.stringify(this.items));
       }
-      this.$emit('change', val);
+      this.$emit('change', value);
     },
   },
 });
