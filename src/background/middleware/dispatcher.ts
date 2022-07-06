@@ -520,7 +520,7 @@ class EventsAPI {
 
   public async getSelections(count: number) {
     let index = 0;
-    const end = Math.min(count, 100);
+    const end = Math.min(count, 1000);
 
     const resObj = { [this.type]: [] as object[] };
     for (index; index < end; index++) {
