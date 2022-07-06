@@ -35,14 +35,14 @@
           <base-input v-model.number="project.port" label="порт для публикации" type="number" />
         </v-col>
         <v-col cols="3">
-          <base-input-history v-model="project.sql.server" label="SQL сервер" required :history-id="`${project.name}-server`" />
+          <base-input-history v-model.trim="project.sql.server" label="SQL сервер" required :history-id="`${project.name}-server`" />
         </v-col>
         <v-col cols="3">
-          <base-input-history v-model="project.sql.base" label="База данных" :history-id="`${project.name}-base`" required />
+          <base-input-history v-model.trim="project.sql.base" label="База данных" :history-id="`${project.name}-base`" required />
         </v-col>
         <v-spacer />
         <v-col cols="2">
-          <base-input v-model="project.sql.login" label="Логин" required />
+          <base-input v-model.trim="project.sql.login" label="Логин" required />
         </v-col>
         <v-col cols="2">
           <base-input v-model="project.sql.password" label="Пароль" />
