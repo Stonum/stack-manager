@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.2](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.1...v0.6.2) (2022-07-07)
+
+
+### Bug Fixes
+
+* поправил создание конфига рабочей области, теперь там 3 папки - фронт, гит и версия. ([d59c7b8](https://git.stack-it.ru/clients/stack-manager/commit/d59c7b8fb9748f8d20c2e15db235806d5158d741))
+* убрал лишние ключи из env, пересобираем env.local при сборке проекта ([3cb394b](https://git.stack-it.ru/clients/stack-manager/commit/3cb394b6ad95b46fccebcf91477cbc10144daeec))
+
 ### [0.6.1](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.0...v0.6.1) (2022-07-01)
 
 
