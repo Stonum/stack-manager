@@ -7,7 +7,7 @@ import fsp from 'fs/promises';
 import os from 'os';
 
 import { projects, settings } from '../store';
-import { getFiles, copyFiles, readSettingsFile, writeSettingsFile, parseArgs, readIniFile, writeIniFile, shrinkListFolders } from '../utils';
+import { getFiles, copyFiles, readSettingsFile, writeSettingsFile, parseArgs, readIniFile, writeIniFile } from '../utils';
 
 import Dispatcher from '../middleware/dispatcher';
 import StaticServer from '../middleware/express';
@@ -1167,35 +1167,37 @@ async function genewateWorkspaceFile(project: Project, wsPath: string) {
     config.folders.push({ path: project.path.front });
   }
 
-  const pathIni = path.join(project.path.bin, 'stack.ini');
-  if (fs.existsSync(pathIni)) {
-    const appPath = (await readSettingsFile(pathIni)).AppPath || {};
-    const folders = [];
-    for (const f of Object.keys(appPath)) {
-      folders.push(...appPath[f]);
-    }
-    const folders_shrinked = shrinkListFolders(folders);
-    for (const f of folders_shrinked) {
-      config.folders.push({
-        path: f,
-        name: `${path.basename(f)}<-${path.basename(path.dirname(f))}`,
-      });
-    }
+  // каталог клиентских заплаток если есть
+  const srvPath = path.join(project.path.git, 'Stack.srv');
+  if (fs.existsSync(srvPath)) {
+    config.folders.push({ path: srvPath });
+  } else {
+    config.folders.push({ path: project.path.git });
   }
 
-  config.settings = {
-    'files.exclude': {
-      '**/Update': true,
-      '**/Bin': true,
-      '**/BinLite': true,
-    },
-    'search.exclude': {
-      '**/.git': true,
-      '**/node_modules': true,
-      '**/.tmp': true,
-    },
-    'editor.formatOnSave': false,
-  };
+  // катлог версии
+  const srvPathVer = path.join(project.path.version, 'Stack.srv');
+  if (fs.existsSync(srvPath)) {
+    config.folders.push({ path: srvPathVer, name: path.basename(project.path.version) });
+  } else {
+    config.folders.push({ path: project.path.version, name: path.basename(project.path.version) });
+  }
+
+  if (!config.settings) {
+    config.settings = {
+      'files.exclude': {
+        '**/Update': true,
+        '**/Bin': true,
+        '**/BinLite': true,
+      },
+      'search.exclude': {
+        '**/.git': true,
+        '**/node_modules': true,
+        '**/.tmp': true,
+      },
+      'editor.formatOnSave': false,
+    };
+  }
 
   const debugs = [];
   for (const app of project.apps) {
