@@ -4,13 +4,19 @@
       <v-card fluid :elevation="0">
         <v-tabs v-model="activeTab" hide-slider :height="tabHeaderHight">
           <v-tab @click="onClickTab(0)">
-            <v-badge :value="messagesCount" color="primary" :content="messagesCount"> Сообщения </v-badge>
+            Сообщения
+            <transition name="bounce">
+              <v-badge :key="`messages` + messagesCount" class="pb-1" :value="messagesCount" color="primary" :content="messagesCount" />
+            </transition>
             <v-btn plain icon title="Очистить список сообщений" class="ml-3" color="error" @click.stop="onClearMessages">
               <v-icon>mdi-delete-circle-outline</v-icon>
             </v-btn>
           </v-tab>
           <v-tab @click="onClickTab(1)">
-            <v-badge :value="eventsCount" color="primary" :content="eventsCount"> События диспетчера </v-badge>
+            События диспетчера
+            <transition name="bounce">
+              <v-badge :key="`events` + eventsCount" class="pb-1" :value="eventsCount" color="primary" :content="eventsCount" />
+            </transition>
           </v-tab>
 
           <v-spacer />
@@ -108,3 +114,23 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style scoped>
+.bounce-enter-active {
+  animation: bounce-in 0.5s;
+}
+.bounce-leave-active {
+  animation: bounce-in 0.5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+</style>

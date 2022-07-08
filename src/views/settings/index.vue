@@ -67,6 +67,7 @@ export default Vue.extend({
         await this.$store.dispatch('mainStore/setSettings', { key: service + '_port', data: this.settings[service + '_port'] });
       }
       await this.$store.dispatch('projectStore/createStaticApp', service);
+      await this.$store.dispatch('projectStore/getEvents');
     },
   },
 });
