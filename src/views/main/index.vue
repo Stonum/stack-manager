@@ -61,6 +61,7 @@ export default Vue.extend({
       this.items = await this.getProjects();
       this.loading = false;
       this.getAppStatus();
+      this.getEvents();
     },
     async onDelete(id: number | null, answer?: boolean) {
       if (answer === undefined) {
