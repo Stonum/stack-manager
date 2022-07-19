@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="py-0">
-    <app-bar :title="isNewProject ? `Создание проекта` : 'Рекдатирование проекта'">
+    <app-bar :title="isNewProject ? `Создание проекта` : 'Редактирование проекта'">
       <v-btn plain :disabled="!valid || loading" :loading="loading" @click="onBuildProject">{{ isNewProject ? 'Сохранить' : 'Пересобрать' }}</v-btn>
     </app-bar>
 

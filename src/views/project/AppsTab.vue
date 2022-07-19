@@ -24,20 +24,20 @@
       </v-col>
       <template v-if="type">
         <v-col v-if="type" cols="1">
-          <base-input v-model="app.syncThreadCount" type="number" hide-details />
+          <base-input v-model="app.syncThreadCount" type="number" hide-details title="Количество синхронных потоков" />
         </v-col>
         <v-col v-if="type" cols="1">
-          <base-input v-model="app.asyncThreadCount" type="number" hide-details />
+          <base-input v-model="app.asyncThreadCount" type="number" hide-details title="Количество асинхронных потоков" />
         </v-col>
         <v-col v-if="type" cols="1">
-          <base-input v-model="app.asyncTaskCount" type="number" hide-details />
+          <base-input v-model="app.asyncTaskCount" type="number" hide-details title="Количество асинхронных работ" />
         </v-col>
       </template>
       <v-col cols="1">
-        <base-input v-model="app.port" type="number" hide-details />
+        <base-input v-model="app.port" type="number" hide-details title="Порт для отладки" />
       </v-col>
       <v-col cols="2">
-        <base-input v-model="app.args" hide-details />
+        <base-input v-model="app.args" hide-details title="Дополнительные аргументы строки запуска" />
       </v-col>
     </v-row>
   </v-container>
