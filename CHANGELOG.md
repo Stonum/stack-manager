@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.3](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.2...v0.6.3) (2022-07-19)
+
+
+### Bug Fixes
+
+* в свернутом состоянии не опрашиваем диспетчер ([34f0637](https://git.stack-it.ru/clients/stack-manager/commit/34f063723be6ca66b5956f6fde18244315cf1a71))
+* удаление лишних ключей при генерации env конфига ([4a88c26](https://git.stack-it.ru/clients/stack-manager/commit/4a88c26bbd4b4e1093116dedc662b83574276558))
+
 ### [0.6.2](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.1...v0.6.2) (2022-07-07)
 
 
