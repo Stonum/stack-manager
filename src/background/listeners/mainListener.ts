@@ -23,10 +23,6 @@ export class MainListener extends CommonListener {
         url: this.update_url,
       });
     }
-
-    autoUpdater.on('error', (error) => {
-      this.window.webContents.send('error', (error.stack || error).toString());
-    });
   }
 
   getSettings(payload: any) {
@@ -108,24 +104,39 @@ export class MainListener extends CommonListener {
   }
 
   async checkForUpdates() {
-    return new Promise((resolve) => {
-      autoUpdater.checkForUpdates();
+    return new Promise((resolve, reject) => {
+      autoUpdater.once('error', (error: AnyException) => {
+        reject(error);
+      });
+
       autoUpdater.once('update-available', () => {
         this.sendInfoMessage('Updater', 'update is available');
+        autoUpdater.removeAllListeners();
         resolve(true);
       });
 
       autoUpdater.once('update-not-available', () => {
         // this.sendInfoMessage('Updater', 'update is not available');
+        autoUpdater.removeAllListeners();
         resolve(false);
       });
+      autoUpdater.checkForUpdates();
     });
   }
 
   downloadAndInstallUpdate() {
-    autoUpdater.downloadUpdate();
-    autoUpdater.once('update-downloaded', () => {
-      autoUpdater.quitAndInstall();
+    return new Promise((resolve, reject) => {
+      autoUpdater.once('error', (error: AnyException) => {
+        reject(error);
+      });
+
+      autoUpdater.once('update-downloaded', () => {
+        autoUpdater.removeAllListeners();
+        autoUpdater.quitAndInstall();
+        resolve(true);
+      });
+
+      autoUpdater.downloadUpdate();
     });
   }
 }
