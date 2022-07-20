@@ -1267,13 +1267,13 @@ async function fillProjects() {
         };
 
         const data = await getDataFromIni(pathini);
-        const args = parseArgs(item.StackProgramParameters);
+        const args = parseArgs(item.StackProgramParameters); // TODO типизировать конфиг файлы
 
         project.sql = {
           server: data.server,
           base: data.base,
-          login: args.u.trim(),
-          password: args.p.trim(),
+          login: args.u?.trim(),
+          password: args.p?.trim(),
         };
 
         app.id = +args.t;
