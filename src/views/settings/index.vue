@@ -60,6 +60,7 @@ export default Vue.extend({
         this.$store.dispatch('mainStore/setSettings', { key, data: this.settings[key] });
       }
       this.$store.dispatch('mainStore/setSettings', { key: 'tasks', data: this.tasks });
+      this.$store.commit('mainStore/MESSAGE_ADD', { type: 'info', text: 'Настройки сохранены' });
     },
     async onCreateService(service: string) {
       await this.$store.dispatch('mainStore/setSettings', { key: service, data: this.settings[service] });

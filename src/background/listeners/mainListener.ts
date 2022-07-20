@@ -116,7 +116,7 @@ export class MainListener extends CommonListener {
       });
 
       autoUpdater.once('update-not-available', () => {
-        this.sendInfoMessage('Updater', 'update is not available');
+        // this.sendInfoMessage('Updater', 'update is not available');
         resolve(false);
       });
     });
