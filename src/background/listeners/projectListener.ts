@@ -1175,12 +1175,22 @@ async function genewateWorkspaceFile(project: Project, wsPath: string) {
     config.folders.push({ path: project.path.git });
   }
 
+  // TODO убрать копипасту, возможно хранить реальный каталог версии на который ссылаемся
   // катлог версии
-  const srvPathVer = path.join(project.path.version, 'Stack.srv');
+  const mathed = project.path.version.match(verpattern);
+  let verdir = project.path.version;
+  if (settings.get('stackversion')) {
+    if (mathed && mathed[1]) {
+      const ver = mathed[1].replaceAll('//', '');
+      verdir = path.join(settings.get('stackversion') as string, ver);
+    }
+  }
+  verdir = path.join(verdir, '\\');
+  const srvPathVer = path.join(verdir, 'Stack.srv');
   if (fs.existsSync(srvPath)) {
-    config.folders.push({ path: srvPathVer, name: path.basename(project.path.version) });
+    config.folders.push({ path: srvPathVer, name: path.basename(verdir) });
   } else {
-    config.folders.push({ path: project.path.version, name: path.basename(project.path.version) });
+    config.folders.push({ path: verdir, name: path.basename(verdir) });
   }
 
   if (!config.settings) {
