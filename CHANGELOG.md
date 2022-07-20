@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.4](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.3...v0.6.4) (2022-07-20)
+
+
+### Features
+
+* добавил toast на info сообщения ([e680ab8](https://git.stack-it.ru/clients/stack-manager/commit/e680ab8fa5b4af2037e00e77cc9773b48758a22f))
+
+
+### Bug Fixes
+
+* исправил заполнение проектов, если нет логина пароля в командной строке ([63fdf49](https://git.stack-it.ru/clients/stack-manager/commit/63fdf49dcbe29f54afb61fa19af370d52ee5a34b)), closes [#9](https://git.stack-it.ru/clients/stack-manager/issues/9)
+* исправил каталог версии в генерируемом workspace ([ef37a01](https://git.stack-it.ru/clients/stack-manager/commit/ef37a014ff6dabc9876aa14e46d403b74b9254ba)), closes [#10](https://git.stack-it.ru/clients/stack-manager/issues/10)
+
 ### [0.6.3](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.2...v0.6.3) (2022-07-19)
 
 
