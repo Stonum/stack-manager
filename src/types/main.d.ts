@@ -68,3 +68,10 @@ interface DispatcherItem {
 }
 
 type Message = { type: string; text: string; time: Date };
+
+interface ProjectCondition {
+  building?: boolean;
+  pulling?: boolean;
+  deploying?: boolean;
+  restarting?: boolean;
+}

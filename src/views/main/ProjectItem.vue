@@ -35,10 +35,10 @@
         <v-icon color="blue">mdi-microsoft-visual-studio-code</v-icon>
       </v-btn>
       <v-spacer />
-      <v-btn icon tile title="Обновить гит" @click="onGitPull">
+      <v-btn icon tile title="Обновить гит" :loading="projectStatus.pulling" @click="onGitPull">
         <v-icon color="accent">mdi-briefcase-download</v-icon>
       </v-btn>
-      <v-btn icon tile title="Собрать фронт" @click="onBuildFront">
+      <v-btn icon tile title="Собрать фронт" :loading="projectStatus.deploying" @click="onBuildFront">
         <v-icon color="accent">mdi-code-tags-check</v-icon>
       </v-btn>
       <v-btn icon tile title="Перезапустить" @click="onRestart">
@@ -69,15 +69,20 @@ export default Vue.extend({
   data() {
     return {
       projectActions: [] as any[],
-      runningActions: [] as boolean[],
     };
   },
   computed: {
     projectUrl() {
       return `http://localhost:${this.item.port || '0000'}`;
     },
+    projectStatus(): ProjectCondition {
+      return this.$store.getters['projectStore/getProjectStatus'](this.item.name);
+    },
     isRunning(): boolean {
-      return this.runningActions.some((running: boolean) => running);
+      if (!this.projectStatus) {
+        return false;
+      }
+      return !!this.projectStatus.building || !!this.projectStatus.restarting;
     },
   },
 
@@ -104,6 +109,10 @@ export default Vue.extend({
     ...mapActions('projectStore', ['projectSendJob', 'getAppStatus', 'getEvents']),
     ...mapActions('mainStore', ['openURL']),
 
+    setProjectStatus(status: ProjectCondition) {
+      this.$store.commit('projectStore/PROJECT_SET_STATUS', { name: this.item.name, status });
+    },
+
     async onStop(appname?: string) {
       await this.projectSendJob({ jobName: 'appStop', projectId: this.id, params: appname });
       this.getAppStatus();
@@ -115,7 +124,7 @@ export default Vue.extend({
       this.getEvents();
     },
     async onRestart(appname?: string) {
-      const idx = this.runningActions.push(true) - 1;
+      this.setProjectStatus({ restarting: true });
       try {
         if (appname && typeof appname === 'string') {
           await this.projectSendJob({ jobName: 'appReStart', projectId: this.id, params: appname });
@@ -127,27 +136,27 @@ export default Vue.extend({
           }
         }
       } finally {
-        this.$set(this.runningActions, idx, false);
+        this.setProjectStatus({ restarting: false });
         this.getAppStatus();
         this.getEvents();
       }
     },
 
     async onBuildFront() {
-      const idx = this.runningActions.push(true) - 1;
+      this.setProjectStatus({ deploying: true });
       try {
         await this.projectSendJob({ jobName: 'buildFront', projectId: this.id });
       } finally {
-        this.$set(this.runningActions, idx, false);
+        this.setProjectStatus({ deploying: false });
       }
     },
 
     async onGitPull() {
-      const idx = this.runningActions.push(true) - 1;
+      this.setProjectStatus({ pulling: true });
       try {
         await this.projectSendJob({ jobName: 'gitPull', projectId: this.id });
       } finally {
-        this.$set(this.runningActions, idx, false);
+        this.setProjectStatus({ pulling: false });
       }
     },
 

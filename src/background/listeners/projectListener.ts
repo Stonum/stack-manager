@@ -3,7 +3,6 @@ import CommonListener from './commonListener';
 import { app } from 'electron';
 import path from 'path';
 import fs from 'fs';
-import fsp from 'fs/promises';
 import os from 'os';
 
 import { projects, settings } from '../store';
