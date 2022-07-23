@@ -40,14 +40,12 @@ const actions: ActionTree<ProjectState, any> = {
   },
 
   async getAppStatus({ state, commit }) {
-    setTimeout(async () => {
-      const apps = await ipcRenderer.invoke('project', { message: 'getAppStatus' });
-      if (apps.length) {
-        for (const app of apps) {
-          commit('APP_SET_STATUS', { name: app.name, status: app.status });
-        }
+    const apps = await ipcRenderer.invoke('project', { message: 'getAppStatus' });
+    if (apps.length) {
+      for (const app of apps) {
+        commit('APP_SET_STATUS', { name: app.name, status: app.status });
       }
-    }, 3000);
+    }
   },
 
   async getEvents({ state, commit }) {
