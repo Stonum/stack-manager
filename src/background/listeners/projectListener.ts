@@ -510,19 +510,23 @@ async function getDataFromIni(pathFile: string) {
   }
 
   const result = {} as any;
-
-  const data = await readSettingsFile(pathFile);
-
-  result.server = data['SQL-mode'].Server;
-  result.base = data['SQL-mode'].Base;
+  result.server = '';
+  result.base = '';
   result.version = '';
   result.commonFolder = '';
   result.gateway = '';
   result.application = '';
 
+  const data = (await readSettingsFile(pathFile)) as StackIniFile;
+
+  if (data['SQL-mode']) {
+    result.server = data['SQL-mode'].Server;
+    result.base = data['SQL-mode'].Base;
+  }
+
   const pathlist = [];
 
-  if (data.AppPath.DB.length) {
+  if (data.AppPath?.DB?.length) {
     for (const cpath of data.AppPath.DB) {
       const res = cpath.match(verpattern);
       if (res) {
@@ -917,84 +921,94 @@ async function getEnvConfig(project: Project, envPath: string) {
 }
 
 async function generateStackIni(project: Project, pathini: string, binold: string, binnew: string, version: string) {
-  const data = await readSettingsFile(pathini);
+  const data = (await readSettingsFile(pathini)) as StackIniFile;
+
+  if (!data['SQL-mode']) {
+    data['SQL-mode'] = {};
+  }
 
   data['SQL-mode'].Server = project.sql.server;
   data['SQL-mode'].Base = project.sql.base;
   data['SQL-mode'].Schema = project.type !== StackBackendType.apphost ? project.sql.base + '.stack' : 'stack';
 
   // correct path of resources
-  for (const key of Object.keys(data['AppPath'])) {
-    for (const idx in data['AppPath'][key]) {
-      const respath = data['AppPath'][key][idx];
-      if (respath.startsWith('..')) {
-        data['AppPath'][key][idx] = path.join(binold, respath);
-      } else {
-        data['AppPath'][key][idx] = respath.replace(verpattern, version);
+  if (data.AppPath) {
+    for (const key in data.AppPath) {
+      if (data.AppPath[key] && data.AppPath[key].length) {
+        for (const idx in data.AppPath[key]) {
+          const respath = data.AppPath[key][idx];
+          if (respath.startsWith('..')) {
+            data.AppPath[key][idx] = path.join(binold, respath);
+          } else {
+            data.AppPath[key][idx] = respath.replace(verpattern, version);
+          }
+        }
       }
     }
   }
 
-  if (project.type !== StackBackendType.apphost) {
-    const libpath = data['LibPath'].Path || '';
+  if (project.type !== StackBackendType.apphost && data.LibPath) {
+    const libpath = data.LibPath.Path || '';
     if (libpath.startsWith('..')) {
-      data['LibPath'].Path = path.join(binold, libpath);
+      data.LibPath.Path = path.join(binold, libpath);
     } else {
-      data['LibPath'].Path = libpath.replace(verpattern, version);
+      data.LibPath.Path = libpath.replace(verpattern, version);
     }
   }
 
-  const jspath = data['JavaClient'].JCPath || '';
-  if (jspath.startsWith('..')) {
-    data['JavaClient'].JCPath = path.join(binold, jspath);
-  } else {
-    data['JavaClient'].JCPath = jspath.replace(verpattern, version);
+  if (data.JavaClient) {
+    const jspath = data.JavaClient.JCPath || '';
+    if (jspath.startsWith('..')) {
+      data.JavaClient.JCPath = path.join(binold, jspath);
+    } else {
+      data.JavaClient.JCPath = jspath.replace(verpattern, version);
+    }
+
+    const jrepath = data.JavaClient.JREPath || '';
+    if (jrepath.startsWith('..')) {
+      data.JavaClient.JREPath = path.join(binold, jrepath);
+    } else {
+      data.JavaClient.JREPath = jrepath.replace(verpattern, version);
+    }
+
+    const jsupath = data.JavaClient.JCUpdatePath || '';
+    if (jsupath.startsWith('..')) {
+      data.JavaClient.JCUpdatePath = path.join(binold, jsupath);
+    } else {
+      data.JavaClient.JCUpdatePath = jsupath.replace(verpattern, version);
+    }
   }
 
-  const jrepath = data['JavaClient'].JREPath || '';
-  if (jrepath.startsWith('..')) {
-    data['JavaClient'].JREPath = path.join(binold, jrepath);
-  } else {
-    data['JavaClient'].JREPath = jrepath.replace(verpattern, version);
-  }
-
-  const jsupath = data['JavaClient'].JCUpdatePath || '';
-  if (jsupath.startsWith('..')) {
-    data['JavaClient'].JCUpdatePath = path.join(binold, jsupath);
-  } else {
-    data['JavaClient'].JCUpdatePath = jsupath.replace(verpattern, version);
-  }
-
-  if (!data['API']) {
-    data['API'] = {};
+  if (!data.API) {
+    data.API = {};
   }
 
   const sharePath = settings.get('share') as string;
   if (sharePath) {
-    data['API'].PublicFilesPath = sharePath;
+    data.API.PublicFilesPath = sharePath;
   }
   const uploadPath = settings.get('upload') as string;
   if (uploadPath) {
-    data['API'].UploadedFilesPath = uploadPath;
+    data.API.UploadedFilesPath = uploadPath;
   }
 
   if (settings.get('birt') && settings.get('birt_port')) {
-    if (!data['BirtStarter']) {
-      data['BirtStarter'] = {};
+    if (!data.BirtStarter) {
+      data.BirtStarter = {};
     }
     if (project.type === StackBackendType.apphost) {
-      data['BirtStarter'].Port = +(settings.get('birt_port') as number);
+      data.BirtStarter.Port = +(settings.get('birt_port') as number);
     } else {
-      data['BirtStarter'].BSPort = +(settings.get('birt_port') as number);
+      data.BirtStarter.BSPort = +(settings.get('birt_port') as number);
     }
   }
 
   if (project.type === StackBackendType.apphost) {
     if (settings.get('dotnetcore') && settings.get('dotnetcore_port')) {
-      if (!data['DotNetCore']) {
-        data['DotNetCore'] = {};
+      if (!data.DotNetCore) {
+        data.DotNetCore = {};
       }
-      data['DotNetCore'].Port = +(settings.get('dotnetcore_port') as number);
+      data.DotNetCore.Port = +(settings.get('dotnetcore_port') as number);
     }
   }
 
@@ -1267,17 +1281,17 @@ async function fillProjects() {
         };
 
         const data = await getDataFromIni(pathini);
-        const args = parseArgs(item.StackProgramParameters); // TODO типизировать конфиг файлы
+        const args = parseArgs(item.StackProgramParameters) as StackArguments;
 
         project.sql = {
           server: data.server,
           base: data.base,
-          login: args.u?.trim(),
-          password: args.p?.trim(),
+          login: args.u?.trim() || '',
+          password: args.p?.trim() || '',
         };
 
-        app.id = +args.t;
-        app.port = +args.inspect;
+        app.id = +(args.t || 0);
+        app.port = +(args.inspect || 0);
 
         const ignoreKeys = ['u', 'p', 't', 'inspect', 'nc', 'LOADRES'];
         for (const keyArg of Object.keys(args)) {
