@@ -28,7 +28,7 @@
     </v-card-title>
 
     <v-card-title class="py-0">
-      <v-btn icon tile :title="projectUrl" @click="onOpenUrl">
+      <v-btn icon tile :title="projectUrl" :disabled="!item.port" @click="onOpenUrl">
         <v-icon color="primary">mdi-web</v-icon>
       </v-btn>
       <v-btn icon tile title="Workspace" @click="onOpenWorkspace">
@@ -74,7 +74,7 @@ export default Vue.extend({
   },
   computed: {
     projectUrl() {
-      return `http://localhost:${this.item.port}`;
+      return `http://localhost:${this.item.port || '0000'}`;
     },
     isRunning(): boolean {
       return this.runningActions.some((running: boolean) => running);
