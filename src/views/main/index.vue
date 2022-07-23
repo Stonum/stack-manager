@@ -48,7 +48,11 @@ export default Vue.extend({
     };
   },
   async mounted() {
+    this.loading = true;
+    this.items = await this.getProjects();
     await this.onRefresh();
+    this.loading = false;
+
     if (this.items.length === 0) {
       this.visibleFillDlg = true;
     }
@@ -57,11 +61,8 @@ export default Vue.extend({
     ...mapActions('projectStore', ['getProjects', 'projectDelete', 'moveProject', 'getAppStatus', 'getEvents']),
 
     async onRefresh() {
-      this.loading = true;
-      this.items = await this.getProjects();
-      this.loading = false;
-      this.getAppStatus();
-      this.getEvents();
+      await this.getAppStatus();
+      await this.getEvents();
     },
     async onDelete(id: number | null, answer?: boolean) {
       if (answer === undefined) {
@@ -77,7 +78,7 @@ export default Vue.extend({
       if (answer && id !== null) {
         await this.projectDelete(id);
       }
-      this.onRefresh();
+      this.items = await this.getProjects();
       this.getEvents();
     },
     async onEdit(id: number) {

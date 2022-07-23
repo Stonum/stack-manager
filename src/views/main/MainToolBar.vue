@@ -1,7 +1,7 @@
 <template>
   <app-bar>
     <v-btn plain title="Перезапустить диспетчер" :loading="onDispLoading" @click="onReloadDisp">Перезапустить диспетчер</v-btn>
-    <v-btn plain icon title="Обновить список" @click="onRefresh"><v-icon>mdi-refresh</v-icon></v-btn>
+    <v-btn plain icon title="Обновить состояния" @click="onRefresh"><v-icon>mdi-refresh</v-icon></v-btn>
     <v-btn plain title="Список изменений" icon to="/changelog"><v-icon>mdi-help-circle-outline</v-icon></v-btn>
   </app-bar>
 </template>

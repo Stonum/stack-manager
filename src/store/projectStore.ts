@@ -36,37 +36,26 @@ const actions: ActionTree<ProjectState, any> = {
   },
 
   async getProjects({ state, commit }): Promise<Project[]> {
-    const projects = await ipcRenderer.invoke('project', { message: 'getAll' });
-    commit('CLEAR_APPS');
-    if (projects && projects.length) {
-      for (const project of projects) {
-        if (project.apps && project.apps.length) {
-          for (const app of project.apps) {
-            commit('APP_ADD', { name: app.name, status: undefined });
-          }
-        }
-      }
-    }
-    return projects;
+    return (await ipcRenderer.invoke('project', { message: 'getAll' })) as Project[];
   },
 
   async getAppStatus({ state, commit }) {
-    if (state.apps.length !== 0) {
+    setTimeout(async () => {
       const apps = await ipcRenderer.invoke('project', { message: 'getAppStatus' });
       if (apps.length) {
         for (const app of apps) {
           commit('APP_SET_STATUS', { name: app.name, status: app.status });
         }
       }
-    }
+    }, 3000);
   },
 
   async getEvents({ state, commit }) {
     state.events = await ipcRenderer.invoke('project', { message: 'getEvents' });
   },
 
-  getProject(ctx, projectId: number): Promise<Project> {
-    return ipcRenderer.invoke('project', { message: 'get', projectId });
+  async getProject(ctx, projectId: number): Promise<Project> {
+    return await ipcRenderer.invoke('project', { message: 'get', projectId });
   },
 
   projectSendJob(ctx, { jobName, projectId, params }: { jobName: string; projectId: number; params: any }): Promise<any> {
@@ -120,16 +109,12 @@ const getters: GetterTree<ProjectState, any> = {
 };
 
 const mutations: MutationTree<ProjectState> = {
-  CLEAR_APPS(state: ProjectState) {
-    state.apps = [];
-  },
-  APP_ADD(state: ProjectState, app: AppState) {
-    state.apps.push(app);
-  },
   APP_SET_STATUS(state: ProjectState, { name, status }: { name: string; status: number }) {
     const app = state.apps.find((value) => value.name === name);
     if (app) {
       app.status = status;
+    } else {
+      state.apps.push({ name, status });
     }
   },
   SET_BLIND_MODE(state: ProjectState, mode: boolean) {
