@@ -106,7 +106,7 @@ export class MainListener extends CommonListener {
   async checkForUpdates() {
     return new Promise((resolve, reject) => {
       autoUpdater.once('error', (error: AnyException) => {
-        reject(error);
+        reject(new Error(`Updater error: ${error.message}`));
       });
 
       autoUpdater.once('update-available', () => {
@@ -127,7 +127,7 @@ export class MainListener extends CommonListener {
   downloadAndInstallUpdate() {
     return new Promise((resolve, reject) => {
       autoUpdater.once('error', (error: AnyException) => {
-        reject(error);
+        reject(new Error(`Updater error: ${error.message}`));
       });
 
       autoUpdater.once('update-downloaded', () => {
