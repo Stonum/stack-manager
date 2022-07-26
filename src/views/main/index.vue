@@ -50,12 +50,12 @@ export default Vue.extend({
   async mounted() {
     this.loading = true;
     this.items = await this.getProjects();
-    await this.onRefresh();
     this.loading = false;
 
     if (this.items.length === 0) {
       this.visibleFillDlg = true;
     }
+    this.onRefresh();
   },
   methods: {
     ...mapActions('projectStore', ['getProjects', 'projectDelete', 'moveProject', 'getAppStatus', 'getEvents']),
