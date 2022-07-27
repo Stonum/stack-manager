@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.5](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.4...v0.6.5) (2022-07-27)
+
+
+### Features
+
+* в настройки вынес каталог, где будут создаваться workspace ([ecfda88](https://git.stack-it.ru/clients/stack-manager/commit/ecfda88de729b0e51dbae3c5d1cf52be94db80c6))
+* хранение состояний проекта в store. запрет многократного запуска сборки фронта ([ac97bb7](https://git.stack-it.ru/clients/stack-manager/commit/ac97bb7721faff00531ac9fbaa437da13f108500))
+
+
+### Bug Fixes
+
+* убрал лишние мерцания статусов ([c9c296c](https://git.stack-it.ru/clients/stack-manager/commit/c9c296c260b354e95f16faa5f83dbb53898a4658))
+
 ### [0.6.4](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.3...v0.6.4) (2022-07-20)
 
 
