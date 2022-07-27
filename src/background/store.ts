@@ -1,4 +1,6 @@
 import Store from 'electron-store';
+import { app } from 'electron';
+import { join } from 'path';
 
 const defSettings = {
   tasks: [
@@ -24,6 +26,8 @@ const defSettings = {
   dotnetcore_name: '_dotnetcore',
   dotnetcore_port: 20001,
   colorBlindMode: false,
+  workspacePath: join(app.getPath('userData'), 'workspaces'),
+  staticPath: join(app.getPath('userData'), 'domains'),
 };
 
 export const settings = new Store({ name: 'settings', cwd: 'config', defaults: defSettings });

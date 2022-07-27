@@ -44,6 +44,7 @@ export default Vue.extend({
         fullLogging: '',
         refresh_interval: 0,
         colorBlindMode: '',
+        workspacePath: '',
       } as Settings,
       tasks: [] as Task[],
     };

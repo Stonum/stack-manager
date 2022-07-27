@@ -1,6 +1,5 @@
 import CommonListener from './commonListener';
 
-import { app } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
@@ -21,8 +20,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 
 export class ProjectListener extends CommonListener {
   private servers = [] as StaticServer[];
-  private staticPath = path.join(app.getPath('userData'), 'domains');
-  private workspacePath = path.join(app.getPath('userData'), 'workspaces');
+  private staticPath = settings.get('staticPath');
 
   constructor() {
     super('project');
@@ -30,8 +28,9 @@ export class ProjectListener extends CommonListener {
     // стартанем статику при старте слушателя
     this.restartServers();
 
-    if (!fs.existsSync(this.workspacePath)) {
-      fs.mkdirSync(this.workspacePath);
+    const workspacePath = settings.get('workspacePath');
+    if (!fs.existsSync(workspacePath)) {
+      fs.mkdirSync(workspacePath);
     }
   }
 
@@ -176,7 +175,7 @@ export class ProjectListener extends CommonListener {
       this.sendInfoMessage(project.name, 'Сборка backend запущена');
       await buildProject(project, data[id]);
       // TOOD - что-то сделать чтобы избавиться от копипасты
-      const wsPath = path.join(this.workspacePath, `${project.name}.code-workspace`);
+      const wsPath = path.join(settings.get('workspacePath'), `${project.name}.code-workspace`);
       await genewateWorkspaceFile(project, wsPath);
       // ********* //
       this.sendInfoMessage(project.name, 'Сборка backend завершена');
@@ -447,8 +446,8 @@ export class ProjectListener extends CommonListener {
     const allProjects = projects.get('projects', []) as Project[];
     if (allProjects[id]) {
       const project = allProjects[id];
-      const wsPath = path.join(this.workspacePath, `${project.name}.code-workspace`);
-
+      const wsPath = path.join(settings.get('workspacePath'), `${project.name}.code-workspace`);
+      console.log(wsPath);
       if (!fs.existsSync(wsPath)) {
         await genewateWorkspaceFile(project, wsPath);
       }

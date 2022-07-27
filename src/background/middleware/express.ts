@@ -4,12 +4,14 @@ import path from 'path';
 import fs from 'fs';
 import log from '../log';
 
+import { settings } from '../store';
+
 export default class StaticServer {
   private server = null as any;
 
   constructor(name: string, port: number) {
     const server = express();
-    const staticPath = path.join(app.getPath('userData'), 'domains', name);
+    const staticPath = path.join(settings.get('staticPath'), name);
 
     if (fs.existsSync(staticPath)) {
       server.use(express.static(staticPath));

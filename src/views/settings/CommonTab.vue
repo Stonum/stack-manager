@@ -34,14 +34,21 @@
           </template>
         </base-input-folder>
       </v-col>
+      <v-col cols="12">
+        <base-input-folder v-model="settings.workspacePath" label="Каталог vs-code workspace" required>
+          <template #append-outer>
+            <help-icon>Каталог в котором будут находиться сгенерированные рабочие области для vs-code</help-icon>
+          </template>
+        </base-input-folder>
+      </v-col>
       <v-col cols="3">
         <base-input v-model.number="settings.refresh_interval" label="Интервал обномления статусов приложений" type="number" suffix="мс" />
       </v-col>
       <v-col cols="12">
-        <v-switch v-model="settings.fullLogging" label="Полное логирование ( включает логирование всех запросов после перезапуска )" />
+        <v-switch v-model="settings.fullLogging" class="my-0" label="Полное логирование ( включает логирование всех запросов после перезапуска )" dense />
       </v-col>
       <v-col cols="12">
-        <v-switch v-model="settings.colorBlindMode" label="Режим цветовой слепоты" />
+        <v-switch v-model="settings.colorBlindMode" class="my-0" label="Режим цветовой слепоты" dense />
       </v-col>
     </v-row>
   </v-container>
