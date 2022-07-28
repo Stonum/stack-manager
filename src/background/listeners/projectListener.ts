@@ -1220,6 +1220,11 @@ async function genewateWorkspaceFile(project: Project, wsPath: string) {
       'editor.formatOnSave': false,
     };
   }
+  // добавляем в конфиг путь к каталогу с ини файлом, чтобы не пытался его найти в каталоге фронта
+  if (!config.settings.stack) {
+    config.settings.stack = {};
+  }
+  config.settings.stack.iniPath = project.path.bin;
 
   const debugs = [];
   for (const app of project.apps) {
