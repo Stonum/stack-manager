@@ -142,7 +142,11 @@ export async function writeYamlFile(filePath: string, data: any) {
 }
 
 export async function readJsonFile(filePath: string) {
-  return JSON.parse(await fsp.readFile(filePath, 'utf8'));
+  try {
+    return JSON.parse(await fsp.readFile(filePath, 'utf8'));
+  } catch (e: AnyException) {
+    throw new Error('Failed to parse JSON file - ' + filePath + '\n' + e.message);
+  }
 }
 
 export async function writeJsonFile(filePath: string, data: any) {
