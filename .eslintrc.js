@@ -158,5 +158,11 @@ module.exports = {
         '@typescript-eslint/explicit-module-boundary-types': 'off',
       },
     },
+    {
+      files: ['**/__tests__/*.{j,t}s?(x)', '**/tests/unit/**/*.spec.{j,t}s?(x)'],
+      env: {
+        jest: true,
+      },
+    },
   ],
 };
