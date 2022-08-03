@@ -1,5 +1,5 @@
-import express from 'express';
-import { app } from 'electron';
+import express, { Express, Request, Response } from 'express';
+import { Server } from 'http';
 import path from 'path';
 import fs from 'fs';
 import log from '../log';
@@ -7,24 +7,31 @@ import log from '../log';
 import { settings } from '../store';
 
 export default class StaticServer {
-  private server = null as any;
+  private name: string;
+  private port: number;
+  private app: Express;
+  private isStarted = false;
+  private server = null as Server | null;
 
   constructor(name: string, port: number) {
-    const server = express();
-    const staticPath = path.join(settings.get('staticPath'), name);
+    this.name = name;
+    this.port = port;
+
+    this.app = express();
+    const staticPath = path.join(settings.get('staticPath'), this.name);
 
     if (fs.existsSync(staticPath)) {
-      server.use(express.static(staticPath));
+      this.app.use(express.static(staticPath));
 
       // проброс путей для позадачных каталогов
       const dirs = fs.readdirSync(staticPath, { withFileTypes: true });
       for (const dir of dirs) {
         if (dir.isDirectory()) {
-          server.use(`/${dir.name}/*`, express.static(path.join(staticPath, dir.name)));
+          this.app.use(`/${dir.name}/*`, express.static(path.join(staticPath, dir.name)));
         }
       }
     } else {
-      server.get('/', (req, res) => {
+      this.app.get('/', (req: Request, res: Response) => {
         res.send(`
           <h1>Ошибка публикации</h1>
           <p>
@@ -34,21 +41,28 @@ export default class StaticServer {
         `);
       });
     }
-
-    log.debug(`Server ${name} is starting...`);
-
-    this.server = server.listen(port, () => {
-      log.debug(`Server ${name} started on http://localhost:${port}`);
-    });
   }
 
   get started() {
-    return !!this.server;
+    return this.isStarted;
+  }
+
+  listen() {
+    log.debug(`Server ${this.name} is starting...`);
+    try {
+      this.server = this.app.listen(this.port, () => {
+        log.debug(`Server ${this.name} started on http://localhost:${this.port}`);
+      });
+      this.isStarted = true;
+    } catch (e: AnyException) {
+      throw new Error('Express server error ' + e.message);
+    }
   }
 
   close() {
-    if (this.server) {
+    if (this.server && this.isStarted) {
       this.server.close();
+      this.isStarted = false;
     }
   }
 }

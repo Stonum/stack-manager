@@ -28,8 +28,9 @@ export default class CommonListener {
     });
   }
 
+  
+
   sendInfoMessage(title: string, message: string) {
-    // new Notification({ title, body: message }).show();
     this.window.webContents.send('info', { title, message });
   }
 }

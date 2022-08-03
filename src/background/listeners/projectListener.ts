@@ -306,6 +306,7 @@ export class ProjectListener extends CommonListener {
       if (project.port) {
         try {
           const server = new StaticServer(project.name, project.port);
+          server.listen();
           if (server.started) {
             this.servers.push(server);
           }
