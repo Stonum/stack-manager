@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.6](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.5...v0.6.6) (2022-08-05)
+
+
+### Bug Fixes
+
+* в workspace добавляем stack.iniPath для более корректного разбора каталогов расширением stack ([49f09a0](https://git.stack-it.ru/clients/stack-manager/commit/49f09a0cfcc5337e3a57daee8dbadaea33ffd462))
+* убрал админку из bundles для фронта ([f0674ae](https://git.stack-it.ru/clients/stack-manager/commit/f0674ae4094d5038b697ab64999e624aca2cb7ff))
+
 ### [0.6.5](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.4...v0.6.5) (2022-07-27)
 
 
