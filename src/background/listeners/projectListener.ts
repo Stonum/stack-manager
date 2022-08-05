@@ -898,7 +898,10 @@ async function getEnvConfig(project: Project, envPath: string) {
     }
   }
 
-  config.BUNDLES = project.apps.map((app) => taskPrefix(app.id)).join(',');
+  config.BUNDLES = project.apps
+    .filter((app) => app.id !== 11075)
+    .map((app) => taskPrefix(app.id))
+    .join(',');
 
   // с версии 1.0.0 стало просто /share а было /gateway/share
   let staticPrefix = isAppHost ? config['API_HOST'] : disp.origin;
