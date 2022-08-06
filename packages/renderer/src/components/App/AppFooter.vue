@@ -1,5 +1,5 @@
 <template>
-   <v-footer app padless fixed>
+   <v-footer app fixed>
       <v-container fluid class="pb-0">
          <v-card fluid :elevation="0">
             <v-tabs v-model="activeTab" hide-slider :height="tabHeaderHight">
@@ -9,9 +9,8 @@
                      <v-badge :key="`messages` + messagesCount" class="pb-1" :value="messagesCount" color="primary"
                         :content="messagesCount" />
                   </transition> -->
-                  <v-btn plain icon title="Очистить список сообщений" class="ml-3" color="error"
-                     @click.stop="onClearMessages">
-                     <v-icon>mdi-delete-circle-outline</v-icon>
+                  <v-btn icon flat title="Очистить список сообщений" @click.stop="onClearMessages">
+                     <v-icon color="error">mdi-delete-circle-outline</v-icon>
                   </v-btn>
                </v-tab>
                <v-tab @click="onClickTab(1)">
@@ -29,19 +28,20 @@
                   <v-icon class="ml-2"> mdi-cloud-download-outline </v-icon>
                </v-btn> -->
 
-               <v-btn color="primary" icon @click="onClickUpDown">
-                  <v-icon>{{ updownicon }}</v-icon>
+               <v-btn icon flat @click="onClickUpDown">
+                  <v-icon color="primary">{{ updownicon }}</v-icon>
                </v-btn>
             </v-tabs>
 
-            <!-- <v-tabs-items v-model="activeTab" :style="`height: ${tabBodyHeight}px`">
+            <v-tabs-items v-model="activeTab" :style="`height: ${tabBodyHeight}px`">
                <v-tab-item>
-                  <message-list :items="messages" :height="tabBodyHeight" />
+                  <div :style="`height: ${tabBodyHeight}px`">13131231</div>
+                  <!-- <message-list :items=" messages" :height="tabBodyHeight" /> -->
                </v-tab-item>
                <v-tab-item>
-                  <message-list :items="events" :height="tabBodyHeight" />
+                  <!-- <message-list :items="events" :height="tabBodyHeight" /> -->
                </v-tab-item>
-            </v-tabs-items> -->
+            </v-tabs-items>
          </v-card>
       </v-container>
    </v-footer>
@@ -71,6 +71,7 @@ const onClickTab = (tab: number) => {
 
 const onClickUpDown = () => {
    tabBodyHeight.value = collapsedFooter.value ? tabBodyMaxHeight.value : 0;
+   console.log(collapsedFooter.value, tabBodyHeight.value)
    emit('change', tabHeaderHight.value + tabBodyHeight.value);
 }
 
@@ -78,7 +79,7 @@ const onClearMessages = () => {
 
 };
 
-// onActivated(() => { emit('change', tabHeaderHight.value + tabBodyHeight.value); });
+onActivated(() => { emit('change', tabHeaderHight.value + tabBodyHeight.value); });
 </script>
 
 <style scoped>

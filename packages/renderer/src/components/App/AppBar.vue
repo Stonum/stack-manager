@@ -1,5 +1,5 @@
 <template>
-   <v-app-bar elevate-on-scroll dense app color="primary" dark>
+   <v-app-bar dense app color="primary" dark>
       <v-btn v-if="!hideHomeBtn" plain icon to="/" title="На главную">
          <v-icon>mdi-home</v-icon>
       </v-btn>

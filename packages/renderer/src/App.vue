@@ -1,8 +1,9 @@
 <template>
    <v-app>
       <v-main>
-         <router-view>
-         </router-view>
+         <vue-scroll :style="`height: ${620 - footerSize}px`">
+            <router-view />
+         </vue-scroll>
       </v-main>
       <app-footer @change="onChangeFooterSize" />
    </v-app>
@@ -10,6 +11,8 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
+
+import AppBar from '/@/components/App/AppBar.vue';
 import AppFooter from '/@/components/App/AppFooter.vue';
 
 const footerSize = ref(0);
