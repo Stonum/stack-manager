@@ -1,7 +1,8 @@
 import { app } from 'electron';
-import devtools from '@vue/devtools';
 import './security-restrictions';
+
 import { restoreOrCreateWindow, createTrayMenu } from '/@/mainWindow';
+import { registerListeners } from './listeners';
 
 /**
  * Prevent electron from running multiple instances.
@@ -38,6 +39,7 @@ app.on('activate', restoreOrCreateWindow);
 app
   .whenReady()
   .then(createTrayMenu)
+  .then(registerListeners)
   .then(restoreOrCreateWindow)
   .catch((e) => console.error('Failed create window:', e));
 

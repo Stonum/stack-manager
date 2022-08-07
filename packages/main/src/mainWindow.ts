@@ -13,7 +13,7 @@ function closeHndl(event: Event) {
   return false;
 }
 
-function getMainWindow() {
+export function getMainWindow() {
   return BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
 }
 
