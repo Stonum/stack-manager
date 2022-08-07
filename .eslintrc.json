@@ -6,11 +6,8 @@
       "browser": false
    },
    "extends": [
-      "plugin:vue/strongly-recommended",
-      "eslint:recommended",
-      "@vue/typescript/recommended",
-      "@vue/prettier",
-      "@vue/prettier/@typescript-eslint"
+      "plugin:vue/vue3-strongly-recommended",
+      "eslint:recommended"
    ],
    "parser": "@typescript-eslint/parser",
    "parserOptions": {
@@ -65,10 +62,7 @@
          "warn",
          {
             "singleline": 10,
-            "multiline": {
-               "max": 1,
-               "allowFirstLine": false
-            }
+            "multiline": 1
          }
       ],
       "vue/v-slot-style": "off",

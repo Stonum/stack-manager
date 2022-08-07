@@ -47,7 +47,7 @@
     "electron-builder": "23.3.3",
     "electron-devtools-installer": "^3.2.0",
     "eslint": "8.20.0",
-    "eslint-plugin-vue": "9.3.0",
+    "eslint-plugin-vue": "^9.3.0",
     "happy-dom": "^6.0.4",
     "playwright": "1.24.2",
     "simple-git-hooks": "2.8.0",

@@ -13,6 +13,10 @@ function closeHndl(event: Event) {
   return false;
 }
 
+function getMainWindow() {
+  return BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
+}
+
 async function createWindow() {
   const browserWindow = new BrowserWindow({
     title: `${app.getName()} ${app.getVersion()}`,
@@ -66,7 +70,7 @@ async function createWindow() {
  * Restore an existing BrowserWindow or Create a new BrowserWindow.
  */
 export async function restoreOrCreateWindow() {
-  let window = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
+  let window = getMainWindow();
 
   if (window === undefined) {
     window = await createWindow();
@@ -86,11 +90,19 @@ export async function createTrayMenu() {
   const appTray = new Tray(nativeImage.createFromDataURL(icon));
   appTray.setToolTip(`${app.getName()} ${app.getVersion()}`);
 
+  appTray.on('click', function () {
+    const window = getMainWindow();
+    if (window) {
+      window.show();
+      window.setTitle(`${app.getName()} ${app.getVersion()}`);
+    }
+  });
+
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'Выход',
       click() {
-        const window = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
+        const window = getMainWindow();
         if (window) {
           window.removeListener('close', closeHndl);
           window.close();

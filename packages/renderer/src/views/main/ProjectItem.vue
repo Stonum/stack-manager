@@ -1,71 +1,82 @@
 <template>
-   <v-card class="flex-grow-1">
-      <v-card-item>
-         <v-card-title>
-            <v-row align="center" hide-gutters no-gutters>
-               <v-col cols="6">
-                  {{ item.name }}
-               </v-col>
-               <v-col cols="6" class="text-right">
-                  <!-- <v-progress-circular class="mr-3" :size="20" :width="isRunning ? 2 : 0" color="primary" :indeterminate="isRunning" /> -->
-                  <v-menu bottom left offset-y>
-                     <template #activator="{ props }">
-                        <v-btn icon flat v-bind="props">
-                           <v-icon>mdi-dots-vertical</v-icon>
-                        </v-btn>
-                     </template>
+  <v-card class="flex-grow-1">
+    <v-card-item>
+      <v-card-title>
+        <v-row align="center" hide-gutters no-gutters>
+          <v-col cols="6">
+            {{ item.name }}
+          </v-col>
+          <v-col cols="6" class="text-right">
+            <!-- <v-progress-circular class="mr-3" :size="20" :width="isRunning ? 2 : 0" color="primary" :indeterminate="isRunning" /> -->
+            <v-menu bottom left offset-y>
+              <template #activator="attrs">
+                <v-btn icon flat v-bind="attrs.props">
+                  <v-icon>mdi-dots-vertical</v-icon>
+                </v-btn>
+              </template>
 
-                     <v-list class="pa-0">
-                        <v-list-item v-for="(action, i) in projectActions" :key="i" @click="action.method">
-                           <template #prepend>
-                              <v-icon :color="action.color">{{ action.icon }}</v-icon>
-                           </template>
-                           <v-list-item-title>{{ action.name }}</v-list-item-title>
-                        </v-list-item>
-                     </v-list>
-                  </v-menu>
-               </v-col>
-            </v-row>
-         </v-card-title>
+              <v-list class="pa-0">
+                <v-list-item v-for="(action, i) in projectActions" :key="i" @click="action.method">
+                  <template #prepend>
+                    <v-icon :color="action.color">
+                      {{ action.icon }}
+                    </v-icon>
+                  </template>
+                  <v-list-item-title>{{ action.name }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-col>
+        </v-row>
+      </v-card-title>
 
-         <v-row justify="space-between" hide-gutters no-gutters>
-            <v-col cols="5">
-               <v-btn icon flat :title="projectUrl" :disabled="!item.port">
-                  <v-icon color="primary">mdi-web</v-icon>
-               </v-btn>
-               <v-btn icon flat title="Workspace" @click="onOpenWorkspace">
-                  <v-icon color="blue">mdi-microsoft-visual-studio-code</v-icon>
-               </v-btn>
-            </v-col>
+      <v-row justify="space-between" hide-gutters no-gutters>
+        <v-col cols="5">
+          <v-btn icon flat :title="projectUrl" :disabled="!item.port">
+            <v-icon color="primary">
+              mdi-web
+            </v-icon>
+          </v-btn>
+          <v-btn icon flat title="Workspace" @click="onOpenWorkspace">
+            <v-icon color="blue">
+              mdi-microsoft-visual-studio-code
+            </v-icon>
+          </v-btn>
+        </v-col>
 
-            <v-col cols="7" class="text-right">
-               <v-btn icon flat title="Обновить гит" :loading="projectStatus.pulling" @click="onGitPull">
-                  <v-icon color="accent">mdi-briefcase-download</v-icon>
-               </v-btn>
-               <v-btn icon flat title="Собрать фронт" :loading="projectStatus.deploying" @click="onBuildFront">
-                  <v-icon color="accent">mdi-code-tags-check</v-icon>
-               </v-btn>
-               <v-btn icon flat title="Перезапустить" @click="onRestart">
-                  <v-icon color="primary">mdi-restart</v-icon>
-               </v-btn>
-            </v-col>
-         </v-row>
-      </v-card-item>
+        <v-col cols="7" class="text-right">
+          <v-btn icon flat title="Обновить гит" :loading="projectStatus.pulling" @click="onGitPull">
+            <v-icon color="accent">
+              mdi-briefcase-download
+            </v-icon>
+          </v-btn>
+          <v-btn icon flat title="Собрать фронт" :loading="projectStatus.deploying" @click="onBuildFront">
+            <v-icon color="accent">
+              mdi-code-tags-check
+            </v-icon>
+          </v-btn>
+          <v-btn icon flat title="Перезапустить" @click="onRestart">
+            <v-icon color="primary">
+              mdi-restart
+            </v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-card-item>
 
-
-      <v-list dense>
-         <!-- <app-item v-for="(app, idxtask) in item.apps" :key="idxtask" :item="app" @restart="onRestart($event)" @start="onStart($event)" @stop="onStop($event)" /> -->
-      </v-list>
-   </v-card>
+    <v-list dense>
+      <!-- <app-item v-for="(app, idxtask) in item.apps" :key="idxtask" :item="app" @restart="onRestart($event)" @start="onStart($event)" @stop="onStop($event)" /> -->
+    </v-list>
+  </v-card>
 </template>
 
 <script lang="ts" setup>
-import { reactive, computed, defineProps, defineEmits } from 'vue';
+import { computed } from 'vue';
 
-const { item } = defineProps({
-   item: Object,
-   id: Number
-})
+const props = defineProps({
+   item: { type: Object, required: true },
+   id: { type: Number, required: true },
+});
 
 const emit = defineEmits(['edit', 'delete']);
 
@@ -85,11 +96,11 @@ const projectActions = [
       method: () => {
          emit('delete');
       },
-   }
+   },
 ];
 
 const projectUrl = computed(() => {
-   return `http://localhost:${item.port || '0000'}`;
+   return `http://localhost:${props.item.port || '0000'}`;
 });
 
 const projectStatus = computed(() => {

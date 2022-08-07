@@ -1,27 +1,27 @@
 <template>
-   <main-tool-bar />
-   <v-progress-linear v-if="isLoading" indeterminate />
-   <p v-else-if="!items.length" style="text-align: center">Проектов пока нет.</p>
-   <v-container v-else fluid>
-      <v-draggable :list="items" class="v-row" item-key="name" @change="onMoveProject">
-         <template #item="{ element, index }">
-            <v-col cols="3" class="d-flex">
-               <project-item :id="index" :item="element" @delete="onDelete(index)" @edit="onEdit(index)" />
-            </v-col>
-         </template>
-      </v-draggable>
-   </v-container>
-   <!-- <yes-no-dialog v-if="visibleDeleteDlg" :header="`Удалить проект ${delName}?`" @click="onDelete(delIndex, $event)" /> -->
+  <main-tool-bar />
+  <v-progress-linear v-if="isLoading" indeterminate />
+  <p v-else-if="!items.length" style="text-align: center">
+    Проектов пока нет.
+  </p>
+  <v-container v-else fluid>
+    <v-draggable :list="items" class="v-row" item-key="name" @change="onMoveProject">
+      <template #item="{ element, index }">
+        <v-col cols="3" class="d-flex">
+          <project-item :id="index" :item="element" @delete="onDelete(index)" @edit="onEdit(index)" />
+        </v-col>
+      </template>
+    </v-draggable>
+  </v-container>
+  <!-- <yes-no-dialog v-if="visibleDeleteDlg" :header="`Удалить проект ${delName}?`" @click="onDelete(delIndex, $event)" /> -->
 
-   <!-- <fill-projects-dialog
+  <!-- <fill-projects-dialog
       v-if="visibleFillDlg"
       @close="
         visibleFillDlg = false;
         onRefresh();
       "
     /> -->
-
-
 </template>
 
 <script lang="ts" setup>
@@ -61,9 +61,9 @@ onMounted(() => {
 
       isLoading.value = false;
    }, 1000);
-})
+});
 
-const onMoveProject = (payload: any) => { console.log('moved', payload) };
-const onDelete = (id: number) => { console.log(id) };
-const onEdit = (id: number) => { console.log(id) };
+const onMoveProject = (payload: any) => { console.log('moved', payload); };
+const onDelete = (id: number) => { console.log(id); };
+const onEdit = (id: number) => { console.log(id); };
 </script>

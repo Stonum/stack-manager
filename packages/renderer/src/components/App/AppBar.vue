@@ -1,29 +1,29 @@
 <template>
-   <v-app-bar dense app color="primary" dark>
-      <v-btn v-if="!hideHomeBtn" plain icon to="/" title="На главную">
-         <v-icon>mdi-home</v-icon>
-      </v-btn>
-      <v-btn v-if="!hideAddBtn" plain icon to="/project/-1" title="Добавить новый проект">
-         <v-icon>mdi-plus</v-icon>
-      </v-btn>
+  <v-app-bar dense app color="primary" dark>
+    <v-btn v-if="!hideHomeBtn" plain icon to="/" title="На главную">
+      <v-icon>mdi-home</v-icon>
+    </v-btn>
+    <v-btn v-if="!hideAddBtn" plain icon to="/project/-1" title="Добавить новый проект">
+      <v-icon>mdi-plus</v-icon>
+    </v-btn>
 
-      <v-app-bar-title>{{ title }}</v-app-bar-title>
+    <v-app-bar-title>{{ props.title }}</v-app-bar-title>
 
-      <v-spacer />
+    <v-spacer />
 
-      <slot />
+    <slot />
 
-      <v-btn v-if="!hideSettingsBtn" plain icon to="/settings" title="Настройки">
-         <v-icon>mdi-cog-outline</v-icon>
-      </v-btn>
-   </v-app-bar>
+    <v-btn v-if="!hideSettingsBtn" plain icon to="/settings" title="Настройки">
+      <v-icon>mdi-cog-outline</v-icon>
+    </v-btn>
+  </v-app-bar>
 </template>
 
 <script lang="ts" setup>
-import { computed, defineProps } from 'vue';
+import { computed } from 'vue';
 import router from '/@/router';
 
-const { title } = defineProps(['title']);
+const props = defineProps({ 'title': { type: String, required: true } });
 
 const currentPath = computed<string>(() => router.currentRoute.value.path);
 const hideHomeBtn = computed<boolean>(() => currentPath.value === '/');
