@@ -35,7 +35,7 @@
           <base-input v-model.number="project.port" label="порт для публикации" type="number" />
         </v-col>
         <v-col cols="3">
-          <base-input-history v-model.trim="project.sql.server" label="SQL сервер" required :history-id="`${project.name}-server`" />
+          <base-input-history v-model.trim="project.sql.server" label="SQL сервер (psql порт можно указать через ':')" required :history-id="`${project.name}-server`" />
         </v-col>
         <v-col cols="3">
           <base-input-history v-model.trim="project.sql.base" label="База данных" :history-id="`${project.name}-base`" required />
