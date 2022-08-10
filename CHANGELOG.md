@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.7](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.6...v0.6.7) (2022-08-10)
+
+
+### Features
+
+* добавил возможность указать порт PSQL сервера через ":" в адресе сервера проекта ([ad71386](https://git.stack-it.ru/clients/stack-manager/commit/ad7138674cc75cf72df9113f11f3842cf00877b0))
+
 ### [0.6.6](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.5...v0.6.6) (2022-08-05)
 
 
