@@ -17,7 +17,7 @@ const config = {
   extraResources: [
     {
       from: './buildResources/icon.png',
-      to: 'icon.png'
+      to: 'icon.png',
     },
     './CHANGELOG.md',
   ],
