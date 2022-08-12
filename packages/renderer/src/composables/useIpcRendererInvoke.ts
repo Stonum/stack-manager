@@ -4,5 +4,5 @@ import { useAsyncState, UseAsyncStateOptions, UseAsyncStateReturn } from '@vueus
 export function useIpcRendererInvoke<T>(channel: string, payload: any, initialState: T, options: UseAsyncStateOptions<true> = {}): UseAsyncStateReturn<T, boolean> {
   return useAsyncState<T>(async () => {
     return ipcRenderer.invoke(channel, payload);
-  }, initialState, options);
+  }, initialState, Object.assign({ immediate: false }, options));
 }

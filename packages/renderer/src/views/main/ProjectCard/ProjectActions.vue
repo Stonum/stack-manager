@@ -1,6 +1,6 @@
 <template>
   <v-row justify="space-between" no-gutters>
-    <v-col cols="5">
+    <v-col cols="5" width="20px">
       <v-btn
         icon="mdi-web" 
         color="primary"

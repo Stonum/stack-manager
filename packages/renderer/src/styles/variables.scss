@@ -1,5 +1,5 @@
 // https: //github.com/vuetifyjs/vuetify-loader/issues/245
-@use "vuetify/styles" with (
+@use "vuetify/lib/styles/main.sass" with (
    $font-size-root: 14px, // 16px !default
    $grid-gutter: 10px, // $spacer * 6 !default;
 

@@ -1,11 +1,7 @@
 <template>
   <v-app-bar dense app color="primary" dark>
-    <v-btn v-if="!hideHomeBtn" plain icon to="/" title="На главную">
-      <v-icon>mdi-home</v-icon>
-    </v-btn>
-    <v-btn v-if="!hideAddBtn" plain icon to="/project/-1" title="Добавить новый проект">
-      <v-icon>mdi-plus</v-icon>
-    </v-btn>
+    <v-btn v-if="!hideHomeBtn" icon="mdi-home" to="/" title="На главную" />
+    <v-btn v-if="!hideAddBtn" icon="mdi-plus" to="/project/-1" title="Добавить новый проект" />
 
     <v-app-bar-title>{{ props.title }}</v-app-bar-title>
 
@@ -13,15 +9,13 @@
 
     <slot />
 
-    <v-btn v-if="!hideSettingsBtn" plain icon to="/settings" title="Настройки">
-      <v-icon>mdi-cog-outline</v-icon>
-    </v-btn>
+    <v-btn v-if="!hideSettingsBtn" icon="mdi-cog-outline" to="/settings" title="Настройки" />
   </v-app-bar>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import router from '/@/router';
+import router from '@/router';
 
 const props = defineProps({ 'title': { type: String, required: true } });
 

@@ -1,7 +1,7 @@
 // Styles
 import '@mdi/font/css/materialdesignicons.css';
 import 'vuetify/styles';
-import '/@/styles/variables.scss';
+// import '/@/styles/variables.scss';
 
 // Vuetify
 import { createVuetify } from 'vuetify';

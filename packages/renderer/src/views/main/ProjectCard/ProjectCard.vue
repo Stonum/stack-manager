@@ -7,7 +7,7 @@
     
     <project-actions :item="props.item" @run="onRunAction" />
 
-    <v-list>
+    <v-list class="pt-0">
       <project-app
         v-for="(app, idxtask) in item.apps" 
         :key="idxtask"

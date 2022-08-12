@@ -1,8 +1,8 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
-import Main from '/@/views/main/index.vue';
-import Settings from '/@/views/settings/index.vue';
-import Project from '/@/views/project/index.vue';
-import ChangeLog from '/@/views/changelog/index.vue';
+import Main from '@/views/main/index.vue';
+import Settings from '@/views/settings/index.vue';
+import Project from '@/views/project/index.vue';
+import ChangeLog from '@/views/changelog/index.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {

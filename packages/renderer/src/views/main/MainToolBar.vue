@@ -1,29 +1,21 @@
 <template>
   <app-bar title="Главная">
-    <v-btn plain title="Перезапустить диспетчер" :loading="isLoading" @click="execute()">
+    <v-btn title="Перезапустить диспетчер" :loading="isLoading" @click="execute()">
       Перезапустить
       диспетчер
     </v-btn>
-    <v-btn plain icon=">mdi-refresh" title="Обновить состояния" @click="emit('refresh')" />
-    <v-btn plain icon="mdi-help-circle-outline" title="Список изменений" to="/changelog" />
+    <v-btn icon="mdi-refresh" title="Обновить состояния" @click="emit('refresh')" />
+    <v-btn icon="mdi-help-circle-outline" title="Список изменений" to="/changelog" />
   </app-bar>
 </template>
 
 <script lang="ts" setup>
-import { watchEffect } from 'vue';
-import { useIpcRendererInvoke } from '/@/composables/useIpcRendererInvoke';
+import { whenever } from '@vueuse/shared';
+import { useIpcRendererInvoke } from '@/composables/useIpcRendererInvoke';
 
 const emit = defineEmits(['refresh']);
 
-const { state, isReady, isLoading, execute } = useIpcRendererInvoke('main', { message: 'restartDispatcher' }, false, {
-    immediate: false,
-  });
+const { isReady, isLoading, execute } = useIpcRendererInvoke('main', { message: 'restartDispatcher' }, false);
 
-   watchEffect(() => {
-      if (isReady.value && state.value) {
-         emit('refresh');
-      }
-   });
-
-
+whenever(isReady, () => emit('refresh'));
 </script>

@@ -12,7 +12,6 @@
       <v-btn
         v-if="status === 0 || status === 1" 
         variant="text"
-        size="small"
         color="primary"
         icon="mdi-restart"
         title="Перезапустить"
@@ -21,7 +20,6 @@
       <v-btn
         v-if="status > 1 || status < 0" 
         variant="text"
-        size="small"
         color="primary"
         icon="mdi-play"
         title="Запустить"
@@ -30,7 +28,6 @@
       <v-btn
         v-if="status === 0 || status === 1" 
         variant="text"
-        size="small"
         color="error"
         icon="mdi-stop"
         title="Остановить"

@@ -20,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-
 const emit = defineEmits(['edit', 'delete']);
 
 const actions = [

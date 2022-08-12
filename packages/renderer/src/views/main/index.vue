@@ -8,7 +8,7 @@
   <v-container v-else fluid>
     <v-draggable :list="items" class="v-row" item-key="name" @change="onMoveProject">
       <template #item="{ element, index }">
-        <v-col cols="3" class="d-flex">
+        <v-col cols="3" class="d-flex pa-2">
           <project-card :id="index" :item="element" @delete="onDelete(index)" @edit="onEdit(index)" />
         </v-col>
       </template>
@@ -26,14 +26,14 @@
 </template>
 
 <script setup lang="ts">
-import { useIpcRendererInvoke } from '/@/composables/useIpcRendererInvoke';
+import { useIpcRendererInvoke } from '@/composables/useIpcRendererInvoke';
 
 import VDraggable from 'vuedraggable';
 
 import MainToolBar from './MainToolBar.vue';
 import ProjectCard from './ProjectCard/ProjectCard.vue';
 
-const { state: items, isLoading } = useIpcRendererInvoke<Project[]>('project', { message: 'getAll' }, [] );
+const { state: items, isLoading } = useIpcRendererInvoke<Project[]>('project', { message: 'getAll' }, [], { immediate: true} );
 
 
 const onMoveProject = (payload: any) => { /** */ };

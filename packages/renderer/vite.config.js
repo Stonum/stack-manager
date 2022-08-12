@@ -16,7 +16,7 @@ const config = {
   root: PACKAGE_ROOT,
   resolve: {
     alias: {
-      '/@/': join(PACKAGE_ROOT, 'src') + '/',
+      '@': join(PACKAGE_ROOT, 'src'),
     },
   },
   base: '',
@@ -46,7 +46,7 @@ const config = {
     // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
     vuetify({
       autoImport: true,
-      styles: 'expose'
+      // styles: 'sass'
     }),
   ],
 };
