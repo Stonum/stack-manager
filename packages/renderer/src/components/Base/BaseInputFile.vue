@@ -1,7 +1,14 @@
 <template>
-  <base-input :value="modelValue" v-bind="$attrs" prepend-icon="mdi-file-document-outline" readonly @click:prepend="execute()">
-    <template v-if="$slots['append-outer']" #append-outer>
-      <slot name="append-outer" />
+  <base-input
+    :model-value="modelValue" 
+    v-bind="$attrs"
+    prepend-icon="mdi-file-document-outline"
+    readonly
+    @click:prepend="selectFile"
+    @click:clear="emit('update:modelValue','')"
+  >
+    <template v-if="$slots['append']" #append>
+      <slot name="append" />
     </template>
   </base-input>
 </template>
@@ -9,13 +16,13 @@
 <script setup lang="ts">
 import { useIpcRendererInvoke } from '@/composables/useIpcRendererInvoke';
 import { FileFilter } from 'electron/main';
-import { whenever } from '@vueuse/shared';
 
-const props = defineProps<{ modelValue: string, filter: FileFilter }>();
+const props = defineProps<{ modelValue?: string, filter: FileFilter }>();
 
 const emit = defineEmits<{ (e: 'update:modelValue', modelValue: string): void }>();
 
-const { state, isReady, execute } = useIpcRendererInvoke('main', { message: 'selectFile', path: props.modelValue?.toString(), filter: props.filter }, props.modelValue);
-
-whenever(isReady, () => { emit('update:modelValue', state.value); });
+const selectFile = async () => {
+   const value = await useIpcRendererInvoke<string>('main', { message: 'selectFile', path: props.modelValue?.toString() });
+   emit('update:modelValue', value);
+};
 </script>

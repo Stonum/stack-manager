@@ -4,6 +4,7 @@ type StackBackendType = 0 | 1;
 
 interface Settings {
   [index: string]: string | number;
+  tasks?: Task[]
 }
 
 interface Task {

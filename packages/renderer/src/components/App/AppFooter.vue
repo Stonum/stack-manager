@@ -3,7 +3,7 @@
     <v-container fluid class="pb-0">
       <v-card fluid :elevation="0">
         <v-tabs v-model="activeTab" hide-slider :height="tabHeaderHight">
-          <v-tab @click="onClickTab(0)">
+          <v-tab value="messages" @click="onClickTab(0)">
             Сообщения
             <!-- <transition name="bounce">
                      <v-badge :key="`messages` + messagesCount" class="pb-1" :value="messagesCount" color="primary"
@@ -15,7 +15,7 @@
               </v-icon>
             </v-btn>
           </v-tab>
-          <v-tab @click="onClickTab(1)">
+          <v-tab value="events" @click="onClickTab(1)">
             События диспетчера
             <!-- <transition name="bounce">
                      <v-badge :key="`events` + eventsCount" class="pb-1" :value="eventsCount" color="primary"
@@ -37,17 +37,18 @@
           </v-btn>
         </v-tabs>
 
-        <v-tabs-items v-model="activeTab" :style="`height: ${tabBodyHeight}px`">
-          <v-tab-item>
+        <v-window v-model="activeTab" :style="`height: ${tabBodyHeight}px`">
+          <v-window-item value="messages">
             <div :style="`height: ${tabBodyHeight}px`">
               13131231
             </div>
             <!-- <message-list :items=" messages" :height="tabBodyHeight" /> -->
-          </v-tab-item>
-          <v-tab-item>
+          </v-window-item>
+          <v-window-item value="events">
+            sdfsdfsdf
             <!-- <message-list :items="events" :height="tabBodyHeight" /> -->
-          </v-tab-item>
-        </v-tabs-items>
+          </v-window-item>
+        </v-window>
       </v-card>
     </v-container>
   </v-footer>

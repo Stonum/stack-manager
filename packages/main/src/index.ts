@@ -1,7 +1,7 @@
 import { app } from 'electron';
 import './security-restrictions';
 
-import { restoreOrCreateWindow, createTrayMenu } from '/@/mainWindow';
+import { restoreOrCreateWindow, createTrayMenu } from '@/mainWindow';
 import { registerListeners } from './listeners';
 
 /**

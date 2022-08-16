@@ -6,9 +6,9 @@
 import { useInput } from '@/composables/useInput';
 
 const props = defineProps<{
-  required: boolean,
-  rules: any[],
-  label: string,
+  label: string
+  required?: boolean,
+  rules?: any[],
 }>();
 
 const { inputLabel, inputRules } = useInput(props);

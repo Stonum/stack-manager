@@ -11,11 +11,11 @@
 
 <script lang="ts" setup>
 import { whenever } from '@vueuse/shared';
-import { useIpcRendererInvoke } from '@/composables/useIpcRendererInvoke';
+import { useIpcRendererInvokeAsync } from '@/composables/useIpcRendererInvokeAsync';
 
 const emit = defineEmits(['refresh']);
 
-const { isReady, isLoading, execute } = useIpcRendererInvoke('main', { message: 'restartDispatcher' }, false);
+const { isReady, isLoading, execute } = useIpcRendererInvokeAsync('main', { message: 'restartDispatcher' }, false);
 
 whenever(isReady, () => emit('refresh'));
 </script>

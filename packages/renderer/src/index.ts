@@ -14,6 +14,8 @@ import BaseCombobox from '@/components/Base/BaseCombobox.vue';
 import BaseInputHistory from '@/components/Base/BaseInputHistory.vue';
 import BaseCheckbox from '@/components/Base/BaseCheckbox.vue';
 
+import HelpIcon from '@/components/HelpIcon.vue';
+
 loadFonts();
 
 const app = createApp(App);
@@ -28,3 +30,5 @@ app.component('BaseInputFile', BaseInputFile);
 app.component('BaseCombobox', BaseCombobox);
 app.component('BaseInputHistory', BaseInputHistory);
 app.component('BaseCheckbox', BaseCheckbox);
+
+app.component('HelpIcon', HelpIcon);

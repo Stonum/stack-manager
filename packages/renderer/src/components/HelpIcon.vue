@@ -1,7 +1,7 @@
 <template>
   <v-menu open-on-hover left bottom offset-y offset-overflow>
     <template #activator="attrs">
-      <v-btn icon="mdi-help-circle-outline" class="pb-3" v-bind="attrs.props" />
+      <v-btn icon="mdi-help-circle-outline" v-bind="attrs.props" flat density="compact" />
     </template>
     <v-card>
       <v-container>

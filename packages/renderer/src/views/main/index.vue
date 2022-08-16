@@ -26,14 +26,14 @@
 </template>
 
 <script setup lang="ts">
-import { useIpcRendererInvoke } from '@/composables/useIpcRendererInvoke';
+import { useIpcRendererInvokeAsync } from '@/composables/useIpcRendererInvokeAsync';
 
 import VDraggable from 'vuedraggable';
 
 import MainToolBar from './MainToolBar.vue';
 import ProjectCard from './ProjectCard/ProjectCard.vue';
 
-const { state: items, isLoading } = useIpcRendererInvoke<Project[]>('project', { message: 'getAll' }, [], { immediate: true} );
+const { state: items, isLoading } = useIpcRendererInvokeAsync<Project[]>('project', { message: 'getAll' }, [], { immediate: true} );
 
 
 const onMoveProject = (payload: any) => { /** */ };

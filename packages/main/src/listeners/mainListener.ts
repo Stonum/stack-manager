@@ -11,7 +11,6 @@ import cmd from '../cmd';
 import { readMarkdownFile } from '../utils';
 
 export default class MainListener extends CommonListener {
-  window = getMainWindow();
   update_url = process.env.UPDATE_URL;
 
   constructor() {
@@ -45,14 +44,16 @@ export default class MainListener extends CommonListener {
   }
 
   getVisibleWindow() {
-    return this.window?.isVisible() && !this.window?.isMinimized();
+    const window = getMainWindow();
+    return window?.isVisible() && !window?.isMinimized();
   }
 
   async selectDir(payload: any) {
-    if (!this.window) {
+    const window = getMainWindow();
+    if (!window) {
       return;
     }
-    const res = await dialog.showOpenDialog(this.window, {
+    const res = await dialog.showOpenDialog(window, {
       defaultPath: payload.path,
       properties: ['openDirectory'],
     });
@@ -64,10 +65,11 @@ export default class MainListener extends CommonListener {
   }
 
   async selectFile(payload: any) {
-    if (!this.window) {
+    const window = getMainWindow();
+    if (!window) {
       return;
     }
-    const res = await dialog.showOpenDialog(this.window, {
+    const res = await dialog.showOpenDialog(window, {
       defaultPath: payload.path,
       filters: [payload.filter],
       properties: ['openFile'],

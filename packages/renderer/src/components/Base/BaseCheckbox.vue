@@ -1,7 +1,3 @@
 <template>
-  <v-checkbox :value="modelValue" v-bind="$attrs" dense />
+  <v-checkbox v-bind="$attrs" />
 </template>
-
-<script setup lang="ts">
-defineProps<{ modelValue: boolean }>();
-</script>
