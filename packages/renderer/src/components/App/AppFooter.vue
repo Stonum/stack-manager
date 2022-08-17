@@ -1,6 +1,6 @@
 <template>
-  <v-footer app fixed>
-    <v-container fluid class="pb-0">
+  <v-footer app fixed class="pa-0" style="border-top: 1px solid light-grey">
+    <v-container fluid class="pa-0">
       <v-card fluid :elevation="0">
         <v-tabs v-model="activeTab" hide-slider :height="tabHeaderHight">
           <v-tab value="messages" @click="onClickTab(0)">
@@ -9,11 +9,7 @@
                      <v-badge :key="`messages` + messagesCount" class="pb-1" :value="messagesCount" color="primary"
                         :content="messagesCount" />
                   </transition> -->
-            <v-btn icon flat title="Очистить список сообщений" @click.stop="onClearMessages">
-              <v-icon color="error">
-                mdi-delete-circle-outline
-              </v-icon>
-            </v-btn>
+            <v-btn icon="mdi-delete-circle-outline" color="error" variant="text" density="compact" title="Очистить список сообщений" @click.stop="onClearMessages" />
           </v-tab>
           <v-tab value="events" @click="onClickTab(1)">
             События диспетчера
@@ -58,7 +54,7 @@
 import { ref, computed, onActivated } from 'vue';
 // import MessageList from '../MessageList/MessageList.vue';
 
-const tabHeaderHight = ref(40);
+const tabHeaderHight = ref(30);
 const tabBodyMaxHeight = ref(tabHeaderHight.value * 8 - tabHeaderHight.value);
 const tabBodyHeight = ref(0);
 const activeTab = ref(null);

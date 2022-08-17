@@ -33,7 +33,7 @@ import VDraggable from 'vuedraggable';
 import MainToolBar from './MainToolBar.vue';
 import ProjectCard from './ProjectCard/ProjectCard.vue';
 
-const { state: items, isLoading } = useIpcRendererInvokeAsync<Project[]>('project', { message: 'getAll' }, [], { immediate: true} );
+const { state: items, isLoading } = useIpcRendererInvokeAsync<Project[]>('project', { message: 'getAll' }, [], { immediate: true, shallow: false} );
 
 
 const onMoveProject = (payload: any) => { /** */ };

@@ -15,6 +15,7 @@
         color="primary"
         icon="mdi-restart"
         title="Перезапустить"
+        density="compact"
         @click="emit('restart', props.app.name)"
       />
       <v-btn
@@ -23,6 +24,7 @@
         color="primary"
         icon="mdi-play"
         title="Запустить"
+        density="compact"
         @click="emit('start', props.app.name)"
       />
       <v-btn
@@ -31,6 +33,7 @@
         color="error"
         icon="mdi-stop"
         title="Остановить"
+        density="compact"
         @click="emit('stop', props.app.name)"
       />
     </template>

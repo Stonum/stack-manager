@@ -40,3 +40,10 @@ const onRestart = (appName?: string) => { };
 const onStart = (appName?: string) => { };
 const onStop = (appName?: string) => { };
 </script>
+
+<style lang="scss">
+.v-card-item {
+   padding: 0.1rem 1rem !important;
+}
+
+</style>

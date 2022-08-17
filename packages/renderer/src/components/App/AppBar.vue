@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar dense app color="primary" dark>
+  <v-app-bar dense app color="primary" dark density="compact">
     <v-btn v-if="!hideHomeBtn" icon="mdi-home" to="/" title="На главную" />
     <v-btn v-if="!hideAddBtn" icon="mdi-plus" to="/project/-1" title="Добавить новый проект" />
 

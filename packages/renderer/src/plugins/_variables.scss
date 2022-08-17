@@ -13,6 +13,10 @@
    // $button-font-size: 14px,
 // );
 
+* {
+   font-size: 16px;
+}
+
 
 // Табы без спецэффектов
 .v-window {
@@ -20,4 +24,16 @@
     -webkit-transition: none;
     transition: none;
   }
+}
+// кнопки
+.v-btn {
+   text-transform: none;
+   font-weight: 400;
+   font-size: 16px;
+   letter-spacing: normal;
+}
+
+// инпуты
+input {
+   font-size: 16px;
 }
