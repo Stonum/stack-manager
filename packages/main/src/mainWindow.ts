@@ -22,7 +22,7 @@ async function createWindow() {
     title: `${app.getName()} ${app.getVersion()}`,
     width: 1280,
     height: 720,
-    resizable: false,
+    resizable: import.meta.env.DEV,
     show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
     webPreferences: {
       nodeIntegration: false,

@@ -1,5 +1,5 @@
 <template>
-  <v-footer app fixed class="pa-0" style="border-top: 1px solid light-grey">
+  <v-footer app fixed class="pa-0" style="border-top: 1px solid lightgrey">
     <v-container fluid class="pa-0">
       <v-card fluid :elevation="0">
         <v-tabs v-model="activeTab" hide-slider :height="tabHeaderHight">
