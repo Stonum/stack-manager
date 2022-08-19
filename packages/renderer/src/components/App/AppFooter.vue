@@ -3,20 +3,30 @@
     <v-container fluid class="pa-0">
       <v-card fluid :elevation="0">
         <v-tabs v-model="activeTab" hide-slider :height="tabHeaderHight">
-          <v-tab value="messages" @click="onClickTab(0)">
+          <v-tab value="messages" @click="onClickTab('messages')">
             Сообщения
-            <!-- <transition name="bounce">
-                     <v-badge :key="`messages` + messagesCount" class="pb-1" :value="messagesCount" color="primary"
-                        :content="messagesCount" />
-                  </transition> -->
+            <transition name="bounce">
+              <v-badge
+                :key="`messages` + messagesCount"
+                class="px-3 pb-4"
+                :value="messagesCount"
+                color="primary"
+                :content="messagesCount"
+              />
+            </transition>
             <v-btn icon="mdi-delete-circle-outline" color="error" variant="text" density="compact" title="Очистить список сообщений" @click.stop="onClearMessages" />
           </v-tab>
-          <v-tab value="events" @click="onClickTab(1)">
+          <v-tab value="events" @click="onClickTab('events')">
             События диспетчера
-            <!-- <transition name="bounce">
-                     <v-badge :key="`events` + eventsCount" class="pb-1" :value="eventsCount" color="primary"
-                        :content="eventsCount" />
-                  </transition> -->
+            <transition name="bounce">
+              <v-badge
+                :key="`events` + eventsCount"
+                class="pl-3 pb-4"
+                :value="eventsCount"
+                color="primary"
+                :content="eventsCount"
+              />
+            </transition>
           </v-tab>
 
           <v-spacer />
@@ -35,14 +45,10 @@
 
         <v-window v-model="activeTab" :style="`height: ${tabBodyHeight}px`">
           <v-window-item value="messages">
-            <div :style="`height: ${tabBodyHeight}px`">
-              13131231
-            </div>
-            <!-- <message-list :items=" messages" :height="tabBodyHeight" /> -->
+            <message-list :items="messages" :height="tabBodyHeight" />
           </v-window-item>
           <v-window-item value="events">
-            sdfsdfsdf
-            <!-- <message-list :items="events" :height="tabBodyHeight" /> -->
+            <message-list :items="events" :height="tabBodyHeight" />
           </v-window-item>
         </v-window>
       </v-card>
@@ -52,21 +58,31 @@
 
 <script lang="ts" setup>
 import { ref, computed, onActivated } from 'vue';
-// import MessageList from '../MessageList/MessageList.vue';
+import { useIpcRendererInvokeAsync } from '@/composables/useIpcRendererInvokeAsync';
+
+import MessageList from '../MessageList/MessageList.vue';
+
+const emit = defineEmits<{ (event: 'change', id: number): void }>();
 
 const tabHeaderHight = ref(30);
 const tabBodyMaxHeight = ref(tabHeaderHight.value * 8 - tabHeaderHight.value);
 const tabBodyHeight = ref(0);
 const activeTab = ref(null);
 
+const messages = ref<Message[]>([]);
+const messagesCount = computed(() => messages.value.length);
+
+const { state: events, execute } = useIpcRendererInvokeAsync<Message[]>('project', { message: 'getEvents' }, [], { immediate: true, resetOnExecute: false });
+const eventsCount = computed(() => events.value.length);
+
+// setInterval(() => {
+//    execute();
+// }, 10000);
+
 const collapsedFooter = computed(() => tabBodyHeight.value === 0);
 const updownicon = computed(() => collapsedFooter.value ? 'mdi-chevron-up' : 'mdi-chevron-down');
 
-const emit = defineEmits<{
-   (event: 'change', id: number): void
-}>();
-
-const onClickTab = (tab: number) => {
+const onClickTab = (tab: string) => {
    if (collapsedFooter.value || tab === activeTab.value) {
       onClickUpDown();
    }
