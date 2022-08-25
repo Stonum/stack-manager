@@ -1,17 +1,21 @@
 import { computed, shallowReactive } from 'vue';
+import { createEventHook } from '@vueuse/core';
 import { ipcRenderer } from '#preload';
 
-let messages = shallowReactive<Message[]>([]);
+const messages = shallowReactive<Message[]>([]);
+const hook = createEventHook<Message>();
 
-ipcRenderer.on('error', (event, payload: any) => {
+ipcRenderer.on('error', (event: any, payload: any) => {
   addMessage('error', payload);
 });
-ipcRenderer.on('info', (event, payload: any) => {
+ipcRenderer.on('info', (event: any, payload: any) => {
   addMessage('info', payload.title + ' ' + payload.message);
 });
 
 function addMessage(type: string, text: string) {
-  messages.push({ type, text, time: new Date() });
+  const message = { type, text, time: new Date() };
+  messages.push(message);
+  hook.trigger(message);
 }
 
 function clearMessages() {
@@ -27,6 +31,7 @@ export function useMessages() {
       });
     }),
     clearMessages,
-    addMessage
+    addMessage,
+    addHook: hook.on
   };
 }
