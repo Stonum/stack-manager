@@ -4,7 +4,6 @@ import { getMainWindow } from '../mainWindow';
 import log from '../log';
 
 export default class CommonListener {
-  window = getMainWindow();
 
   constructor(_name: string) {
     ipcMain.handle(_name, async (event, payload) => {
@@ -18,7 +17,8 @@ export default class CommonListener {
           return await this[methodName](payload);
         } catch (e: AnyException) {
           log.error(e);
-          this.window?.webContents.send('error', e.message || e);
+          const window = getMainWindow();
+          window?.webContents.send('error', e.message || e);
           throw e;
         }
       } else {
@@ -29,6 +29,7 @@ export default class CommonListener {
   }
 
   sendInfoMessage(title: string, message: string) {
-    this.window?.webContents.send('info', { title, message });
+    const window = getMainWindow();
+    window?.webContents.send('info', { title, message });
   }
 }

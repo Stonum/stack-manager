@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useSettings } from '@/composables/useSettings';
+import { useSettings } from '@/composables';
 
 import CommonTab from './CommonTab.vue';
 import ServicesTab from './ServicesTab.vue';
