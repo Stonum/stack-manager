@@ -15,8 +15,7 @@ function addMessage(type: string, text: string) {
 }
 
 function clearMessages() {
-  console.log('clear');
-  messages = [];
+  messages.splice(0);
 }
 
 export function useMessages() {
