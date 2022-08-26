@@ -37,6 +37,11 @@ const config = {
   },
   test: {
     environment: 'happy-dom',
+    setupFiles: ['./tests/setupVuetify.js', './tests/setupPlugins.js', './tests/setupComponents.js'],
+    deps: {
+      inline: ['vuetify'],
+    },
+    globals: true,
   },
   plugins: [
     vue(),

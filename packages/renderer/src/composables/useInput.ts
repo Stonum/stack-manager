@@ -1,6 +1,6 @@
 import { computed } from 'vue';
 
-export const useInput = (props: { required?: boolean, rules?: any[], label: string }) => {
+export const useInput = (props: { required?: boolean, rules?: any[], label?: string }) => {
 
   const inputRules = computed<any[]>(() => {
     const rules = props.rules || [];

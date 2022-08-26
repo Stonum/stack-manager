@@ -1,11 +1,5 @@
 <template>
-  <v-text-field
-    v-bind="$attrs"
-    :label="inputLabel"
-    :rules="inputRules"
-    variant="underlined" 
-    :hide-details="hideDetails"
-  >
+  <v-text-field v-bind="$attrs" :label="inputLabel" :rules="inputRules" variant="underlined" :hide-details="hideDetails">
     <template v-if="$slots['append']" #append>
       <slot name="append" />
     </template>
@@ -17,9 +11,9 @@ import { computed } from 'vue';
 import { useInput } from '@/composables/useInput';
 
 const props = defineProps<{
-  label: string
-  required?: boolean,
-  rules?: any[],
+  label?: string;
+  required?: boolean;
+  rules?: any[];
 }>();
 
 const { inputLabel, inputRules } = useInput(props);
