@@ -8,3 +8,4 @@ export * from './useSettings';
 export * from './useFooter';
 export * from './useUpdater';
 export * from './useMessages';
+export * from './useEvents';
