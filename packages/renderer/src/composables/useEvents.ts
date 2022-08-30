@@ -4,7 +4,7 @@ import { ipcRenderer } from '#preload';
 const events = shallowRef<Message[]>([]);
 
 async function loadEvents() {
-  events.value = await ipcRenderer.invoke('main', { message: 'getEvents' });
+  events.value = await ipcRenderer.invoke('project', { message: 'getEvents' });
 }
 
 export function useEvents() {

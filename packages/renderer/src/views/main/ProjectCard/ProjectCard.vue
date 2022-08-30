@@ -2,43 +2,48 @@
   <v-card class="flex-grow-1" density="compact">
     <v-card-item class="py-0" :title="props.item.name" density="compact">
       <template #append>
-        <v-progress-circular class="mr-3" :size="20" :width="isRunning ? 2 : 0" color="primary" :indeterminate="isRunning" />
-        <project-menu @delete="onDelete" @edit="onEdit" />
+        <v-progress-circular v-if="isRunning" class="mr-3" :size="20" :width="2" color="primary" :indeterminate="true" />
+        <project-menu @delete="remove" @edit="onEdit" />
       </template>
     </v-card-item>
-   
-    <project-actions :item="props.item" @run="onRunAction" />
+
+    <project-actions :item="props.item" :state="state" @run="sendJob" />
 
     <v-list class="pt-0">
-      <project-app
-        v-for="(app, idxtask) in item.apps" 
-        :key="idxtask"
-        :app="app"
-        @restart="onRestart($event)"
-        @start="onStart($event)"
-        @stop="onStop($event)"
-      />
+      <project-app v-for="(app, idxtask) in item.apps" :key="idxtask" :app="app" @restart="onRestart($event)" @start="onStart($event)" @stop="onStop($event)" />
     </v-list>
   </v-card>
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
+import router from '@/router';
+import { useProject } from '@/composables';
+
 import ProjectMenu from './ProjectMenu.vue';
 import ProjectActions from './ProjectActions.vue';
 import ProjectApp from './ProjectApp.vue';
 
-const props = defineProps<{ item: Project, id: Number }>();
+const props = defineProps<{ item: Project; id: number }>();
 
-const isRunning = false;
+const { sendJob, remove, state } = useProject(props.id);
+const isRunning = computed(() => {
+  return !!state?.building || !!state?.restarting;
+});
 
-const onDelete = () => { };
-const onEdit = () => { };
-const onRunAction = (action: string) => { };
+const onEdit = (id: number) => {
+  router.push(`/project/${id}`);
+};
 
-const onOpenWorkspace = () => { };
-const onGitPull = () => { };
-const onBuildFront = () => { };
-const onRestart = (appName?: string) => { };
-const onStart = (appName?: string) => { };
-const onStop = (appName?: string) => { };
+const onRestart = (appName: string) => {
+  sendJob('appStart', appName);
+};
+
+const onStart = (appName: string) => {
+  sendJob('appStart', appName);
+};
+
+const onStop = (appName: string) => {
+  sendJob('appStop', appName);
+};
 </script>

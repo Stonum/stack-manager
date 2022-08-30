@@ -1,8 +1,8 @@
-import { app } from 'electron';
-import './security-restrictions';
+import { app, shell } from 'electron';
 
-import { restoreOrCreateWindow, createTrayMenu } from '@/mainWindow';
+import { restoreOrCreateWindow, createTrayMenu } from './mainWindow';
 import { registerListeners } from './listeners';
+import log from './log';
 
 /**
  * Prevent electron from running multiple instances.
@@ -41,7 +41,16 @@ app
   .then(createTrayMenu)
   .then(registerListeners)
   .then(restoreOrCreateWindow)
-  .catch((e) => console.error('Failed create window:', e));
+  .catch((e) => log.error('Failed create window:', e));
+
+
+app.on('web-contents-created', (_, contents) => {
+  contents.on('will-navigate', (event, url) => {
+    shell.openExternal(url);
+    event.preventDefault();
+  });
+});
+
 
 /**
  * Install Vue.js or any other extension in development mode only.
@@ -58,7 +67,7 @@ if (import.meta.env.DEV) {
         },
       })
     )
-    .catch((e) => console.error('Failed install extension:', e));
+    .catch((e) => log.error('Failed install extension:', e));
 }
 
 /**
@@ -69,5 +78,5 @@ if (import.meta.env.PROD) {
     .whenReady()
     .then(() => import('electron-updater'))
     .then(({ autoUpdater }) => autoUpdater.checkForUpdatesAndNotify())
-    .catch((e) => console.error('Failed check updates:', e));
+    .catch((e) => log.error('Failed check updates:', e));
 }

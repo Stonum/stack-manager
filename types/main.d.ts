@@ -48,6 +48,7 @@ interface ProjectGateway {
   path: string;
   port: number;
 }
+
 interface Project {
   name: string;
   path: ProjectPaths;

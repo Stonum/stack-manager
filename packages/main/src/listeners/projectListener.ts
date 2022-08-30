@@ -231,10 +231,24 @@ export default class ProjectListener extends CommonListener {
   async appReStart(payload: any) {
     const id = payload.projectId;
     const allProjects = projects.get('projects', []) as Project[];
-    const apphost_project = (allProjects[id]?.type || StackBackendType.stack) === StackBackendType.apphost;
+    const project = allProjects[id];
+    const apphost_project = (project?.type || StackBackendType.stack) === StackBackendType.apphost;
 
     const webServer = apphost_project ? getDispatcher().appServer() : getDispatcher().webServer();
-    const res = await webServer.restartItem(payload.params);
+
+    let res: boolean = false;
+    if (payload.params) {
+      res = await webServer.restartItem(payload.params);
+    } else {
+      if (project && project.apps?.length) {
+        for (const app of project.apps) {
+          if (app.active) {
+            res = await webServer.restartItem(app.name);
+          }
+        }
+      }
+    }
+
     return res;
   }
 
