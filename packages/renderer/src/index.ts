@@ -14,6 +14,7 @@ import BaseInputHistory from '@/components/Base/BaseInputHistory.vue';
 import BaseCheckbox from '@/components/Base/BaseCheckbox.vue';
 
 import HelpIcon from '@/components/HelpIcon.vue';
+import YesNoDialog from '@/components/YesNoDialog.vue';
 
 loadFonts();
 
@@ -31,3 +32,4 @@ app.component('BaseInputHistory', BaseInputHistory);
 app.component('BaseCheckbox', BaseCheckbox);
 
 app.component('HelpIcon', HelpIcon);
+app.component('YesNoDialog', YesNoDialog);

@@ -1,9 +1,6 @@
 <template>
   <app-bar title="Главная">
-    <v-btn title="Перезапустить диспетчер" :loading="isLoading" @click="execute()">
-      Перезапустить
-      диспетчер
-    </v-btn>
+    <v-btn title="Перезапустить диспетчер" :loading="isLoading" @click="execute()"> Перезапустить диспетчер </v-btn>
     <v-btn icon="mdi-refresh" title="Обновить состояния" @click="emit('refresh')" />
     <v-btn icon="mdi-help-circle-outline" title="Список изменений" to="/changelog" />
   </app-bar>
@@ -15,7 +12,7 @@ import { useIpcRendererInvokeAsync } from '@/composables/useIpcRendererInvokeAsy
 
 const emit = defineEmits(['refresh']);
 
-const { isReady, isLoading, execute } = useIpcRendererInvokeAsync('main', { message: 'restartDispatcher' }, false);
+const { isReady, isLoading, execute } = useIpcRendererInvokeAsync('main', { message: 'restartDispatcher' }, false, { immediate: false });
 
 whenever(isReady, () => emit('refresh'));
 </script>

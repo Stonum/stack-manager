@@ -11,7 +11,7 @@ import Dispatcher from '../middleware/dispatcher';
 import StaticServer from '../middleware/express';
 import cmd from '../cmd';
 
-enum StackBackendType {
+const enum StackBackendType {
   stack = 0,
   apphost = 1,
 }

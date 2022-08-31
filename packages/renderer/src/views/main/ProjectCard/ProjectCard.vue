@@ -3,7 +3,7 @@
     <v-card-item class="py-0" :title="props.item.name" density="compact">
       <template #append>
         <v-progress-circular v-if="isRunning" class="mr-3" :size="20" :width="2" color="primary" :indeterminate="true" />
-        <project-menu @delete="remove" @edit="onEdit" />
+        <project-menu @delete="onDelete()" @edit="onEdit" />
       </template>
     </v-card-item>
 
@@ -13,10 +13,12 @@
       <project-app v-for="(app, idxtask) in item.apps" :key="idxtask" :app="app" @restart="onRestart($event)" @start="onStart($event)" @stop="onStop($event)" />
     </v-list>
   </v-card>
+
+  <yes-no-dialog v-if="askAboutDelete" :header="`Удалить проект ${item.name}?`" @click="onDelete($event)" />
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import router from '@/router';
 import { useProject } from '@/composables';
 
@@ -25,11 +27,24 @@ import ProjectActions from './ProjectActions.vue';
 import ProjectApp from './ProjectApp.vue';
 
 const props = defineProps<{ item: Project; id: number }>();
+const emit = defineEmits(['refresh']);
+
+const askAboutDelete = ref(false);
 
 const { sendJob, remove, state } = useProject(props.id);
 const isRunning = computed(() => {
   return !!state?.building || !!state?.restarting;
 });
+
+const onDelete = async (answer?: boolean) => {
+  askAboutDelete.value = false;
+  if (answer === undefined) {
+    askAboutDelete.value = true;
+  } else if (answer) {
+    await remove();
+    emit('refresh');
+  }
+};
 
 const onEdit = (id: number) => {
   router.push(`/project/${id}`);

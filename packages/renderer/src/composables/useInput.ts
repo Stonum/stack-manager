@@ -12,8 +12,12 @@ export const useInput = (props: { required?: boolean, rules?: any[], label?: str
     return rules;
   });
 
-  const inputLabel = computed<string>(() => {
-    return props.label && props.required ? props.label + '*' : props.label;
+  const inputLabel = computed<string>((): string => {
+    if (props.label) {
+      return props.required ? props.label + '*' : props.label;
+    } else {
+      return '';
+    }
   });
 
   return {
