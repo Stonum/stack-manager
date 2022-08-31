@@ -1,9 +1,9 @@
 <template>
   <v-app>
     <v-main>
-      <vue-scroll :style="`height: ${620 - footerSize}px`">
+      <div :style="`height: ${620 - footerSize}px; position: relative; overflow: auto;`" class="scrollbar__visible">
         <router-view />
-      </vue-scroll>
+      </div>
     </v-main>
     <app-toast />
     <app-footer @change="onChangeFooterSize" />
