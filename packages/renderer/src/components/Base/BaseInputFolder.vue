@@ -1,7 +1,15 @@
 <template>
-  <base-input :model-value="modelValue" v-bind="$attrs" prepend-icon="mdi-folder-outline" readonly @click:prepend="selectDir" @click:clear="emit('update:modelValue', '')">
+  <base-input
+    :model-value="modelValue"
+    v-bind="$attrs" 
+    prepend-icon="mdi-folder-outline"
+    append-inner-icon="mdi-open-in-new"
+    readonly
+    @click:prepend="selectDir"
+    @click:append-inner="openPath"
+    @click:clear="emit('update:modelValue', '')"
+  >
     <template v-if="$slots['append']" #append>
-      <v-btn icon="mdi-open-in-new" flat density="compact" @click="openPath" />
       <slot name="append" />
     </template>
   </base-input>

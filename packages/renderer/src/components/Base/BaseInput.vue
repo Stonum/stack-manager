@@ -1,5 +1,13 @@
 <template>
-  <v-text-field v-bind="$attrs" :label="inputLabel" :rules="inputRules" variant="underlined" :hide-details="hideDetails">
+  <v-text-field
+    v-bind="$attrs"
+    :label="inputLabel"
+    :rules="inputRules" 
+    variant="underlined"
+    :hide-details="hideDetails"
+    persistent-clear
+    clear-icon="mdi-close"
+  >
     <template v-if="$slots['append']" #append>
       <slot name="append" />
     </template>

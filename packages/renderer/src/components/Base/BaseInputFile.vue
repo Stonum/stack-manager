@@ -3,6 +3,7 @@
     :model-value="modelValue" 
     v-bind="$attrs"
     prepend-icon="mdi-file-document-outline"
+    prepend-color="primary"
     readonly
     @click:prepend="selectFile"
     @click:clear="emit('update:modelValue','')"
