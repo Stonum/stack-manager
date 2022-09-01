@@ -2,7 +2,9 @@
   <main-tool-bar />
 
   <v-progress-linear v-if="isLoading" indeterminate />
-  <p v-else-if="!items.length" style="text-align: center">Проектов пока нет.</p>
+  <p v-else-if="!items.length" style="text-align: center">
+    Проектов пока нет.
+  </p>
   <v-container v-else fluid>
     <v-draggable :list="items" class="v-row" item-key="name" @change="onMoveProject">
       <template #item="{ element, index }">

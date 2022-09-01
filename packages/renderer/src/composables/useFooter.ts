@@ -1,4 +1,4 @@
-import { ref, computed, onActivated } from 'vue';
+import { ref, computed } from 'vue';
 
 export function useFooter(emit: any) {
 
@@ -14,9 +14,7 @@ export function useFooter(emit: any) {
     emit('change', tabHeaderHight.value + tabBodyHeight.value);
   }
 
-  onActivated(() => {
-    emit('change', tabHeaderHight.value + tabBodyHeight.value);
-  });
+  emit('change', tabHeaderHight.value + tabBodyHeight.value);
 
   return {
     tabHeaderHight,

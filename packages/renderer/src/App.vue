@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main>
-      <div :style="`height: ${620 - footerSize}px; position: relative; overflow: auto;`" class="scrollbar__visible">
+      <div :style="wrapperStyle" class="scrollbar__visible">
         <router-view />
       </div>
     </v-main>
@@ -11,14 +11,17 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { CSSProperties, reactive } from 'vue';
 
 import AppFooter from '@/components/App/AppFooter.vue';
 import AppToast from '@/components/App/AppToast.vue';
 
-const footerSize = ref(0);
+const wrapperStyle = reactive<CSSProperties>({
+   height: '595px',
+   'overflow-y': 'scroll',
+});
 
 function onChangeFooterSize(payload: number) {
-  footerSize.value = payload;
+  wrapperStyle.height = `${595 - payload}px`;
 }
 </script>
