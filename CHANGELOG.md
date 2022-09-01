@@ -2,6 +2,128 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.7](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.6...v0.6.7) (2022-08-10)
+
+
+### Features
+
+* добавил возможность указать порт PSQL сервера через ":" в адресе сервера проекта ([ad71386](https://git.stack-it.ru/clients/stack-manager/commit/ad7138674cc75cf72df9113f11f3842cf00877b0))
+
+### [0.6.6](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.5...v0.6.6) (2022-08-05)
+
+
+### Bug Fixes
+
+* в workspace добавляем stack.iniPath для более корректного разбора каталогов расширением stack ([49f09a0](https://git.stack-it.ru/clients/stack-manager/commit/49f09a0cfcc5337e3a57daee8dbadaea33ffd462))
+* убрал админку из bundles для фронта ([f0674ae](https://git.stack-it.ru/clients/stack-manager/commit/f0674ae4094d5038b697ab64999e624aca2cb7ff))
+
+### [0.6.5](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.4...v0.6.5) (2022-07-27)
+
+
+### Features
+
+* в настройки вынес каталог, где будут создаваться workspace ([ecfda88](https://git.stack-it.ru/clients/stack-manager/commit/ecfda88de729b0e51dbae3c5d1cf52be94db80c6))
+* хранение состояний проекта в store. запрет многократного запуска сборки фронта ([ac97bb7](https://git.stack-it.ru/clients/stack-manager/commit/ac97bb7721faff00531ac9fbaa437da13f108500))
+
+
+### Bug Fixes
+
+* убрал лишние мерцания статусов ([c9c296c](https://git.stack-it.ru/clients/stack-manager/commit/c9c296c260b354e95f16faa5f83dbb53898a4658))
+
+### [0.6.4](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.3...v0.6.4) (2022-07-20)
+
+
+### Features
+
+* добавил toast на info сообщения ([e680ab8](https://git.stack-it.ru/clients/stack-manager/commit/e680ab8fa5b4af2037e00e77cc9773b48758a22f))
+
+
+### Bug Fixes
+
+* исправил заполнение проектов, если нет логина пароля в командной строке ([63fdf49](https://git.stack-it.ru/clients/stack-manager/commit/63fdf49dcbe29f54afb61fa19af370d52ee5a34b)), closes [#9](https://git.stack-it.ru/clients/stack-manager/issues/9)
+* исправил каталог версии в генерируемом workspace ([ef37a01](https://git.stack-it.ru/clients/stack-manager/commit/ef37a014ff6dabc9876aa14e46d403b74b9254ba)), closes [#10](https://git.stack-it.ru/clients/stack-manager/issues/10)
+
+### [0.6.3](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.2...v0.6.3) (2022-07-19)
+
+
+### Bug Fixes
+
+* в свернутом состоянии не опрашиваем диспетчер ([34f0637](https://git.stack-it.ru/clients/stack-manager/commit/34f063723be6ca66b5956f6fde18244315cf1a71))
+* удаление лишних ключей при генерации env конфига ([4a88c26](https://git.stack-it.ru/clients/stack-manager/commit/4a88c26bbd4b4e1093116dedc662b83574276558))
+
+### [0.6.2](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.1...v0.6.2) (2022-07-07)
+
+
+### Bug Fixes
+
+* поправил создание конфига рабочей области, теперь там 3 папки - фронт, гит и версия. ([d59c7b8](https://git.stack-it.ru/clients/stack-manager/commit/d59c7b8fb9748f8d20c2e15db235806d5158d741))
+* убрал лишние ключи из env, пересобираем env.local при сборке проекта ([3cb394b](https://git.stack-it.ru/clients/stack-manager/commit/3cb394b6ad95b46fccebcf91477cbc10144daeec))
+
+### [0.6.1](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.0...v0.6.1) (2022-07-01)
+
+
+### Bug Fixes
+
+* вернул кнопки создания сервисов и справочные иконки ([e90f4c5](https://git.stack-it.ru/clients/stack-manager/commit/e90f4c54f9d75ec7a0b46c963013541829d38066))
+
+## [0.6.0](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.11...v0.6.0) (2022-07-01)
+
+
+### Features
+
+* отображение количества сообщений, и возможность их очистить ([61921e0](https://git.stack-it.ru/clients/stack-manager/commit/61921e0e7559885f5427518fe334793f79b24524))
+* реализовал генерацию рабочей области VsCode и ее открытие по проекту ([a4c7169](https://git.stack-it.ru/clients/stack-manager/commit/a4c71690dd7be31160c66ecf6e6ff27aa8d256c4))
+* события диспетчера отображаем только за текущие сутки ([850eec4](https://git.stack-it.ru/clients/stack-manager/commit/850eec4ddde98b77deae226924d961b8ca6bc1b0))
+
+
+### Bug Fixes
+
+* исправил проверку версии для инст проектов ([ce7b12a](https://git.stack-it.ru/clients/stack-manager/commit/ce7b12a8b4ff22feeed39d91c62c530dbab022a2))
+* сворачивание папок для вокрспэйса ([94d649a](https://git.stack-it.ru/clients/stack-manager/commit/94d649a4dcfd3bfbdeb4bf3088bf84eb500ff1c7))
+
+### [0.5.11](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.10...v0.5.11) (2022-06-20)
+
+
+### Bug Fixes
+
+* исправил обновление статусов после удаления проекта ([220fd6c](https://git.stack-it.ru/clients/stack-manager/commit/220fd6c7094291d945f375a485c38df27a09d61d))
+* поправил пути до статики в env для stackgateway 0.0.3 ([436d0e6](https://git.stack-it.ru/clients/stack-manager/commit/436d0e628f5332d3688158d59625eea59b95825d))
+
+### [0.5.10](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.9...v0.5.10) (2022-06-15)
+
+
+### Features
+
+* переделал интерфейс на карточки вместо экспандов ([2e1969f](https://git.stack-it.ru/clients/stack-manager/commit/2e1969f51c7ca02b7b999cf4b4c38c92c2d22b4e))
+
+
+### Bug Fixes
+
+* обновление папки фронта, если разные каталоги с проектом ([06817cb](https://git.stack-it.ru/clients/stack-manager/commit/06817cb147be0d8a6aa674bd1adc9355662c62f6))
+
+### [0.5.9](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.8...v0.5.9) (2022-06-10)
+
+
+### Features
+
+* для гейтвэя теперь выбираем только каталог, файл настроек ищется как application.yml в папке ([1cdaa64](https://git.stack-it.ru/clients/stack-manager/commit/1cdaa64cdba45fca7f7cc2248bec662dde32447b))
+* для app_host шара и аплоад через gateway ([5365c86](https://git.stack-it.ru/clients/stack-manager/commit/5365c86fd920c7043533eed35c27c1b87b972e7e))
+* сохраняем признак что задача принудительно выключена и не стартуем ее при пересборке ([f7d5b44](https://git.stack-it.ru/clients/stack-manager/commit/f7d5b44b39e981b14b1e8fb32fe62e7f61b62ddc))
+
+### [0.5.8](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.7...v0.5.8) (2022-05-19)
+
+
+### Features
+
+* копирование gateway в каталог <project>\StackGateway ([4cf409f](https://git.stack-it.ru/clients/stack-manager/commit/4cf409f65dd90a59350be20075df17b00321a10d))
+
+
+### Bug Fixes
+
+* добавил проверку наличия application.yml ([2389948](https://git.stack-it.ru/clients/stack-manager/commit/238994864cca12db68d77254969771fc9395f3d2))
+* запрет запуска нескольких окон приложения ([b908b0f](https://git.stack-it.ru/clients/stack-manager/commit/b908b0fd4f55eb8d57d675c78c4e2ccd8b700d44))
+* исправил удаление gateway при смене имени проекта ([26e8b51](https://git.stack-it.ru/clients/stack-manager/commit/26e8b5158396ab6a44d9d9aa09b9d86833d82429))
+
 ### [0.5.7](https://git.stack-it.ru/clients/stack-manager/compare/v0.5.6...v0.5.7) (2022-05-12)
 
 

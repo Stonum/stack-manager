@@ -943,9 +943,18 @@ async function generateStackIni(project: Project, pathini: string, binold: strin
     data['SQL-mode'] = {};
   }
 
-  data['SQL-mode'].Server = project.sql.server;
+  const [sqlserver, sqlport] = project.sql.server.split(':');
+
+  data['SQL-mode'].Server = sqlserver;
   data['SQL-mode'].Base = project.sql.base;
   data['SQL-mode'].Schema = project.type !== StackBackendType.apphost ? project.sql.base + '.stack' : 'stack';
+
+  if (sqlport) {
+    if (!data['PostgreSQL options']) {
+      data['PostgreSQL options'] = {};
+    }
+    data['PostgreSQL options'].AddConnectionString = `port=${sqlport} sslmode=disable`;
+  }
 
   // correct path of resources
   if (data.AppPath) {
@@ -1149,8 +1158,10 @@ async function generateGatewaySettings(project: Project, pathnew: string) {
         },
       };
     })();
+
+    const [sqlserver, sqlport] = project.sql.server.split(':');
     profile.spring.datasource = {
-      url: `jdbc:postgresql://${project.sql.server}:${project.sql.port || 5432}/${project.sql.base}`,
+      url: `jdbc:postgresql://${sqlserver}:${sqlport || 5432}/${project.sql.base}`,
       username: project.sql.login,
       password: project.sql.password,
     };

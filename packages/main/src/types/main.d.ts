@@ -31,7 +31,6 @@ interface ProjectSQLSettings {
   base: string;
   login: string;
   password: string;
-  port?: number;
 }
 
 interface ProjectPaths {
