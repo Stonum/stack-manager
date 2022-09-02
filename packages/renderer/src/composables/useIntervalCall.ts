@@ -4,11 +4,12 @@ const callbacks: Function[] = [];
 let interval = 1000;
 
 setTimeout(async function start() {
-  const isVisible = ipcRenderer.invoke('main', { message: 'getVisibleWindow' });
+  const isVisible = await ipcRenderer.invoke('main', { message: 'getVisibleWindow' });
   if (!isVisible || callbacks.length === 0) {
     setTimeout(start, 1000);
     return;
   }
+
   interval = +(await ipcRenderer.invoke('main', { message: 'getSettings', key: 'refresh_interval' })) || 20000;
   try {
     callbacks.forEach((callback) => callback());
@@ -21,6 +22,9 @@ setTimeout(async function start() {
 }, interval);
 
 export function useIntervalCall(callback: Function) {
-  callbacks.push(callback);
+  // просто по имени ф-ии проверяем, нет ли уже такой в пуле вызовов
+  if (!callbacks.find(cb => cb.name === callback.name)) {
+    callbacks.push(callback);
+  }
 }
 
