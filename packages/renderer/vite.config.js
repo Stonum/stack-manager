@@ -50,8 +50,7 @@ const config = {
     }),
     // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
     vuetify({
-      autoImport: true,
-      // styles: 'sass'
+      styles: { configFile: 'src/styles/settings.scss' },
     }),
   ],
 };

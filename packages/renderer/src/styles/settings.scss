@@ -1,0 +1,13 @@
+$font-size: 14px;
+
+@use 'vuetify/settings' with (
+   $font-size-root: $font-size,
+   $grid-gutter: 5px,
+
+   $button-font-size: $font-size,
+   $button-text-letter-spacing: normal,
+   $button-text-transform: none,
+   $button-font-weight: 400,
+
+   $input-font-size: $font-size
+);
