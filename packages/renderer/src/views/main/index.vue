@@ -25,8 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { useIpcRendererInvokeAsync } from '@/composables/useIpcRendererInvokeAsync';
-import { useIpcRendererInvoke } from '@/composables/useIpcRendererInvoke';
+import { useIpcRendererInvokeAsync, useIpcRendererInvoke, useApp, useIntervalCall } from '@/composables';
 
 import VDraggable from 'vuedraggable';
 
@@ -38,4 +37,8 @@ const { state: items, isLoading, execute } = useIpcRendererInvokeAsync<Project[]
 const onMoveProject = (payload: any) => {
   useIpcRendererInvoke('project', { message: 'moveProject', oldIndex: payload.moved.oldIndex, newIndex: payload.moved.newIndex });
 };
+
+const { loadStatuses } = useApp();
+useIntervalCall(loadStatuses);
+
 </script>

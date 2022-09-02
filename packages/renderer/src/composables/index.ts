@@ -11,3 +11,4 @@ export * from './useMessages';
 export * from './useEvents';
 
 export * from './useProject';
+export * from './useApp';

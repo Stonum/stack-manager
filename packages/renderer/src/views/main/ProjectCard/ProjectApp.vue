@@ -41,6 +41,7 @@
 </template>
 
 <script setup lang="ts">
+import { useApp } from '@/composables';
 import { ref } from 'vue';
 
 const props = defineProps<{ app: ProjectApp }>();
@@ -53,6 +54,5 @@ const emit = defineEmits<{
 const title = ref(props.app.name);
 const subtitle = ref(props.app.path + props.app.port ? ` --inspect=${props.app.port}` : ``);
 
-const status = ref(1);
-const color = ref('primary');
+const { status, color } = useApp(props.app.name);
 </script>
