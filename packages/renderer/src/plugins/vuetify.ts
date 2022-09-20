@@ -30,6 +30,21 @@ export default createVuetify(
         },
       },
     },
+
+    defaults: {
+      VTabs: {
+        color: 'primary'
+      },
+      VCheckbox: {
+        color: 'primary'
+      },
+      VTextField: {
+        color: 'primary'
+      },
+      VSwitch: {
+        color: 'primary'
+      }
+    }
   }
 );
 
