@@ -96,7 +96,7 @@ export default class MainListener extends CommonListener {
   }
 
   async getChangeLog() {
-    const result = readMarkdownFile(path.join(__dirname, '../CHANGELOG.md'));
+    const result = readMarkdownFile(path.join(__dirname, '../../../CHANGELOG.md'));
     return result;
   }
 

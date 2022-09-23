@@ -1,14 +1,22 @@
 <template>
   <app-bar title="Настройки">
-    <v-btn v-if="isChanged" @click="saveSettings"> Сохранить настройки </v-btn>
+    <v-btn v-if="isChanged" @click="saveSettings">
+      Сохранить настройки
+    </v-btn>
   </app-bar>
 
   <v-tabs v-model="tab">
-    <v-tab value="common"> Общие параметры </v-tab>
+    <v-tab value="common">
+      Общие параметры
+    </v-tab>
 
-    <v-tab value="service"> Сервисы </v-tab>
+    <v-tab value="service">
+      Сервисы
+    </v-tab>
 
-    <v-tab value="tasks"> Задачи </v-tab>
+    <v-tab value="tasks">
+      Задачи
+    </v-tab>
   </v-tabs>
 
   <v-window v-model="tab">
