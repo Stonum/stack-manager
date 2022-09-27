@@ -5,7 +5,8 @@
     :subtitle="subtitle"
   >
     <template #prepend>
-      <v-icon variant="text" size="small" :color="color" icon="mdi-circle" />
+      <!-- drop default opacity for prepend slot items -->
+      <v-icon variant="text" size="small" :color="color" icon="mdi-circle" style="opacity: 1" />
     </template>
 
     <template #append>
