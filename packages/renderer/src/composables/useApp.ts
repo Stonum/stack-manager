@@ -1,12 +1,16 @@
 import { reactive, computed } from 'vue';
 import { ipcRenderer } from '#preload';
 
+import { useSettings } from '@/composables';
+
 interface AppState {
   name: string;
   status: number;
 }
 
 const appState = reactive<AppState[]>([]);
+
+const { settings } = useSettings();
 
 async function loadStatuses() {
   const apps = await ipcRenderer.invoke('project', { message: 'getAppStatus' });
@@ -35,12 +39,11 @@ export function useApp(name?: string) {
   const color = computed<string>(() => {
     switch (status.value) {
       case 0:
-        return 'green';
+        return 'primary';
       case 1:
         return 'warning';
       case 2:
-        // return colorBlindMode ? 'blue' : 'error';
-        return 'error';
+        return settings.value.colorBlindMode ? 'blue' : 'error';
       default:
         return '#D3D3D3';
     }

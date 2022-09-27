@@ -10,8 +10,9 @@ function normalizeObject<T,>(obj: Ref<T> | T): T {
   return JSON.parse(JSON.stringify(isRef(obj) ? obj.value : obj));
 }
 
+const settings = ref<Settings>({});
+
 export function useSettings() {
-  const settings = ref<Settings>({});
 
   let settingsBeforeChange: Settings = {};
   const loading = ref(false);
