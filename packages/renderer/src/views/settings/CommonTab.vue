@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-row no-gutters>
+    <v-row>
       <v-col cols="8">
         <base-input v-model="settings.dispatcher_url" label="Диспетчер ( адрес : порт )" placeholder="http://<url>:<port>" prepend-icon="mdi-web" clearable />
       </v-col>

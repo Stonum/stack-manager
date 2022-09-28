@@ -1,5 +1,5 @@
 <template>
-  <v-combobox v-bind="$attrs" :label="inputLabel" :rules="inputRules" dense />
+  <v-combobox v-bind="$attrs" :label="inputLabel" :rules="inputRules" density="compact" />
 </template>
 
 <script setup lang="ts">

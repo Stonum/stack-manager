@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-row dense>
+    <v-row>
       <v-col cols="12">
         <base-input-folder v-model="settings.share" label="Каталог публикации файлов (/share)" clearable>
           <template #append>
