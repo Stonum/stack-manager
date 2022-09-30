@@ -16,9 +16,8 @@
 
 <script setup lang="ts">
 import { useIpcRendererInvoke } from '@/composables/useIpcRendererInvoke';
-import { FileFilter } from 'electron/main';
 
-const props = defineProps<{ modelValue?: string, filter: FileFilter }>();
+const props = defineProps<{ modelValue?: string }>();
 
 const emit = defineEmits<{ (e: 'update:modelValue', modelValue: string): void }>();
 
