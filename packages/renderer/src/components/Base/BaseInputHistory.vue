@@ -1,8 +1,17 @@
 <template>
-  <base-combobox v-bind="$attrs" :items="items" :label="inputLabel" :rules="inputRules" dense @change="onChange" />
+  <base-combobox
+    :model-value="modelValue" 
+    v-bind="$attrs"
+    :items="items"
+    :label="inputLabel"
+    :rules="inputRules"
+    hide-no-data
+    @update:search="onChange($event)"
+  />
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import { useStorage } from '@vueuse/core';
 import { useInput } from '@/composables/useInput';
 
@@ -10,23 +19,39 @@ const props = defineProps<{
   label: string
   required?: boolean,
   rules?: any[],
-  historyId: string
+   historyId: string
+  modelValue: string,
 }>();
 
-const emit = defineEmits<{ (e: 'change', value: string): void }>();
+const emit = defineEmits<{
+   (e: 'update:modelValue', modelValue: string): void
+}>();
 
 const { inputLabel, inputRules } = useInput(props);
 
 const items = useStorage<string[]>(props.historyId, []);
 
-const onChange = (val: string) => {
-   const value = val.trim();
-   if (value && items.value.indexOf(value) === -1) {
-      // Новое значение добавляем в начало
-      items.value.unshift(value);
-   }
+let timer = null as NodeJS.Timeout | null;
 
-   emit('change', val);
+const onChange = (val: string) => {
+   if (timer) {
+      clearTimeout(timer);
+   }
+   timer = setTimeout(() => {
+      const value = val.trim();
+      if (!value) {
+         return;
+      }
+      if (value && items.value.indexOf(value) === -1) {
+         // Новое значение добавляем в начало
+         items.value.unshift(value);
+      }
+      emit('update:modelValue', val);
+   }, 250);
 };
+
+onMounted(() => {
+   onChange(props.modelValue);
+});
 
 </script>
