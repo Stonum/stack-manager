@@ -12,7 +12,7 @@ ipcRenderer.on('info', (event: any, payload: any) => {
   addMessage('info', payload.title + ' ' + payload.message);
 });
 
-function addMessage(type: string, text: string) {
+function addMessage(type: MessageType, text: string) {
   const message = { type, text, time: new Date() };
   messages.push(message);
   hook.trigger(message);

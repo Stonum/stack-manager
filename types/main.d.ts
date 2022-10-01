@@ -69,7 +69,9 @@ interface DispatcherItem {
   [parameter: string]: string;
 }
 
-type Message = { type: string; text: string; time: Date };
+
+type MessageType = 'info' | 'error';
+type Message = { type: MessageType; text: string; time: Date };
 
 interface ProjectCondition {
   building?: boolean;

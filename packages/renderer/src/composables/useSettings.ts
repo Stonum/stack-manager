@@ -1,6 +1,6 @@
 import { Ref, isRef, ref, watch } from 'vue';
 import { ipcRenderer } from '#preload';
-
+import { useMessages } from '@/composables';
 
 async function saveSettingKey(key: string, data: string | boolean | number | Task[]) {
   return ipcRenderer.invoke('main', { message: 'setSettings', key, data });
@@ -17,6 +17,8 @@ export function useSettings() {
   let settingsBeforeChange: Settings = {};
   const loading = ref(false);
   const isChanged = ref(false);
+
+  const { addMessage } = useMessages();
 
   watch(settings, () => { isChanged.value = true; }, { deep: true });
 
@@ -41,6 +43,7 @@ export function useSettings() {
     }
 
     loadSettings();
+    addMessage('info', 'Настройки сохранены');
   }
 
   async function createService(service: string) {
