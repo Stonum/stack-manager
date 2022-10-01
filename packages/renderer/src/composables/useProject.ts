@@ -111,6 +111,20 @@ export function useProject(projectId: number, immediate = false) {
     return true;
   }
 
+  async function checkVersion() {
+    const data = await ipcRenderer.invoke('project', { message: 'readIniFile', path: project.value.path.ini });
+    if (data.version && data.version.toString().toLowerCase() !== project.value.path.version?.toLowerCase()) {
+      return {
+        differentVersion: true,
+        newVersion: data.version
+      };
+    }
+    return {
+      differentVersion: false,
+      newVersion: project.value.path.version
+    };
+  }
+
   async function get() {
     loading.value = true;
     project.value = await ipcRenderer.invoke('project', { message: 'get', projectId });
@@ -128,6 +142,7 @@ export function useProject(projectId: number, immediate = false) {
     readFolder,
     readIniFile,
     buildProject,
+    checkVersion,
     state,
     project,
     loading
