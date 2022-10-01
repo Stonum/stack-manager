@@ -32,7 +32,7 @@ const config = {
       },
     },
     emptyOutDir: true,
-    reportCompressedSize: false,
+    reportCompressedSize: true,
   },
 };
 

@@ -417,6 +417,9 @@ export default class ProjectListener extends CommonListener {
       } catch (e: AnyException) {
         //
       }
+      if (!fs.existsSync('C:\\Program Files\\dotnet\\dotnet.exe')) {
+        cmd.execSudo(import.meta.env.VITE_DOTNET_PATH || '');
+      }
       await webServer.addItem(name, {
         IsActive: 1,
         cmd: 'C:\\Program Files\\dotnet\\dotnet.exe',
@@ -428,9 +431,6 @@ export default class ProjectListener extends CommonListener {
       });
       webServer.startItem(name);
 
-      if (!fs.existsSync('C:\\Program Files\\dotnet\\dotnet.exe')) {
-        cmd.execSudo(process.env.DOTNET_PATH || '');
-      }
 
       this.sendInfoMessage(name, `Веб сервис создан`);
     }

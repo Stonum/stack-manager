@@ -1,15 +1,19 @@
 import log from 'electron-log';
 import { app } from 'electron';
-import { format } from 'date-fns';
-import ru from 'date-fns/locale/ru';
 import path from 'path';
 import { settings } from './store';
+
+const format = (date: Date) => {
+  const month = date.getMonth() < 10 ? '0' + date.getMonth() : date.getMonth();
+  const day = date.getDay() < 10 ? '0' + date.getDay() : date.getDay();
+  return `${date.getFullYear()}_${month}_${day}`;
+};
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const isFullLogging = settings.get('fullLogging');
 
 const folder = path.join(app.getPath('userData'), 'logs');
-const filePath = () => path.join(folder, `log_${format(new Date(), 'yyyy_MM_dd', { locale: ru })}.log`);
+const filePath = () => path.join(folder, `log_${format(new Date())}.log`);
 
 log.transports.file.resolvePath = filePath;
 if (!isDevelopment && !isFullLogging) {

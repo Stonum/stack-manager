@@ -33,7 +33,6 @@ const config = {
       input: join(PACKAGE_ROOT, 'index.html'),
     },
     emptyOutDir: true,
-    reportCompressedSize: false,
   },
   test: {
     environment: 'happy-dom',

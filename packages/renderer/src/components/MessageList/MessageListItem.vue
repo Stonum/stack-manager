@@ -22,7 +22,6 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { format } from 'date-fns';
 
 import MessageListDialog from './MessageListDialog.vue';
 
@@ -30,8 +29,15 @@ const props = defineProps<{ item: Message }>();
 
 const isVisibleDialog = ref(false);
 
+const format = (date: Date) => {
+  const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+  const minute = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+  const second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+  return `${hour}:${minute}:${second}`;
+};
+
 const msgText = computed(() => { return props.item.text.length > 200 ? props.item.text.substring(1, 200) + '...' : props.item.text; });
-const msgTime = computed(() => { return format(props.item.time, 'HH:mm:ss'); });
+const msgTime = computed(() => { return format(props.item.time); });
 const msgColor = computed(() => { return props.item.type === 'error' ? 'error' : 'green'; });
 const msgIcon = computed(() => { return props.item.type === 'error' ? 'mdi-alert-circle' : 'mdi-information-outline'; });
 </script>
