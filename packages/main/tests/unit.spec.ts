@@ -1,8 +1,8 @@
-import type {MockedClass} from 'vitest';
+import type { MockedClass, MockedObject } from 'vitest';
 import {beforeEach, expect, test, vi} from 'vitest';
 import {restoreOrCreateWindow} from '../src/mainWindow';
 
-import {BrowserWindow} from 'electron';
+import { BrowserWindow, App } from 'electron';
 
 /**
  * Mock real electron BrowserWindow API
@@ -22,7 +22,11 @@ vi.mock('electron', () => {
   bw.prototype.focus = vi.fn();
   bw.prototype.restore = vi.fn();
 
-  return {BrowserWindow: bw};
+  const eapp = vi.fn() as unknown as MockedObject<App>;
+  eapp.getName = vi.fn();
+  eapp.getVersion = vi.fn();
+
+  return { BrowserWindow: bw, app: eapp };
 });
 
 
