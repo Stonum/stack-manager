@@ -33,6 +33,7 @@ const config = {
     },
     './CHANGELOG.md',
   ],
+  npmRebuild: false,
   publish: [{ provider: 'generic', url: 'http://arshinova:8090/manager_auto_update' }],
 };
 
