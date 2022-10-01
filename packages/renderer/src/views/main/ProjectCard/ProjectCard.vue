@@ -46,8 +46,8 @@ const onDelete = async (answer?: boolean) => {
   }
 };
 
-const onEdit = (id: number) => {
-  router.push(`/project/${id}`);
+const onEdit = () => {
+  router.push(`/project/${props.id}`);
 };
 
 const onRestart = (appName: string) => {

@@ -19,7 +19,7 @@
 import { useIpcRendererInvoke } from '@/composables/useIpcRendererInvoke';
 
 const props = defineProps<{ modelValue?: string }>();
-const emit = defineEmits<{ (e: 'update:modelValue', modelValue: string): void }>();
+const emit = defineEmits<{(e: 'update:modelValue', modelValue: string): void}>();
 
 const selectDir = async () => {
   const value = await useIpcRendererInvoke<string>('main', { message: 'selectDir', path: props.modelValue?.toString() });

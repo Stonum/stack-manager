@@ -12,6 +12,9 @@
     <template v-if="$slots['append']" #append>
       <slot name="append" />
     </template>
+    <template v-if="$slots['prepend']" #prepend>
+      <slot name="prepend" />
+    </template>
   </v-text-field>
 </template>
 

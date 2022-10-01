@@ -77,3 +77,5 @@ interface ProjectCondition {
   deploying?: boolean;
   restarting?: boolean;
 }
+
+interface SelectableApp extends ProjectApp, Task { }
