@@ -20,7 +20,11 @@ export function useSettings() {
 
   const { addMessage } = useMessages();
 
-  watch(settings, () => { isChanged.value = true; }, { deep: true });
+  watch(settings, (oldVal, newVal) => {
+    if (oldVal === newVal) {
+      isChanged.value = true;
+    }
+  }, { deep: true });
 
   async function loadSettings() {
     loading.value = true;
