@@ -1,6 +1,6 @@
 {
   "name": "stack-manager",
-  "version": "0.6.7",
+  "version": "0.6.8",
   "private": true,
   "author": {
     "name": "stonum",
@@ -24,7 +24,9 @@
     "typecheck:main": "tsc --noEmit -p packages/main/tsconfig.json",
     "typecheck:preload": "tsc --noEmit -p packages/preload/tsconfig.json",
     "typecheck:renderer": "vue-tsc --noEmit -p packages/renderer/tsconfig.json",
-    "typecheck": "npm run typecheck:main && npm run typecheck:preload && npm run typecheck:renderer"
+    "typecheck": "npm run typecheck:main && npm run typecheck:preload && npm run typecheck:renderer",
+    "release-path": "standard-version",
+    "release-minor": "standard-version --release-as minor"
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
@@ -67,6 +69,7 @@
     "sass": "^1.54.3",
     "sass-loader": "^13.0.2",
     "simple-git-hooks": "2.8.0",
+    "standard-version": "^9.5.0",
     "typescript": "4.7.4",
     "unplugin-auto-expose": "0.0.2",
     "vite": "3.0.4",

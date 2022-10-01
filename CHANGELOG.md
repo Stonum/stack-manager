@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.8](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.7...v0.6.8) (2022-10-01)
+
+
+### Features
+
+* changelog page ([720f9ef](https://git.stack-it.ru/clients/stack-manager/commit/720f9ef1d05890f2c4d57a28f196673bd7802fe6))
+* create and rebuild project ([6a3841e](https://git.stack-it.ru/clients/stack-manager/commit/6a3841e6fe7f083fc29f48a5c81f86eac40d3666))
+* fill project dialog ([4f281e9](https://git.stack-it.ru/clients/stack-manager/commit/4f281e9d7d774c6ebc3101cf3131eabc5f22e400))
+* force reload statuses ([8bdc196](https://git.stack-it.ru/clients/stack-manager/commit/8bdc196ca39a1b56ec4a8fea22cdb90b8735c441))
+* motify about save messagers ([51d9fc1](https://git.stack-it.ru/clients/stack-manager/commit/51d9fc1a56204dd7d4079224d0ca60bcf7ab64b2))
+* use color blind mode ([4325583](https://git.stack-it.ru/clients/stack-manager/commit/432558369212d45bbf87b0d2f3005718d4c17263))
+
+
+### Bug Fixes
+
+* поправил определение высоты контейнера ([f84a5b7](https://git.stack-it.ru/clients/stack-manager/commit/f84a5b7d8b55ce1a09b2d350cf87b293be0c3ae4))
+* del filter from input file ([f57eea2](https://git.stack-it.ru/clients/stack-manager/commit/f57eea2f27d80ab564070f7cf0af7ecec0eb68c2))
+* drop default opacity for prepend slot items ([3ac9980](https://git.stack-it.ru/clients/stack-manager/commit/3ac9980be7cdb958f56e0d6a5c3621ca9b3a2c39))
+* input history ([e997552](https://git.stack-it.ru/clients/stack-manager/commit/e99755224bdb078b0b24073fa5167730ca9c46f1))
+* intervall calls interval ([0b631ca](https://git.stack-it.ru/clients/stack-manager/commit/0b631ca891129a912b058359d779628190510bb6))
+* set default color ([bc77698](https://git.stack-it.ru/clients/stack-manager/commit/bc77698b88705cbfbcfd9576d49ba4e3ca96b5bf))
+* warnings input history ([ffdf141](https://git.stack-it.ru/clients/stack-manager/commit/ffdf141a07db7205181058d58a5a103787d709ed))
+
 ### [0.6.7](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.6...v0.6.7) (2022-08-10)
 
 
