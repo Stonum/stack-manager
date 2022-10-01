@@ -11,18 +11,11 @@ import cmd from '../cmd';
 import { readMarkdownFile } from '../utils';
 
 export default class MainListener extends CommonListener {
-  update_url = process.env.UPDATE_URL;
 
   constructor() {
     super('main');
 
     autoUpdater.autoDownload = false;
-    if (this.update_url) {
-      autoUpdater.setFeedURL({
-        provider: 'generic',
-        url: this.update_url,
-      });
-    }
   }
 
   getSettings(payload: any) {
