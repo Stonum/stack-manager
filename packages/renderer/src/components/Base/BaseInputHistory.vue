@@ -19,12 +19,12 @@ const props = defineProps<{
   label: string
   required?: boolean,
   rules?: any[],
-   historyId: string
-  modelValue: string,
+  historyId: string
+  modelValue?: string,
 }>();
 
 const emit = defineEmits<{
-   (e: 'update:modelValue', modelValue: string): void
+   (e: 'update:modelValue', modelValue: string | undefined): void
 }>();
 
 const { inputLabel, inputRules } = useInput(props);
@@ -33,12 +33,12 @@ const items = useStorage<string[]>(props.historyId, []);
 
 let timer = null as NodeJS.Timeout | null;
 
-const onChange = (val: string) => {
+const onChange = (val: string | undefined) => {
    if (timer) {
       clearTimeout(timer);
    }
    timer = setTimeout(() => {
-      const value = val.trim();
+      const value = val?.trim();
       if (!value) {
          return;
       }
