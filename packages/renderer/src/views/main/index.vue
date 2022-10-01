@@ -15,22 +15,25 @@
     </v-draggable>
   </v-container>
 
-  <!-- <fill-projects-dialog
-      v-if="visibleFillDlg"
-      @close="
-        visibleFillDlg = false;
-        onRefresh();
-      "
-    /> -->
+  <fill-projects-dialog
+    v-if="visibleDialog"
+    @close="
+      visibleDialog = false;
+      unwatch();
+      execute();
+    "
+  />
 </template>
 
 <script setup lang="ts">
+import { ref, watch } from 'vue';
 import { useIpcRendererInvokeAsync, useIpcRendererInvoke, useApp, useIntervalCall } from '@/composables';
 
 import VDraggable from 'vuedraggable';
 
 import MainToolBar from './MainToolBar.vue';
 import ProjectCard from './ProjectCard/ProjectCard.vue';
+import FillProjectsDialog from './FillProjectsDialog.vue';
 
 const { state: items, isLoading, execute } = useIpcRendererInvokeAsync<Project[]>('project', { message: 'getAll' }, [], { immediate: true, shallow: false, resetOnExecute: false });
 
@@ -40,5 +43,12 @@ const onMoveProject = (payload: any) => {
 
 const { loadStatuses } = useApp();
 useIntervalCall(loadStatuses);
+
+const visibleDialog = ref(false);
+const unwatch = watch(isLoading, () => {
+   if (items.value.length === 0) {
+      visibleDialog.value = true;
+   }
+});
 
 </script>
