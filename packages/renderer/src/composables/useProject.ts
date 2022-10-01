@@ -1,6 +1,8 @@
 import { reactive, ref, Ref, isRef } from 'vue';
 import { ipcRenderer } from '#preload';
 
+import { useEvents, useApp } from '@/composables';
+
 interface ProjectState {
   [index: number]: ProjectCondition
 }
@@ -10,6 +12,9 @@ const projectState = reactive<ProjectState>({});
 function normalizeObject<T,>(obj: Ref<T> | T): T {
   return JSON.parse(JSON.stringify(isRef(obj) ? obj.value : obj));
 }
+
+const { loadEvents } = useEvents();
+const { loadStatuses } = useApp();
 
 export function useProject(projectId: number, immediate = false) {
 
@@ -41,15 +46,10 @@ export function useProject(projectId: number, immediate = false) {
     }
   }
 
-  async function add(params: Project) {
-    state.building = true;
-    const res = await ipcRenderer.invoke('project', { message: 'add', params });
-    state.building = false;
-    return res;
-  }
-
   async function del() {
-    return ipcRenderer.invoke('project', { message: 'delete', projectId });
+    const res = await ipcRenderer.invoke('project', { message: 'delete', projectId });
+    loadEvents();
+    return res;
   }
 
   async function sendJob(jobName: string, params?: any) {
@@ -58,6 +58,8 @@ export function useProject(projectId: number, immediate = false) {
       await ipcRenderer.invoke('project', { message: jobName, projectId, params });
     } finally {
       setStatus(jobName, false);
+      loadEvents();
+      loadStatuses();
     }
   }
 
@@ -90,6 +92,7 @@ export function useProject(projectId: number, immediate = false) {
   }
 
   async function buildProject() {
+    state.building = true;
     loading.value = true;
     try {
       if (projectId < 0) {
@@ -101,6 +104,9 @@ export function useProject(projectId: number, immediate = false) {
       return false;
     } finally {
       loading.value = false;
+      state.building = false;
+      loadEvents();
+      loadStatuses();
     }
     return true;
   }
@@ -117,7 +123,6 @@ export function useProject(projectId: number, immediate = false) {
 
   return {
     get,
-    add,
     remove: del,
     sendJob,
     readFolder,
