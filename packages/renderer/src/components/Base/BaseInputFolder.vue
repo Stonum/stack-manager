@@ -1,14 +1,15 @@
 <template>
   <base-input
     :model-value="modelValue"
-    v-bind="$attrs" 
-    prepend-icon="mdi-folder-outline"
+    v-bind="$attrs"
     append-inner-icon="mdi-open-in-new"
     readonly
-    @click:prepend="selectDir"
     @click:append-inner="openPath"
     @click:clear="emit('update:modelValue', '')"
   >
+    <template #prepend>
+      <v-btn icon="mdi-folder-outline" flat :density="null" @click="selectDir" />
+    </template>
     <template v-if="$slots['append']" #append>
       <slot name="append" />
     </template>
@@ -19,11 +20,13 @@
 import { useIpcRendererInvoke } from '@/composables/useIpcRendererInvoke';
 
 const props = defineProps<{ modelValue?: string }>();
-const emit = defineEmits<{(e: 'update:modelValue', modelValue: string): void}>();
+const emit = defineEmits<{ (e: 'update:modelValue', modelValue: string): void }>();
 
 const selectDir = async () => {
   const value = await useIpcRendererInvoke<string>('main', { message: 'selectDir', path: props.modelValue?.toString() });
-  emit('update:modelValue', value);
+  if (value !== props.modelValue) {
+    emit('update:modelValue', value);
+  }
 };
 
 const openPath = () => {
