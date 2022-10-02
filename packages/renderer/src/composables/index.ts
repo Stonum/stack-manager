@@ -1,4 +1,5 @@
 export * from './useInput';
+export * from './usePathInput';
 
 export * from './useIntervalCall';
 export * from './useIpcRendererInvoke';

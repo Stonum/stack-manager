@@ -2,8 +2,9 @@
   <base-input
     :model-value="modelValue" 
     v-bind="$attrs"
-    readonly
+    :rules="inputRules"
     @click:clear="emit('update:modelValue','')"
+    @update:model-value="emit('update:modelValue', $event)"
   >
     <template #prepend>
       <v-btn icon="mdi-file-document-outline" flat :density="null" @click="selectFile" />
@@ -15,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { useIpcRendererInvoke } from '@/composables/useIpcRendererInvoke';
+import { useIpcRendererInvoke, usePathInput  } from '@/composables';
 
 const props = defineProps<{ modelValue?: string }>();
 
@@ -27,4 +28,6 @@ const selectFile = async () => {
       emit('update:modelValue', value);
    }
 };
+
+const { inputRules } = usePathInput(props);
 </script>
