@@ -16,7 +16,7 @@ const enum StackBackendType {
   apphost = 1,
 }
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
+const isDevelopment = import.meta.env.DEV;
 
 export default class ProjectListener extends CommonListener {
   private servers = [] as StaticServer[];
@@ -462,7 +462,6 @@ export default class ProjectListener extends CommonListener {
     if (allProjects[id]) {
       const project = allProjects[id];
       const wsPath = path.join(settings.get('workspacePath'), `${project.name}.code-workspace`);
-      console.log(wsPath);
       if (!fs.existsSync(wsPath)) {
         await genewateWorkspaceFile(project, wsPath);
       }
