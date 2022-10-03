@@ -10,6 +10,6 @@ export * from './useFooter';
 export * from './useUpdater';
 export * from './useMessages';
 export * from './useEvents';
+export * from './useApp';
 
 export * from './useProject';
-export * from './useApp';

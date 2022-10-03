@@ -7,7 +7,8 @@ vi.mock('#preload', () => {
     ipcRenderer: {
       invoke: () => {
         return '/home/dir';
-      }
+      },
+      on: vi.fn()
     }
   };
 });

@@ -5,7 +5,8 @@ import BaseInputFile from '../BaseInputFile.vue';
 vi.mock('#preload', () => {
   return {
     ipcRenderer: {
-      invoke: () => { return '/home/dir'; }
+      invoke: () => { return '/home/dir'; },
+      on: () => { }
     }
   };
 });
