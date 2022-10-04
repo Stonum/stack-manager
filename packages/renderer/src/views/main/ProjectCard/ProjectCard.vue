@@ -51,7 +51,7 @@ const onEdit = () => {
 };
 
 const onRestart = (appName: string) => {
-  sendJob('appStart', appName);
+  sendJob('appReStart', appName);
 };
 
 const onStart = (appName: string) => {
