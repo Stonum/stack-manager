@@ -1,9 +1,14 @@
 <template>
   <v-dialog v-model="dialog" persistent :max-width="props.width">
-    <v-card>
-      <v-card-title class="text-primary">
-        {{ props.header }}
-      </v-card-title>
+    <v-card density="compact" min-height="15em">
+      <template #prepend>
+        <p class="text-h6 text-primary">
+          {{ props.header }}
+        </p>
+      </template>
+      <template #append>
+        <v-btn icon="mdi-close" flat density="compact" @click="emit('click', false)" />
+      </template>
       <v-card-text v-if="props.text">
         {{ props.text }}
       </v-card-text>
@@ -31,7 +36,7 @@ const props = withDefaults(
   }>(),
   {
     text: '',
-    width: 290,
+    width: 500,
   }
 );
 

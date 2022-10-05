@@ -14,7 +14,7 @@
     </v-list>
   </v-card>
 
-  <yes-no-dialog v-if="askAboutDelete" :header="`Удалить проект ${item.name}?`" @click="onDelete($event)" />
+  <yes-no-dialog v-if="askAboutDelete" header="Удаление проекта" :text="`Удалить проект ${item.name}?`" @click="onDelete($event)" />
 </template>
 
 <script lang="ts" setup>
