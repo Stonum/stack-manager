@@ -16,12 +16,13 @@ import { CSSProperties, reactive } from 'vue';
 import AppFooter from '@/components/App/AppFooter.vue';
 import AppToast from '@/components/App/AppToast.vue';
 
+// TODO убрать хардкод, брать высоту от v-main
 const wrapperStyle = reactive<CSSProperties>({
-   height: '595px',
+   height: '625px',
    'overflow-y': 'scroll',
 });
 
 function onChangeFooterSize(payload: number) {
-  wrapperStyle.height = `${595 - payload}px`;
+  wrapperStyle.height = `${625 - payload}px`;
 }
 </script>

@@ -37,7 +37,7 @@
         />
       </v-window-item>
 
-      <v-window-item value="tasks" class="pt-2" eager>
+      <v-window-item value="tasks" eager>
         <apps-tab v-model:apps="apps" :is-app-host="isAppHost" @select="onAppSelect" />
       </v-window-item>
     </v-window>
