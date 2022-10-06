@@ -4,12 +4,12 @@ import path from 'path';
 import { settings } from './store';
 
 const format = (date: Date) => {
-  const month = date.getMonth() < 10 ? '0' + date.getMonth() : date.getMonth();
-  const day = date.getDay() < 10 ? '0' + date.getDay() : date.getDay();
+  const month = date.getMonth() < 9 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
+  const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
   return `${date.getFullYear()}_${month}_${day}`;
 };
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
+const isDevelopment = import.meta.env.DEV;
 const isFullLogging = settings.get('fullLogging');
 
 const folder = path.join(app.getPath('userData'), 'logs');
