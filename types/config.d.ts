@@ -48,4 +48,7 @@ interface StackIniFile {
     UploadedFilesPath?: string;
     PublicFilesPath?: string;
   };
+  'PostgreSQL options'?: {
+    AddConnectionString?: string
+  };
 }

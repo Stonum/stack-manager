@@ -11,10 +11,10 @@ import Dispatcher from '../middleware/dispatcher';
 import StaticServer from '../middleware/express';
 import cmd from '../cmd';
 
-const enum StackBackendType {
-  stack = 0,
-  apphost = 1,
-}
+const StackBackendType = {
+  stack: 0,
+  apphost: 1
+};
 
 const isDevelopment = import.meta.env.DEV;
 
@@ -122,7 +122,7 @@ export default class ProjectListener extends CommonListener {
   async delete(payload: any) {
     const id = payload.projectId;
     const allProjects = projects.get('projects', []) as Project[];
-    let project = null;
+    let project = null as null | Project;
     if (allProjects && allProjects[id]) {
       project = allProjects[id];
       allProjects.splice(id, 1);
@@ -170,7 +170,7 @@ export default class ProjectListener extends CommonListener {
 
     const data = projects.get('projects', []) as Project[];
     if (data && data[id]) {
-      const project = prepareProject(payload.params, data[id]);
+      const project = prepareProject(payload.params);
       checkProject(project, id);
       this.sendInfoMessage(project.name, 'Сборка backend запущена');
       await buildProject(project, data[id]);
@@ -325,7 +325,7 @@ export default class ProjectListener extends CommonListener {
             this.servers.push(server);
           }
         } catch (e: AnyException) {
-          console.error(e);
+          // console.error(e);
         }
       }
     }
@@ -594,7 +594,7 @@ async function getDataFromIni(pathFile: string) {
   return result;
 }
 
-function prepareProject(payload: Project, oldProject?: Project) {
+function prepareProject(payload: Project) {
   const project = {} as Project;
   project.name = payload.name;
 
@@ -720,7 +720,7 @@ async function buildProject(project: Project, oldProject?: Project) {
 
   // удалим старые приложения если есть
   if (oldProject) {
-    for (const app of oldProject?.apps) {
+    for (const app of oldProject?.apps || []) {
       try {
         await webServer.deleteItem(app.name);
       } catch (e) {

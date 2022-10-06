@@ -1,23 +1,23 @@
 {
-  "compilerOptions": {
-    "module": "esnext",
-    "target": "esnext",
-    "sourceMap": false,
-    "moduleResolution": "Node",
-    "skipLibCheck": true,
-    "strict": true,
-    "isolatedModules": true,
-
-    "types" : ["node"],
-
-    "baseUrl": ".",
-  },
-  "include": [
-    "src/**/*.ts",
-    "../../types/**/*.d.ts"
-  ],
-  "exclude": [
-    "**/*.spec.ts",
-    "**/*.test.ts"
-  ]
+   "compilerOptions": {
+      "module": "esnext",
+      "target": "esnext",
+      "sourceMap": false,
+      "moduleResolution": "Node",
+      "skipLibCheck": true,
+      "strict": true,
+      "isolatedModules": true,
+      "types": [
+         "node"
+      ],
+      "baseUrl": ".",
+   },
+   "files": [
+      "src/**/*.ts",
+      "../../types/**/*.d.ts"
+   ],
+   "exclude": [
+      "**/*.spec.ts",
+      "**/*.test.ts"
+   ]
 }
