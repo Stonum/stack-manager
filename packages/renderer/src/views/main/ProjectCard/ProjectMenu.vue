@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-const emit = defineEmits(['edit', 'delete']);
+const emit = defineEmits(['edit', 'delete', 'openFolder']);
 
 const actions = [
    {
@@ -37,6 +37,14 @@ const actions = [
       color: 'error',
       method: () => {
          emit('delete');
+      },
+   },
+   {
+      name: 'Просмотр каталога',
+      icon: 'mdi-folder',
+      color: 'primary',
+      method: () => {
+         emit('openFolder');
       },
    },
 ];

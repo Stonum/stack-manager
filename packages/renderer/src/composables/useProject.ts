@@ -125,6 +125,11 @@ export function useProject(projectId: number, immediate = false) {
     };
   }
 
+  async function openProjectFolder() {
+    await get();
+    await ipcRenderer.invoke('main', { message: 'openPath', path: project.value.path.bin });
+  }
+
   async function get() {
     loading.value = true;
     project.value = await ipcRenderer.invoke('project', { message: 'get', projectId });
@@ -143,6 +148,7 @@ export function useProject(projectId: number, immediate = false) {
     readIniFile,
     buildProject,
     checkVersion,
+    openProjectFolder,
     state,
     project,
     loading

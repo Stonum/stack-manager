@@ -3,7 +3,7 @@
     <v-card-item class="py-0" :title="props.item.name" density="compact">
       <template #append>
         <v-progress-circular v-if="isRunning" class="mr-3" :size="20" :width="2" color="primary" :indeterminate="true" />
-        <project-menu @delete="onDelete()" @edit="onEdit" />
+        <project-menu @delete="onDelete()" @edit="onEdit" @open-folder="openProjectFolder" />
       </template>
     </v-card-item>
 
@@ -31,7 +31,7 @@ const emit = defineEmits(['refresh']);
 
 const askAboutDelete = ref(false);
 
-const { sendJob, remove, state } = useProject(props.id);
+const { sendJob, remove, openProjectFolder, state } = useProject(props.id);
 const isRunning = computed(() => {
   return !!state?.building || !!state?.restarting;
 });
