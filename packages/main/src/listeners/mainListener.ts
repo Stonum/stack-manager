@@ -36,11 +36,6 @@ export default class MainListener extends CommonListener {
     return '';
   }
 
-  getVisibleWindow() {
-    const window = getMainWindow();
-    return window?.isVisible() && !window?.isMinimized();
-  }
-
   async selectDir(payload: any) {
     const window = getMainWindow();
     if (!window) {

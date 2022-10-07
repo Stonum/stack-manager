@@ -3,10 +3,16 @@ import { ipcRenderer } from '#preload';
 const callbacks: Function[] = [];
 let interval = 1000;
 
+let isVisible = document.visibilityState === 'visible';
+document.addEventListener('visibilitychange', () => {
+  // выводим состояние видимости страницы в консоль
+  isVisible = document.visibilityState === 'visible';
+});
+
+
 setTimeout(async function start() {
-  const isVisible = await ipcRenderer.invoke('main', { message: 'getVisibleWindow' });
   if (!isVisible || callbacks.length === 0) {
-    setTimeout(start, 1000);
+    setTimeout(start, 500);
     return;
   }
 
