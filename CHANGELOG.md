@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.1](https://git.stack-it.ru/clients/stack-manager/compare/v0.7.0...v0.7.1) (2022-10-07)
+
+
+### Features
+
+* возможность ручного редактирования путей к каталогам и файлам ([67e21dc](https://git.stack-it.ru/clients/stack-manager/commit/67e21dc3f7be6007b5f0bc421cdfcc2575d39bf3))
+* опрос диспетчера только если приложение не перекрыто и не свернуто ([0ec74b1](https://git.stack-it.ru/clients/stack-manager/commit/0ec74b145714c779ea82ba8926a70b2243cdbcf4))
+* открытие папки с exe ([22da3c9](https://git.stack-it.ru/clients/stack-manager/commit/22da3c9fa0af8a9834b187f81436e1b1c4ffe4c3)), closes [#12](https://git.stack-it.ru/clients/stack-manager/issues/12)
+
+
+### Bug Fixes
+
+* исправил высоту области под скролл ([dc6b960](https://git.stack-it.ru/clients/stack-manager/commit/dc6b96089ec51703efffe68777c3535ef3f7eaeb))
+* **vue3:** исправил логирование ([fa35110](https://git.stack-it.ru/clients/stack-manager/commit/fa351103a30d9e1af35f44c60efd784f77a43763))
+* **vue3:** исправил путь до файла со списком изменений ([092e9b0](https://git.stack-it.ru/clients/stack-manager/commit/092e9b066a0087c8f8ca61ef2147f88e3357e682))
+* **vue3:** исправил работу статик сервера ([0725277](https://git.stack-it.ru/clients/stack-manager/commit/0725277f30f8e1cd0d1c8c22f66b0d3b0daa34b3))
+* **vue3:** исправил рестарт программы автозапуска ([2800717](https://git.stack-it.ru/clients/stack-manager/commit/2800717c709ed467c031f96afe51e315f4eaa2c6))
+
 ## [0.7.0](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.7...v0.7.0) (2022-10-01)
 
 ### [0.6.7](https://git.stack-it.ru/clients/stack-manager/compare/v0.6.6...v0.6.7) (2022-08-10)
