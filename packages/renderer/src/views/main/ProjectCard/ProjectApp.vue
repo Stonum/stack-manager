@@ -53,7 +53,7 @@ const emit = defineEmits<{
 }>();
 
 const title = ref(props.app.name);
-const subtitle = ref(props.app.path + props.app.port ? ` --inspect=${props.app.port}` : ``);
+const subtitle = ref(props.app.path + (props.app.port ? ` --inspect=${props.app.port}` : ``));
 
 const { status, color } = useApp(props.app.name);
 </script>
