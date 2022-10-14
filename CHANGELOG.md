@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.2](https://git.stack-it.ru/clients/stack-manager/compare/v0.7.1...v0.7.2) (2022-10-14)
+
+
+### Bug Fixes
+
+* путь к каталогу Stack.Srv в workspacefix: исправлен путь к каталогу Stack.Srv в workspace ([157c76f](https://git.stack-it.ru/clients/stack-manager/commit/157c76fc611aa5b22ad6b8455cedf6702fddf8b3))
+
 ### [0.7.1](https://git.stack-it.ru/clients/stack-manager/compare/v0.7.0...v0.7.1) (2022-10-07)
 
 
