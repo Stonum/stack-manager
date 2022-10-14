@@ -1208,9 +1208,9 @@ async function genewateWorkspaceFile(project: Project, wsPath: string) {
   }
 
   // каталог клиентских заплаток если есть
-  const srvPath = path.join(project.path.git, 'Stack.srv');
-  if (fs.existsSync(srvPath)) {
-    config.folders.push({ path: srvPath });
+  const srvName = fs.readdirSync(project.path.git).find(fld => fld.toLowerCase() === 'stack.srv');
+  if (srvName) {
+    config.folders.push({ path: path.join(project.path.git, srvName) });
   } else {
     config.folders.push({ path: project.path.git });
   }
@@ -1226,9 +1226,9 @@ async function genewateWorkspaceFile(project: Project, wsPath: string) {
     }
   }
   verdir = path.join(verdir, '\\');
-  const srvPathVer = path.join(verdir, 'Stack.srv');
-  if (fs.existsSync(srvPath)) {
-    config.folders.push({ path: srvPathVer, name: path.basename(verdir) });
+  const srvNameVer = fs.readdirSync(verdir).find(fld => fld.toLowerCase() === 'stack.srv');
+  if (srvNameVer) {
+    config.folders.push({ path: path.join(verdir, srvNameVer), name: path.basename(verdir) });
   } else {
     config.folders.push({ path: verdir, name: path.basename(verdir) });
   }
