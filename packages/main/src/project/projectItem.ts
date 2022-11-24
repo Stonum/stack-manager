@@ -176,21 +176,6 @@ export default class ProjectItem {
     }
 
     return Promise.all(promises);
-
-    // for (const app of this.apps) {
-    //   try {
-    //     await this.webServer.deleteItem(app.name);
-    //   } catch (e: AnyException) {
-    //     // console.error(e);
-    //   }
-    // }
-    // if (this.gateway?.name) {
-    //   try {
-    //     await this.webServer.deleteItem(this.gateway.name);
-    //   } catch (e: AnyException) {
-    //     // console.error(e);
-    //   }
-    // }
   }
 
   async build() {
@@ -330,10 +315,6 @@ export default class ProjectItem {
 
   async appStart(appName: string) {
     await this.webServer.startItem(appName);
-
-    this.apps = this.apps.map((app: ProjectApp) => {
-      return { ...app, active: app.name === appName ? true : app.active };
-    });
   }
 
   async appReStart(appName?: string) {
@@ -352,10 +333,6 @@ export default class ProjectItem {
 
   async appStop(appName: string) {
     await this.webServer.stopItem(appName);
-
-    this.apps = this.apps.map((app: ProjectApp) => {
-      return { ...app, active: app.name === appName ? false : app.active };
-    });
   }
 
   async gitPull() {

@@ -176,7 +176,7 @@ export default class ProjectListener extends CommonListener {
     const project = ProjectFactory.create(payload.projectId, this.get(payload));
     await project.appStart(payload.params);
 
-    projects.set(payload.projectId, ProjectFactory.extractObject(project));
+    projects.setAppStatus(payload.projectId, payload.params, true);
     return true;
   }
 
@@ -191,7 +191,7 @@ export default class ProjectListener extends CommonListener {
     const project = ProjectFactory.create(payload.projectId, this.get(payload));
     await project.appStop(payload.params);
 
-    projects.set(payload.projectId, ProjectFactory.extractObject(project));
+    projects.setAppStatus(payload.projectId, payload.params, false);
     return true;
   }
 

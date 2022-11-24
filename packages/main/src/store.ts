@@ -69,6 +69,21 @@ class ProjectStore {
     res.splice(index, 1);
     this.setAll(res);
   }
+
+  setAppStatus(projectId: number, appName: string, status: boolean) {
+    const res = this.getAll();
+
+    if (res[projectId]) {
+
+      const project = res[projectId];
+
+      project.apps.forEach((app, appId) => {
+        if (app.name == appName) {
+          this.store.set(`projects.${projectId}.apps.${appId}.active`, status);
+        }
+      });
+    }
+  }
 }
 
 export const projects = new ProjectStore({ name: 'projects', cwd: 'config' });
