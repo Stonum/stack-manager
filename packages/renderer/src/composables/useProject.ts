@@ -63,32 +63,15 @@ export function useProject(projectId: number, immediate = false) {
     }
   }
 
-  async function readFolder(path: string) {
-    const data = await ipcRenderer.invoke('project', { message: 'readFolder', path });
-    let iniFiles = [];
-    if (data) {
-      iniFiles = data.ini;
-      project.value.path.front = data.front;
-      project.value.path.ini = iniFiles[0];
-      project.value.type = data.type;
-      if (project.value.gateway) {
-        project.value.gateway.path = data.gateway;
-      }
-      readIniFile(project.value.path.ini);
-    }
-    return iniFiles;
+  async function readFolder() {
+    const data = await ipcRenderer.invoke('project', { message: 'changeFolder', params: normalizeObject(project.value) });
+    project.value = data.project;
+    return data.iniFiles || [];
   }
 
-  async function readIniFile(path: string) {
-    const data = await ipcRenderer.invoke('project', { message: 'readIniFile', path });
-    if (data && project.value) {
-      project.value.sql.server = data.server;
-      project.value.sql.base = data.base;
-      project.value.path.version = data.version;
-      if (project.value.gateway && !project.value.gateway?.path && data.gateway) {
-        project.value.gateway.path = data.gateway;
-      }
-    }
+  async function readIniFile() {
+    const data = await ipcRenderer.invoke('project', { message: 'changeIniFile', params: normalizeObject(project.value) });
+    project.value = data.project;
   }
 
   async function buildProject() {
@@ -112,11 +95,12 @@ export function useProject(projectId: number, immediate = false) {
   }
 
   async function checkVersion() {
-    const data = await ipcRenderer.invoke('project', { message: 'readIniFile', path: project.value.path.ini });
-    if (data.version && data.version.toString().toLowerCase() !== project.value.path.version?.toLowerCase()) {
+    const data = await ipcRenderer.invoke('project', { message: 'changeIniFile', params: normalizeObject(project.value) });
+    const ver = data.project.path.version;
+    if (ver && ver.toString().toLowerCase() !== project.value.path.version?.toLowerCase()) {
       return {
         differentVersion: true,
-        newVersion: data.version
+        newVersion: ver
       };
     }
     return {
@@ -136,8 +120,18 @@ export function useProject(projectId: number, immediate = false) {
     loading.value = false;
   }
 
-  if (immediate && projectId >= 0) {
-    get();
+  async function init() {
+    loading.value = true;
+    project.value = await ipcRenderer.invoke('project', { message: 'init' });
+    loading.value = false;
+  }
+
+  if (immediate) {
+    if (projectId >= 0) {
+      get();
+    } else {
+      init();
+    }
   }
 
   return {

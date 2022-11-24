@@ -6,6 +6,8 @@ const axios = Axios.create({
   method: 'post',
 });
 
+const isDevelopment = import.meta.env.DEV;
+
 export default class Dispatcher {
   static token = null as string | null;
 
@@ -90,15 +92,21 @@ export default class Dispatcher {
       headers['s-session-token'] = token;
     }
     const timeout = 60000;
-    log.debug('dispatcher', 'req', JSON.stringify(request).substring(0, 100));
+    if (!isDevelopment) {
+      log.debug('dispatcher', 'req', JSON.stringify(request).substring(0, 100));
+    }
     const result = await axios
       .post(URL, request, { headers, timeout })
       .then((response: any) => {
-        log.debug('dispatcher', 'res', JSON.stringify(response.data).substring(0, 100));
+        if (!isDevelopment) {
+          log.debug('dispatcher', 'res', JSON.stringify(response.data).substring(0, 100));
+        }
         return response.data;
       })
       .catch((error: any) => {
-        log.error('dispatcher', 'err', JSON.stringify(error).substring(0, 100));
+        if (!isDevelopment) {
+          log.error('dispatcher', 'err', JSON.stringify(error).substring(0, 100));
+        }
         if (error.response?.data) {
           return error.response.data;
         } else {
@@ -425,7 +433,18 @@ class DispatcherAPI {
   }
 }
 
-class ServerAPI {
+export interface IServerAPI {
+  get isAuth(): boolean;
+  getItems(): Promise<DispatcherItem[]>;
+  getItem(name: string): Promise<DispatcherItem>;
+  addItem(name: string, params?: any): Promise<boolean>;
+  deleteItem(name: string): Promise<boolean>;
+  setParameters(name: string, params: any): Promise<boolean>;
+  stopItem(name: string): Promise<boolean>;
+  startItem(name: string): Promise<boolean>;
+  restartItem(name: string): Promise<boolean>;
+}
+class ServerAPI implements IServerAPI {
   private api: DispatcherAPI;
   private type: string;
 

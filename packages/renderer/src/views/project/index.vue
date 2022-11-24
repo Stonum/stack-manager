@@ -32,8 +32,8 @@
           :is-new-project="isNewProject"
           :is-app-host="isAppHost"
           :inifiles="iniFiles"
-          @update:ini-file="readIniFile(project.path.ini)"
-          @update:project-folder="onChangeFolder(project.path.git)"
+          @update:ini-file="readIniFile()"
+          @update:project-folder="onChangeFolder()"
         />
       </v-window-item>
 
@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, watchEffect } from 'vue';
 import router from '@/router';
 import { useProject, useSettings } from '@/composables';
 
@@ -78,8 +78,8 @@ const isAppHost = computed(() => {
 const { project, loading, readFolder, readIniFile, buildProject, checkVersion } = useProject(+props.projectid, true);
 const { settings } = useSettings();
 
-const onChangeFolder = async (path: string) => {
-   iniFiles.value = await readFolder(path);
+const onChangeFolder = async () => {
+   iniFiles.value = await readFolder();
 };
 
 const allowNewVersion = (answer: boolean) => {
@@ -88,7 +88,7 @@ const allowNewVersion = (answer: boolean) => {
 };
 
 const apps = ref<SelectableApp[]>([]);
-watch(
+const stopWatchProject = watch(
    project,
    async () => {
       if (settings.value.tasks) {
@@ -109,8 +109,8 @@ watch(
       if (project.value.path.ini) {
          ckecVersionResult.value = await checkVersion();
       }
-   },
-   { immediate: true }
+      stopWatchProject();
+   }
 );
 
 const onAppSelect = (id: number, checked: boolean) => {
@@ -138,7 +138,6 @@ const onBuildProject = async () => {
    project.value.apps = apps.value.filter((app) => app.selected);
 
    const res = await buildProject();
-   console.log(res);
    if (res) {
       router.push('/');
    }

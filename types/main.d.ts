@@ -2,12 +2,12 @@ type AnyException = any;
 
 type StackBackendType = 0 | 1;
 
-interface Settings {
+type Settings = {
   [index: string]: string | number;
   tasks?: Task[]
 }
 
-interface Task {
+type Task = {
   title: string;
   prefix: string;
   id: number;
@@ -15,7 +15,7 @@ interface Task {
   port: number | null;
 }
 
-interface ProjectApp {
+type ProjectApp = {
   name: string;
   id: number;
   path: string;
@@ -27,7 +27,7 @@ interface ProjectApp {
   active: boolean;
 }
 
-interface ProjectSQLSettings {
+type ProjectSQLSettings = {
   server: string;
   base: string;
   login: string;
@@ -35,7 +35,7 @@ interface ProjectSQLSettings {
   port?: number;
 }
 
-interface ProjectPaths {
+type ProjectPaths = {
   version: string;
   bin: string;
   git: string;
@@ -43,13 +43,13 @@ interface ProjectPaths {
   front: string;
 }
 
-interface ProjectGateway {
+type ProjectGateway = {
   name: string;
   path: string;
   port: number;
-}
 
-interface Project {
+}
+type Project = {
   name: string;
   path: ProjectPaths;
   sql: ProjectSQLSettings;
@@ -59,7 +59,9 @@ interface Project {
   gateway?: ProjectGateway;
 }
 
-interface DispatcherItem {
+type ProjectOptions = Partial<Project>;
+
+type DispatcherItem = {
   Name: string;
   State: string;
   StackProgramDir: string;
@@ -73,11 +75,11 @@ interface DispatcherItem {
 type MessageType = 'info' | 'error';
 type Message = { type: MessageType; text: string; time: Date };
 
-interface ProjectCondition {
+type ProjectCondition = {
   building?: boolean;
   pulling?: boolean;
   deploying?: boolean;
   restarting?: boolean;
 }
 
-interface SelectableApp extends ProjectApp, Task { }
+type SelectableApp = ProjectApp & Task;

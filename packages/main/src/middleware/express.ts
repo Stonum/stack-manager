@@ -6,6 +6,8 @@ import log from '../log';
 
 import { settings } from '../store';
 
+const isDevelopment = import.meta.env.DEV;
+
 export default class StaticServer {
   private name: string;
   private port: number;
@@ -48,6 +50,11 @@ export default class StaticServer {
   }
 
   listen() {
+    if (isDevelopment) {
+      log.debug(`Server ${this.name} is not started in development mode`);
+      return;
+    }
+
     log.debug(`Server ${this.name} is starting...`);
     try {
       this.server = this.app.listen(this.port, () => {

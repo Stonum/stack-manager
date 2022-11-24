@@ -31,5 +31,44 @@ const defSettings = {
 };
 
 export const settings = new Store({ name: 'settings', cwd: 'config', defaults: defSettings });
+class ProjectStore {
 
-export const projects = new Store({ name: 'projects', cwd: 'config' });
+  private store;
+
+  constructor(options: any) {
+    this.store = new Store(options);
+  }
+
+  getAll(): Project[] {
+    return this.store.get('projects', []) as Project[];
+  }
+
+  setAll(projects: Project[]) {
+    this.store.set('projects', projects);
+  }
+
+  get(index: number): Project {
+    const res = this.getAll();
+    return res[index];
+  }
+
+  set(index: number, project: Project) {
+    const res = this.getAll();
+    res[index] = project;
+    this.setAll(res);
+  }
+
+  add(project: Project) {
+    const res = this.getAll();
+    res.push(project);
+    this.setAll(res);
+  }
+
+  delete(index: number) {
+    const res = this.getAll();
+    res.splice(index, 1);
+    this.setAll(res);
+  }
+}
+
+export const projects = new ProjectStore({ name: 'projects', cwd: 'config' });
