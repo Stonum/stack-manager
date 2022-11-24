@@ -159,6 +159,11 @@ export default class ProjectListener extends CommonListener {
     }
   }
 
+  async changeType(payload: any) {
+    const project = ProjectFactory.create(null, payload.params);
+    return { project: ProjectFactory.extractObject(project) };
+  }
+
   async changeFolder(payload: any) {
     const project = ProjectFactory.create(null, payload.params);
     const iniFiles = await project.changeFolder();

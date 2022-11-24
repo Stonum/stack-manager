@@ -10,6 +10,7 @@ import BaseInput from '@/components/Base/BaseInput.vue';
 import BaseInputFolder from '@/components/Base/BaseInputFolder.vue';
 import BaseInputFile from '@/components/Base/BaseInputFile.vue';
 import BaseCombobox from '@/components/Base/BaseCombobox.vue';
+import BaseAutocomplete from '@/components/Base/BaseAutocomplete.vue';
 import BaseInputHistory from '@/components/Base/BaseInputHistory.vue';
 import BaseCheckbox from '@/components/Base/BaseCheckbox.vue';
 
@@ -28,6 +29,7 @@ app.component('BaseInput', BaseInput);
 app.component('BaseInputFolder', BaseInputFolder);
 app.component('BaseInputFile', BaseInputFile);
 app.component('BaseCombobox', BaseCombobox);
+app.component('BaseAutocomplete', BaseAutocomplete);
 app.component('BaseInputHistory', BaseInputHistory);
 app.component('BaseCheckbox', BaseCheckbox);
 

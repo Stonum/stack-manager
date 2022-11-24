@@ -1,5 +1,5 @@
 <template>
-  <base-combobox
+  <base-autocomplete
     :model-value="modelValue" 
     v-bind="$attrs"
     :items="items"

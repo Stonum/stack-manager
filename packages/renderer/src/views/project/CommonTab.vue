@@ -1,13 +1,23 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col cols="12">
+      <v-col cols="9">
         <base-input-folder
           v-model="project.path.git"
           label="Каталог проекта в git"
           :readonly="!isNewProject" 
           required
           @update:model-value="emit('update:projectFolder')"
+        />
+      </v-col>
+      <v-col>
+        <base-autocomplete
+          v-model="project.type"
+          label="Тип проекта" 
+          :items="[{ title: 'stack', value: 0 }, { title: 'app_host', value: 1 }]"
+          :return-object="false"
+          no-filter
+          :readonly="!isNewProject" 
         />
       </v-col>
       <template v-if="project.path.git">

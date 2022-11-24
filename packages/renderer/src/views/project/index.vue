@@ -75,8 +75,10 @@ const isAppHost = computed(() => {
    return project.value.type === 1;
 });
 
-const { project, loading, readFolder, readIniFile, buildProject, checkVersion } = useProject(+props.projectid, true);
+const { project, loading, readFolder, readIniFile, buildProject, checkVersion, changeType } = useProject(+props.projectid, true);
 const { settings } = useSettings();
+
+watch(() => project.value.type, changeType);
 
 const onChangeFolder = async () => {
    iniFiles.value = await readFolder();

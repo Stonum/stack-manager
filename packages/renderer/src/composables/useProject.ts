@@ -74,6 +74,11 @@ export function useProject(projectId: number, immediate = false) {
     project.value = data.project;
   }
 
+  async function changeType() {
+    const data = await ipcRenderer.invoke('project', { message: 'changeType', params: normalizeObject(project.value) });
+    project.value = data.project;
+  }
+
   async function buildProject() {
     state.building = true;
     loading.value = true;
@@ -143,6 +148,7 @@ export function useProject(projectId: number, immediate = false) {
     buildProject,
     checkVersion,
     openProjectFolder,
+    changeType,
     state,
     project,
     loading

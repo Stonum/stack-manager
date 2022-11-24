@@ -54,7 +54,7 @@ export default class ProjectFactory {
       password: params.sql?.password || '',
     };
 
-    if (project.type === helper.StackBackendType.apphost && params.gateway) {
+    if (project.type === helper.StackBackendType.apphost) {
       project.gateway = {
         name: project.name + '_gateway',
         path: params.gateway?.path || '',
