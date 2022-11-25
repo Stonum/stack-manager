@@ -2,8 +2,8 @@ import { ref, computed } from 'vue';
 
 export function useFooter(emit: any) {
 
-  const tabHeaderHight = ref(30);
-  const tabBodyMaxHeight = ref(tabHeaderHight.value * 9 - tabHeaderHight.value);
+  const tabHeaderHight = ref(48);
+  const tabBodyMaxHeight = ref(tabHeaderHight.value * 6 - tabHeaderHight.value);
   const tabBodyHeight = ref(0);
 
   const collapsed = computed(() => tabBodyHeight.value === 0);
