@@ -7,7 +7,7 @@
     :hide-details="hideDetails"
     persistent-clear
     clear-icon="mdi-close"
-    density="comfortable" 
+    density="compact" 
   >
     <template v-if="$slots['append']" #append>
       <slot name="append" />
