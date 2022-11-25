@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.3](https://git.stack-it.ru/clients/stack-manager/compare/v0.7.2...v0.7.3) (2022-11-25)
+
+
+### Features
+
+* возможность смены типа проекта ([7ffbf1d](https://git.stack-it.ru/clients/stack-manager/commit/7ffbf1d3028014201159c7dd7c7671cc2dc76b0f))
+* добавил возможность указать макс. кол-во перезапусков ([8848a42](https://git.stack-it.ru/clients/stack-manager/commit/8848a42352f72dd83618fc2abac361323b910df9))
+
 ### [0.7.2](https://git.stack-it.ru/clients/stack-manager/compare/v0.7.1...v0.7.2) (2022-10-14)
 
 
