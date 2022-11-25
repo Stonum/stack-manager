@@ -39,6 +39,8 @@ export default class ProjectFactory {
     }
     const pathbin_new = project.name ? path.join(bindir, project.name) : '';
 
+    project.restartMaxCount = params.restartMaxCount ?? 5;
+
     project.path = {
       version: params.path?.version || '',
       bin: pathbin_new,

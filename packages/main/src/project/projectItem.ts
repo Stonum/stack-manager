@@ -20,6 +20,7 @@ export default class ProjectItem {
   apps: ProjectApp[];
   port: number | null;
   type: StackBackendType;
+  restartMaxCount: number;
   gateway?: ProjectGateway;
 
   webServer: IServerAPI;
@@ -35,6 +36,7 @@ export default class ProjectItem {
     this.apps = project.apps;
     this.port = project.port;
     this.type = project.type;
+    this.restartMaxCount = project.restartMaxCount;
     this.gateway = project.gateway;
 
     this.frontPath = path.join(settings.get('staticPath'), project.name);
@@ -244,6 +246,7 @@ export default class ProjectItem {
           UploadStaticContent: 0,
           FallbackEnabled: 0,
           AllowServiceCommands: 0,
+          RestartComStackMaxCount: this.restartMaxCount
         });
         if (app.active) {
           await this.webServer.startItem(app.name);
@@ -270,8 +273,8 @@ export default class ProjectItem {
           cmd: path.join(this.path.bin, 'app_host.exe'),
           cmdArgs,
           path: this.path.bin,
-          restart: 1,
-          restartMaxCount: 5,
+          restart: this.restartMaxCount > 0 ? 1 : 0,
+          restartMaxCount: this.restartMaxCount,
         });
         if (app.active) {
           await this.webServer.startItem(app.name);

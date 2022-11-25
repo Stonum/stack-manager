@@ -57,6 +57,7 @@ type Project = {
   port: number | null;
   type: StackBackendType;
   gateway?: ProjectGateway;
+  restartMaxCount: number;
 }
 
 type ProjectOptions = Partial<Project>;

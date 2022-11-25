@@ -64,6 +64,15 @@
         <v-col cols="12">
           <base-input-folder v-model="project.path.version" label="Каталог версии" required />
         </v-col>
+        <v-col cols="5">
+          <base-input v-model="project.restartMaxCount" type="number">
+            <template #prepend>
+              <span class="text-subtitle-1 d-flex align-end">
+                Максимальное количество неуспешных перезапусков
+              </span>
+            </template>
+          </base-input>
+        </v-col>
       </template>
     </v-row>
   </v-container>
