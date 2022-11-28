@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.4](https://git.stack-it.ru/clients/stack-manager/compare/v0.7.3...v0.7.4) (2022-11-28)
+
+
+### Features
+
+* добавил копирование проекта ([d04e5c7](https://git.stack-it.ru/clients/stack-manager/commit/d04e5c79d4c2243bfa86ba9065a5b4a176ca2702))
+
 ### [0.7.3](https://git.stack-it.ru/clients/stack-manager/compare/v0.7.2...v0.7.3) (2022-11-25)
 
 
