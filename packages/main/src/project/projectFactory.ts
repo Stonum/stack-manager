@@ -12,9 +12,9 @@ export default class ProjectFactory {
     return this.prepare(params || {});
   }
 
-  static create(projectId: number | null, params: ProjectOptions, withoutCheck = false): ProjectItem {
+  static create(projectId: number | null, params: ProjectOptions, withCheck = false): ProjectItem {
     const project = this.prepare(params);
-    if (withoutCheck) {
+    if (withCheck) {
       this.check(projectId, project);
     }
     return new ProjectItem(project);
@@ -22,7 +22,7 @@ export default class ProjectFactory {
 
   static copy(params: ProjectOptions): ProjectItem {
     const project = this.prepare({ ...params, name: params.name + '_copy' });
-    project.apps.forEach(app => app.name = project.name + '_' + app.id);
+    project.apps.forEach(app => { app.name = project.name + '_' + app.id; app.port = null; });
     return new ProjectItem(project);
   }
 

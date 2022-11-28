@@ -105,7 +105,7 @@ export default class ProjectListener extends CommonListener {
   }
 
   async add(payload: any) {
-    const project = ProjectFactory.create(null, payload.params);
+    const project = ProjectFactory.create(null, payload.params, true);
     projects.add(ProjectFactory.extractObject(project));
 
     this.sendInfoMessage(project.name, 'Сборка backend запущена');
@@ -116,7 +116,7 @@ export default class ProjectListener extends CommonListener {
   }
 
   async delete(payload: any) {
-    const project = ProjectFactory.create(payload.projectId, this.get(payload), true);
+    const project = ProjectFactory.create(payload.projectId, this.get(payload));
 
     this.sendInfoMessage(project.name, 'удаление проекта');
     await project.delete();
@@ -132,13 +132,14 @@ export default class ProjectListener extends CommonListener {
   }
 
   async rebuild(payload: any) {
+    const project = ProjectFactory.create(payload.projectId, payload.params, true);
+
     // получаем старый проект и удаляем приложения
-    let project = ProjectFactory.create(payload.projectId, this.get(payload));
-    this.sendInfoMessage(project.name, 'удаление приложений по задачам');
-    await project.deleteApps();
+    const old_project = ProjectFactory.create(payload.projectId, this.get(payload));
+    this.sendInfoMessage(old_project.name, 'удаление приложений по задачам');
+    await old_project.deleteApps();
 
-    project = ProjectFactory.create(payload.projectId, payload.params);
-
+    // создаем новый
     this.sendInfoMessage(project.name, 'cборка backend запущена');
     project.build();
     projects.set(payload.projectId, ProjectFactory.extractObject(project));
@@ -379,7 +380,7 @@ async function fillProjects() {
         params.path.bin = bin;
         params.path.ini = pathini;
 
-        const project = ProjectFactory.create(null, params, true);
+        const project = ProjectFactory.create(null, params);
         const commonFolder = await project.changeIniFile();
 
         project.path.git = commonFolder || '';
