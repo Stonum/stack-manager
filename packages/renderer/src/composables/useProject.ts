@@ -2,6 +2,7 @@ import { reactive, ref, Ref, isRef } from 'vue';
 import { ipcRenderer } from '#preload';
 
 import { useEvents, useApp } from '@/composables';
+import { copyFile } from 'original-fs';
 
 interface ProjectState {
   [index: number]: ProjectCondition
@@ -16,7 +17,7 @@ function normalizeObject<T,>(obj: Ref<T> | T): T {
 const { loadEvents } = useEvents();
 const { loadStatuses } = useApp();
 
-export function useProject(projectId: number, immediate = false) {
+export function useProject(projectId: number, immediate = false, sourceId = null as null | number) {
 
   if (!projectState[projectId]) {
     projectState[projectId] = reactive({});
@@ -131,11 +132,21 @@ export function useProject(projectId: number, immediate = false) {
     loading.value = false;
   }
 
+  async function copy() {
+    loading.value = true;
+    project.value = await ipcRenderer.invoke('project', { message: 'copy', projectId: sourceId });
+    loading.value = false;
+  }
+
   if (immediate) {
     if (projectId >= 0) {
       get();
     } else {
-      init();
+      if (sourceId) {
+        copy();
+      } else {
+        init();
+      }
     }
   }
 

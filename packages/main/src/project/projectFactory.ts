@@ -20,6 +20,12 @@ export default class ProjectFactory {
     return new ProjectItem(project);
   }
 
+  static copy(params: ProjectOptions): ProjectItem {
+    const project = this.prepare({ ...params, name: params.name + '_copy' });
+    project.apps.forEach(app => app.name = project.name + '_' + app.id);
+    return new ProjectItem(project);
+  }
+
   static extractObject(project: ProjectItem) {
     return this.prepare(project);
   }

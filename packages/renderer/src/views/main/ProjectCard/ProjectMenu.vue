@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-const emit = defineEmits(['edit', 'delete', 'openFolder']);
+const emit = defineEmits(['edit', 'copy', 'delete', 'openFolder']);
 
 const actions = [
    {
@@ -29,6 +29,14 @@ const actions = [
       color: 'primary',
       method: () => {
          emit('edit');
+      },
+   },
+   {
+      name: 'Копировать',
+      icon: 'mdi-content-copy',
+      color: 'primary',
+      method: () => {
+         emit('copy');
       },
    },
    {

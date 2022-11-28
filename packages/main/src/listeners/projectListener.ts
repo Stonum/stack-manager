@@ -116,13 +116,19 @@ export default class ProjectListener extends CommonListener {
   }
 
   async delete(payload: any) {
-    const project = ProjectFactory.create(payload.projectId, this.get(payload));
+    const project = ProjectFactory.create(payload.projectId, this.get(payload), true);
 
     this.sendInfoMessage(project.name, 'удаление проекта');
     await project.delete();
     projects.delete(payload.projectId);
 
     return true;
+  }
+
+  async copy(payload: any) {
+    const project = ProjectFactory.copy(this.get(payload));
+
+    return ProjectFactory.extractObject(project);
   }
 
   async rebuild(payload: any) {

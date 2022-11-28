@@ -3,7 +3,7 @@
     <v-card-item class="py-0" :title="props.item.name" density="compact">
       <template #append>
         <v-progress-circular v-if="isRunning" class="mr-3" :size="20" :width="2" color="primary" :indeterminate="true" />
-        <project-menu @delete="onDelete()" @edit="onEdit" @open-folder="openProjectFolder" />
+        <project-menu @delete="onDelete()" @edit="onEdit" @open-folder="openProjectFolder" @copy="onCopy" />
       </template>
     </v-card-item>
 
@@ -48,6 +48,10 @@ const onDelete = async (answer?: boolean) => {
 
 const onEdit = () => {
   router.push(`/project/${props.id}`);
+};
+
+const onCopy = () => {
+  router.push(`/project/-1?from=${props.id}`);
 };
 
 const onRestart = (appName: string) => {

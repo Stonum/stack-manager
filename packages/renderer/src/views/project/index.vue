@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, watchEffect } from 'vue';
+import { computed, ref, watch } from 'vue';
 import router from '@/router';
 import { useProject, useSettings } from '@/composables';
 
@@ -62,6 +62,7 @@ import AppsTab from './AppsTab.vue';
 import BaseInput from '@/components/Base/BaseInput.vue';
 
 const props = defineProps<{ projectid: string }>();
+const sourceId = +(router.currentRoute.value.query.from || 0) || null;
 
 const formValid = ref(false);
 const tab = ref(null);
@@ -75,7 +76,7 @@ const isAppHost = computed(() => {
    return project.value.type === 1;
 });
 
-const { project, loading, readFolder, readIniFile, buildProject, checkVersion, changeType } = useProject(+props.projectid, true);
+const { project, loading, readFolder, readIniFile, buildProject, checkVersion, changeType } = useProject(+props.projectid, true, sourceId);
 const { settings } = useSettings();
 
 watch(() => project.value.type, changeType);
@@ -103,13 +104,20 @@ const stopWatchProject = watch(
                port: null,
                args: '',
                active: true,
-               selected: isNewProject.value ? task.selected : app ? true : false,
+               selected: isNewProject.value && !sourceId ? task.selected : app ? true : false,
                ...app,
             };
          });
       }
       if (project.value.path.ini) {
          ckecVersionResult.value = await checkVersion();
+      }
+      if (sourceId) {
+         for (const idx in apps.value) {
+            if (apps.value[idx].selected) {
+               onAppSelect(+idx, true);
+            }
+         }
       }
       stopWatchProject();
    }
