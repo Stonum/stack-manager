@@ -5,7 +5,9 @@
     </v-btn>
   </app-bar>
 
-  <v-form v-model="formValid">
+  <v-progress-linear v-if="loading" indeterminate />
+
+  <v-form v-else v-model="formValid">
     <v-tabs v-model="tab">
       <v-row class="mx-3" no-gutters>
         <v-col cols="5">
@@ -34,6 +36,7 @@
           :inifiles="iniFiles"
           @update:ini-file="readIniFile()"
           @update:project-folder="onChangeFolder()"
+          @update:project-type="changeType()"
         />
       </v-window-item>
 
@@ -78,8 +81,6 @@ const isAppHost = computed(() => {
 
 const { project, loading, readFolder, readIniFile, buildProject, checkVersion, changeType } = useProject(+props.projectid, true, sourceId);
 const { settings } = useSettings();
-
-watch(() => project.value.type, changeType);
 
 const onChangeFolder = async () => {
    iniFiles.value = await readFolder();

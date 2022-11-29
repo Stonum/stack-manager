@@ -18,6 +18,7 @@
           :return-object="false"
           no-filter
           :readonly="!isNewProject" 
+          @update:model-value="emit('update:projectType')"
         />
       </v-col>
       <template v-if="project.path.git">
@@ -32,7 +33,13 @@
             no-filter
             @update:model-value="emit('update:iniFile')"
           />
-          <base-input-file v-else v-model="project.path.ini" label="Путь к stack.ini" required @update:model-value="emit('update:iniFile')" />
+          <base-input-file
+            v-else 
+            v-model="project.path.ini"
+            label="Путь к stack.ini"
+            required
+            @update:model-value="emit('update:iniFile')"
+          />
         </v-col>
         <template v-if="props.isAppHost && project.gateway">
           <v-col cols="10">
@@ -92,6 +99,7 @@ const emit = defineEmits<{
    (e: 'update:modelValue', modelValue: Settings): void,
    (e: 'update:iniFile'): void,
    (e: 'update:projectFolder'): void,
+   (e: 'update:projectType'): void,
 }
 >();
 
