@@ -73,7 +73,7 @@
     "unplugin-auto-expose": "0.0.2",
     "vite": "3.0.4",
     "vite-plugin-vuetify": "^1.0.0",
-    "vitest": "0.20.2",
+    "vitest": "0.25.3",
     "vue-tsc": "0.39.4"
   }
 }
