@@ -12,7 +12,7 @@
       ],
       "baseUrl": ".",
    },
-   "files": [
+   "include": [
       "src/**/*.ts",
       "../../types/**/*.d.ts"
    ],

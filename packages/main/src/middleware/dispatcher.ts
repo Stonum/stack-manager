@@ -514,7 +514,7 @@ class EventsAPI {
     return res;
   }
 
-  public async getRecords(params?: string): Promise<DispatcherItem[]> {
+  public async getRecords(): Promise<DispatcherItem[]> {
     const count = await this.getCount();
     const selection = await this.getSelections(count);
     return selection;

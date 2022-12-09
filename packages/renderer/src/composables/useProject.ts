@@ -2,7 +2,6 @@ import { reactive, ref, Ref, isRef } from 'vue';
 import { ipcRenderer } from '#preload';
 
 import { useEvents, useApp } from '@/composables';
-import { copyFile } from 'original-fs';
 
 interface ProjectState {
   [index: number]: ProjectCondition
