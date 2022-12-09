@@ -82,7 +82,6 @@ export function useProject(projectId: number, immediate = false, sourceId = null
 
   async function buildProject() {
     state.building = true;
-    loading.value = true;
     try {
       if (projectId < 0) {
         await ipcRenderer.invoke('project', { message: 'add', params: normalizeObject(project.value) });
@@ -92,7 +91,6 @@ export function useProject(projectId: number, immediate = false, sourceId = null
     } catch (e: AnyException) {
       return false;
     } finally {
-      loading.value = false;
       state.building = false;
       loadEvents();
       loadStatuses();

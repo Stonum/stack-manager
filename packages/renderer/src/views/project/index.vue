@@ -1,6 +1,6 @@
 <template>
   <app-bar :title="isNewProject ? `Создание проекта` : 'Редактирование проекта'">
-    <v-btn :disabled="formValid === false || loading" :loading="loading" @click="onBuildProject">
+    <v-btn :disabled="formValid === false || loading || state.building" :loading="state.building" @click="onBuildProject">
       {{ isNewProject ? 'Создать' : 'Пересобрать' }}
     </v-btn>
   </app-bar>
@@ -79,7 +79,7 @@ const isAppHost = computed(() => {
    return project.value.type === 1;
 });
 
-const { project, loading, readFolder, readIniFile, buildProject, checkVersion, changeType } = useProject(+props.projectid, true, sourceId);
+const { project, loading, state, readFolder, readIniFile, buildProject, checkVersion, changeType } = useProject(+props.projectid, true, sourceId);
 const { settings } = useSettings();
 
 const onChangeFolder = async () => {
