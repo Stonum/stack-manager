@@ -43,6 +43,7 @@ export default class ProjectListener extends CommonListener {
       return {
         name: project.name,
         port: project.port,
+        sql: project.sql,
         apps,
       };
     });

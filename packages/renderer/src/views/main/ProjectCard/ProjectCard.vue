@@ -1,6 +1,14 @@
 <template>
   <v-card class="flex-grow-1" density="compact">
-    <v-card-item class="py-0" :title="props.item.name" density="compact">
+    <v-card-item class="py-0" density="compact">
+      <template #title>
+        <span class="text-h6">{{ props.item.name }}</span>
+      </template>
+
+      <template #subtitle>
+        <span class="text-subtitle-2" :title="cardSubtitle">{{ cardSubtitle }}</span>
+      </template>
+
       <template #append>
         <v-progress-circular v-if="isRunning" class="mr-3" :size="20" :width="2" color="primary" :indeterminate="true" />
         <project-menu @delete="onDelete()" @edit="onEdit" @open-folder="openProjectFolder" @copy="onCopy" />
@@ -30,6 +38,9 @@ const props = defineProps<{ item: Project; id: number }>();
 const emit = defineEmits(['refresh']);
 
 const askAboutDelete = ref(false);
+const cardSubtitle = computed(() => {
+   return `${props.item.sql.server}/${props.item.sql.base}`;
+});
 
 const { sendJob, remove, openProjectFolder, state } = useProject(props.id);
 const isRunning = computed(() => {
