@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-main ref="vmain">
+    <v-main v-resize="onResize">
       <div :style="wrapperStyle" class="scrollbar__visible">
         <router-view />
       </div>
@@ -11,12 +11,11 @@
 </template>
 
 <script lang="ts" setup>
-import { CSSProperties, computed, ref, watch } from 'vue';
+import { CSSProperties, computed, ref, onMounted } from 'vue';
 
 import AppFooter from '@/components/App/AppFooter.vue';
 import AppToast from '@/components/App/AppToast.vue';
 
-const vmain = ref(null);
 const mainHeight = ref(0);
 const footerHeight = ref(0);
 const wrapperStyle = computed<CSSProperties>(() => {
@@ -26,10 +25,10 @@ const wrapperStyle = computed<CSSProperties>(() => {
    };
 });
 
-watch(vmain, () => {
-   // @ts-ignore
-   mainHeight.value = vmain.value?.$vuetify.display.height - 48; // 48px на верхний padding
-});
+const onResize = () => {
+   mainHeight.value = window.innerHeight - 48; // 48px на верхний padding
+};
+onMounted(onResize);
 
 function onChangeFooterSize(payload: number) {
    footerHeight.value = payload;
