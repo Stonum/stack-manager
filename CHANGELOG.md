@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.5](https://github.com/stonum/stack-manager/compare/v0.7.4...v0.7.5) (2022-12-15)
+
+
+### Features
+
+* возможность ресайза окна приложения ([288eb2e](https://github.com/stonum/stack-manager/commit/288eb2ec4fc097fd7fca87dfb3e0778c1bd5015e))
+* отображение сервера и базы на карточке проекта ([267557b](https://github.com/stonum/stack-manager/commit/267557bb4004e9e1957b181d37ea6cc074dc7f88))
+
 ### [0.7.4](https://github.com/Stonum/stack-manager/compare/v0.7.3...v0.7.4) (2022-11-28)
 
 
