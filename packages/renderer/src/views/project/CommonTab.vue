@@ -42,17 +42,17 @@
           />
         </v-col>
         <template v-if="props.isAppHost && project.gateway">
-          <v-col cols="10">
+          <v-col cols="9" md="10">
             <base-input-folder v-model="project.gateway.path" label="StackGateway каталог" required />
           </v-col>
-          <v-col cols="2">
+          <v-col cols="3" md="2">
             <base-input v-model="project.gateway.port" label="порт" required type="number" />
           </v-col>
         </template>
-        <v-col cols="10">
+        <v-col cols="9" md="10">
           <base-input-folder v-model="project.path.front" label="Stack.Front каталог" :hide-details="false" />
         </v-col>
-        <v-col cols="2">
+        <v-col cols="3" md="2">
           <base-input v-model.number="project.port" label="порт для публикации" type="number" />
         </v-col>
         <v-col cols="3">
@@ -62,16 +62,16 @@
           <base-input-history v-model.trim="project.sql.base" label="База данных" :history-id="`${project.name}-base`" required />
         </v-col>
         <v-spacer />
-        <v-col cols="2">
+        <v-col cols="3" md="2">
           <base-input v-model.trim="project.sql.login" label="Логин" required />
         </v-col>
-        <v-col cols="2">
+        <v-col cols="3" md="2">
           <base-input v-model="project.sql.password" label="Пароль" />
         </v-col>
         <v-col cols="12">
           <base-input-folder v-model="project.path.version" label="Каталог версии" required />
         </v-col>
-        <v-col cols="5">
+        <v-col cols="10" md="5">
           <base-input v-model="project.restartMaxCount" type="number">
             <template #prepend>
               <span class="text-subtitle-1 d-flex align-end">

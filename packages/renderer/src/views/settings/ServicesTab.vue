@@ -15,20 +15,20 @@
           </template>
         </base-input-folder>
       </v-col>
-      <v-col cols="10">
+      <v-col cols="9" md="10">
         <base-input-folder v-model="settings.birt" label="Каталог Birt" clearable />
       </v-col>
-      <v-col cols="2">
+      <v-col cols="3" md="2">
         <base-input v-model="settings.birt_port" label="Порт Birt" type="number" clearable>
           <template #append>
             <v-btn icon="mdi-export-variant" density="compact" flat title="Создать сервис Birt" @click.stop="emit('create', 'birt')" />
           </template>
         </base-input>
       </v-col>
-      <v-col cols="10">
+      <v-col cols="9" md="10">
         <base-input-folder v-model="settings.dotnetcore" label="Каталог DotNetCore" clearable />
       </v-col>
-      <v-col cols="2">
+      <v-col cols="3" md="2">
         <base-input v-model="settings.dotnetcore_port" label="Порт DotNetCore" type="number" clearable>
           <template #append>
             <v-btn icon="mdi-export-variant" density="compact" flat title="Создать сервис DotNetCore" @click.stop="emit('create', 'dotnetcore')" />

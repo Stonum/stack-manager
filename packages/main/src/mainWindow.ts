@@ -20,9 +20,10 @@ export function getMainWindow() {
 async function createWindow() {
   const browserWindow = new BrowserWindow({
     title: `${app.getName()} ${app.getVersion()}`,
-    width: 1280,
+    width: 1300,
+    minWidth: 650,
     height: 720,
-    resizable: import.meta.env.DEV,
+    minHeight: 450,
     show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
     webPreferences: {
       nodeIntegration: false,

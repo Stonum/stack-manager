@@ -10,7 +10,7 @@
   <v-form v-else v-model="formValid">
     <v-tabs v-model="tab">
       <v-row class="mx-3" no-gutters>
-        <v-col cols="5">
+        <v-col cols="12" sm="10" md="6">
           <base-input v-model="project.name" required hide-details>
             <template #prepend>
               <span class="d-flex align-end"> Краткое название проекта </span>

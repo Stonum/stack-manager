@@ -4,7 +4,6 @@
     <v-btn v-if="!hideAddBtn" icon="mdi-plus" to="/project/-1" title="Добавить новый проект" />
 
     <v-app-bar-title>{{ props.title }}</v-app-bar-title>
-
     <v-spacer />
 
     <slot />

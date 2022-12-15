@@ -31,6 +31,16 @@ export default createVuetify(
       },
     },
 
+    // display: {
+    //   thresholds: {
+    //     xs: 0,
+    //     sm: 750,
+    //     md: 960,
+    //     lg: 1150,
+    //     xl: 1900,
+    //   },
+    // },
+
     defaults: {
       VTabs: {
         color: 'primary'
