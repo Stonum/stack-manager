@@ -29,6 +29,18 @@ vi.mock('electron', () => {
   return { BrowserWindow: bw, app: eapp };
 });
 
+vi.mock('electron-window-state', () => {
+  return {
+    __esModule: true,
+    default: vi.fn().mockImplementation(() => {
+      return {
+        x: 0, y: 0, width: 800, height: 600,
+        manage: vi.fn()
+      };
+    }),
+  };
+});
+
 
 beforeEach(() => {
   vi.clearAllMocks();

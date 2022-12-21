@@ -1,4 +1,5 @@
 import { BrowserWindow, app, Menu, Tray, nativeImage } from 'electron';
+import windowStateKeeper from 'electron-window-state';
 import { join } from 'path';
 import { URL } from 'url';
 import icon from '../../../buildResources/icon.png';
@@ -18,11 +19,21 @@ export function getMainWindow() {
 }
 
 async function createWindow() {
+
+  const mainWindowState = windowStateKeeper({
+    defaultWidth: 1300,
+    defaultHeight: 720
+  });
+
   const browserWindow = new BrowserWindow({
     title: `${app.getName()} ${app.getVersion()}`,
-    width: 1300,
+
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
+
     minWidth: 650,
-    height: 720,
     minHeight: 450,
     show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
     webPreferences: {
@@ -33,6 +44,9 @@ async function createWindow() {
       preload: join(__dirname, '../../preload/dist/index.cjs'),
     },
   });
+
+  mainWindowState.manage(browserWindow);
+
   if (import.meta.env.PROD) {
     const menu = Menu.buildFromTemplate([]);
     Menu.setApplicationMenu(menu);
@@ -62,7 +76,7 @@ async function createWindow() {
 
   await browserWindow.loadURL(pageUrl);
 
-  browserWindow.on('close', closeHndl);
+  // browserWindow.on('close', closeHndl);
 
   return browserWindow;
 }
