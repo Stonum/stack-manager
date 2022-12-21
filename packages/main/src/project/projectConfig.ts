@@ -176,6 +176,8 @@ export async function generateGatewaySettings(project: Project, pathnew: string)
     common.server.port = +project.gateway.port || common.server.port;
     common.stack.security.cors.allowedOrigins = helper.getAllowedOrigins([8080, 8081, project.port || 0]);
 
+    common.stack.license = { trustedServer: settings.get('trustedServer') };
+
     const tasks = settings.get('tasks') as Task[];
 
     common.stack.queue.rpc.tasks = Object.fromEntries(
@@ -185,8 +187,6 @@ export async function generateGatewaySettings(project: Project, pathnew: string)
         return [
           taskid,
           {
-            url: '',
-            exchange: '',
             routingKey: os.hostname + '_' + project.name + '_' + taskid,
             routingKeyAsync: os.hostname + '_' + project.name + '_' + taskid,
             useAsyncCache: false,

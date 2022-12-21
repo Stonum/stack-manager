@@ -28,6 +28,7 @@ const defSettings = {
   colorBlindMode: false,
   workspacePath: join(app.getPath('userData'), 'workspaces'),
   staticPath: join(app.getPath('userData'), 'domains'),
+  trustedServer: import.meta.env.VITE_TRUSTED_SERVER || '',
 };
 
 export const settings = new Store({ name: 'settings', cwd: 'config', defaults: defSettings });

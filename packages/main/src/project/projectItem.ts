@@ -261,12 +261,13 @@ export default class ProjectItem {
         const syncThreadCount = app.syncThreadCount || 20;
         const asyncThreadCount = app.asyncThreadCount || 2;
         const asyncTaskCount = app.asyncTaskCount || 5;
+        const trustedServer = settings.get('trustedServer');
 
         const addParams = app.id === 11075 ? ',очищатьПросроченныеДанные:true' : '';
         const expression = `ЗапуститьОчередьСообщений(@{количествоПотоков:${syncThreadCount},количествоАсинхронныхПотоков:${asyncThreadCount},количествоАсинхронныхРабот:${asyncTaskCount}${addParams}})`;
         const rabbitsettings = `settings_${task?.prefix || app.id}.toml`;
         const inspect = app.port ? `--inspect=${app.port}` : '';
-        const cmdArgs = `--task=${app.id} ${inspect} -r testsrv:9898 -i "stack.ini" -c "credentials.ini" --rabbit="${rabbitsettings}" -f "${expression}"`;
+        const cmdArgs = `--task=${app.id} ${inspect} -r ${trustedServer} -i "stack.ini" -c "credentials.ini" --rabbit="${rabbitsettings}" -f "${expression}"`;
 
         await this.webServer.addItem(app.name, {
           IsActive: app.active ? 1 : 0,
