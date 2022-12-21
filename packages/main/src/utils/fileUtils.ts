@@ -131,12 +131,13 @@ export async function readYamlFile(filePath: string) {
 }
 
 export async function writeYamlFile(filePath: string, data: any) {
+  const replacer = (key: string, value: any) => { return value ?? undefined; };
   let stringdata = '';
   for (const doc of data) {
     if (stringdata.length) {
       stringdata += '\n---\n';
     }
-    stringdata += yaml.dump(doc);
+    stringdata += yaml.dump(doc, { replacer });
   }
   await fsp.writeFile(filePath, stringdata);
 }
