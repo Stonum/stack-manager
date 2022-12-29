@@ -222,7 +222,7 @@ export default class ProjectItem {
         await this.webServer.addItem(this.gateway.name, {
           IsActive: 1,
           cmd: path.join(settings.get('jre'), 'bin', 'javaw.exe'),
-          cmdArgs: `-jar ${helper.getGatewayFileName(path_gateway)} --spring.config.location=classpath:/application.yml,classpath:file:${gatewaySettingsPath}`,
+          cmdArgs: `-Xmx1024m -jar ${helper.getGatewayFileName(path_gateway)} --spring.config.location=classpath:/application.yml,classpath:file:${gatewaySettingsPath}`,
           path: path_gateway,
           restart: 1,
           restartMaxCount: 5,
