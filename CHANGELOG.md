@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.6](https://github.com/stonum/stack-manager/compare/v0.7.5...v0.7.6) (2022-12-30)
+
+
+### Features
+
+*  сохранение размеров и позиции окна ([008c84c](https://github.com/stonum/stack-manager/commit/008c84ce78e1be0af41246014b8c9b0469f8e59c))
+* добавлен trustedServer в yml для stackgateway ([50ba1a5](https://github.com/stonum/stack-manager/commit/50ba1a531aa0234307dc375640ecb25be2c77bf9))
+
 ### [0.7.5](https://github.com/stonum/stack-manager/compare/v0.7.4...v0.7.5) (2022-12-15)
 
 
