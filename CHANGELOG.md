@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.7](https://github.com/stonum/stack-manager/compare/v0.7.6...v0.7.7) (2023-01-10)
+
+
+### Features
+
+* add codeTask to application.yml ([4fc4d8b](https://github.com/stonum/stack-manager/commit/4fc4d8be839fbf445131e05ed6ab585a5452cf28))
+
+
+### Bug Fixes
+
+* close window ([403b0fb](https://github.com/stonum/stack-manager/commit/403b0fbd7bb235bc1cad6e81544997f9a48daf50))
+
 ### [0.7.6](https://github.com/stonum/stack-manager/compare/v0.7.5...v0.7.6) (2022-12-30)
 
 
