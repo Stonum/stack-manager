@@ -76,7 +76,7 @@ async function createWindow() {
 
   await browserWindow.loadURL(pageUrl);
 
-  // browserWindow.on('close', closeHndl);
+  browserWindow.on('close', closeHndl);
 
   return browserWindow;
 }
