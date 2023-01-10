@@ -190,6 +190,7 @@ export async function generateGatewaySettings(project: Project, pathnew: string)
             routingKey: os.hostname + '_' + project.name + '_' + taskid,
             routingKeyAsync: os.hostname + '_' + project.name + '_' + taskid,
             useAsyncCache: false,
+            codeTask: app.id,
           },
         ];
       })
