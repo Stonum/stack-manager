@@ -104,6 +104,7 @@ export default class ProjectItem {
     }
 
     const data = (await readSettingsFile(this.path.ini)) as StackIniFile;
+    const verPath = this.path.version;
 
     if (data['SQL-mode']) {
       this.sql.server = data['SQL-mode'].Server || '';
@@ -138,9 +139,9 @@ export default class ProjectItem {
     if (!this.path.version && commonFolder) {
       this.path.version = commonFolder;
     }
-    // если найденный каталог не попадает под паттерн версии то зануляем, ибо нашли что-то не то
+    // если найденный каталог не попадает под паттерн версии то не меняем, ибо нашли что-то не то
     if (!this.path.version.match(helper.verpattern)) {
-      this.path.version = '';
+      this.path.version = verPath;
     }
 
     // поищем гейтвэй
