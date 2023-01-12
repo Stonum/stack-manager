@@ -323,7 +323,7 @@ export default class ProjectListener extends CommonListener {
         //
       }
       if (!fs.existsSync('C:\\Program Files\\dotnet\\dotnet.exe')) {
-        cmd.execSudo(import.meta.env.VITE_DOTNET_PATH || '');
+        await cmd.execSudo(import.meta.env.VITE_DOTNET_PATH || '');
       }
       await webServer.addItem(name, {
         IsActive: 1,

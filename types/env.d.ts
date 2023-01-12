@@ -15,4 +15,5 @@ interface ImportMeta {
 interface ImportMetaEnv {
   readonly VITE_DEV_SERVER_URL: undefined | string;
   readonly VITE_DOTNET_PATH: undefined | string;
+  readonly VITE_TRUSTED_SERVER: undefined | string;
 }
