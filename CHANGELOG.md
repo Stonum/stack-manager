@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.8](https://github.com/stonum/stack-manager/compare/v0.7.7...v0.7.8) (2023-01-17)
+
+
+### Features
+
+* добавил вкладку с доп. настройками ([754ccf2](https://github.com/stonum/stack-manager/commit/754ccf2c8a5e05eb7f91529ddb8081874913e0b4))
+
+
+### Bug Fixes
+
+* исправлено определение переменных окружения ([f76d8bf](https://github.com/stonum/stack-manager/commit/f76d8bfad554f20a16f240d31f4606de2474f1d3))
+* не сбрасываем выбранную версию, если при смене ini файла не нашли другую ([cd1645c](https://github.com/stonum/stack-manager/commit/cd1645c199248e0d834cfcc5c1c33f8ae359ae84))
+
 ### [0.7.7](https://github.com/stonum/stack-manager/compare/v0.7.6...v0.7.7) (2023-01-10)
 
 
