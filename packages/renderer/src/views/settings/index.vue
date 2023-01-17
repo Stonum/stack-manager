@@ -1,45 +1,47 @@
 <template>
   <app-bar title="Настройки">
-    <v-btn v-if="isChanged" @click="saveSettings">
+    <v-btn v-if="isChanged && formValid !== false" @click="saveSettings">
       Сохранить настройки
     </v-btn>
   </app-bar>
 
-  <v-tabs v-model="tab">
-    <v-tab value="common">
-      Общие параметры
-    </v-tab>
+  <v-form v-model="formValid">
+    <v-tabs v-model="tab">
+      <v-tab value="common">
+        Общие параметры
+      </v-tab>
 
-    <v-tab value="service">
-      Сервисы
-    </v-tab>
+      <v-tab value="service">
+        Сервисы
+      </v-tab>
 
-    <v-tab value="tasks">
-      Задачи
-    </v-tab>
+      <v-tab value="tasks">
+        Задачи
+      </v-tab>
 
-    <v-tab value="additional">
-      Дополнительно
-    </v-tab>
-  </v-tabs>
+      <v-tab value="additional">
+        Дополнительно
+      </v-tab>
+    </v-tabs>
 
-  <v-window v-model="tab">
-    <v-window-item value="common" class="pt-2">
-      <common-tab v-model="settings" />
-    </v-window-item>
+    <v-window v-model="tab">
+      <v-window-item value="common" class="pt-2">
+        <common-tab v-model="settings" />
+      </v-window-item>
 
-    <v-window-item value="service" class="pt-2" eager>
-      <services-tab v-model="settings" @create="createService" />
-    </v-window-item>
+      <v-window-item value="service" class="pt-2" eager>
+        <services-tab v-model="settings" @create="createService" />
+      </v-window-item>
 
-    <v-window-item value="tasks" eager>
-      <tasks-tab v-model:tasks="settings.tasks" />
-    </v-window-item>
+      <v-window-item value="tasks" eager>
+        <tasks-tab v-model:tasks="settings.tasks" />
+      </v-window-item>
 
-    <v-window-item value="additional" eager>
-      <additional-tab v-model="settings" />
-    </v-window-item>
-  </v-window>
+      <v-window-item value="additional" eager>
+        <additional-tab v-model="settings" />
+      </v-window-item>
+    </v-window>
+  </v-form>
 </template>
 
 <script setup lang="ts">
@@ -52,6 +54,7 @@ import TasksTab from './TasksTab.vue';
 import AdditionalTab from './AdditionalTab.vue';
 
 const tab = ref(null);
+const formValid = ref(false);
 
 const { settings, isChanged, saveSettings, createService } = useSettings();
 </script>
