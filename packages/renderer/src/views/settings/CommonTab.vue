@@ -41,7 +41,7 @@
           </template>
         </base-input-folder>
       </v-col>
-      <v-col cols="3">
+      <v-col cols="5" md="3">
         <base-input v-model="settings.refresh_interval" label="Интервал обномления статусов приложений" type="number" suffix="мс" />
       </v-col>
       <v-col cols="12">

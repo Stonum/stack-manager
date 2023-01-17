@@ -55,21 +55,21 @@
         <v-col cols="3" md="2">
           <base-input v-model.number="project.port" label="порт для публикации" type="number" />
         </v-col>
-        <v-col cols="3">
+        <v-col cols="6" md="3">
           <base-input-history v-model.trim="project.sql.server" label="SQL сервер (psql порт можно указать через ':')" required :history-id="`${project.name}-server`" />
         </v-col>
-        <v-col cols="3">
+        <v-col cols="6" md="3">
           <base-input-history v-model.trim="project.sql.base" label="База данных" :history-id="`${project.name}-base`" required />
         </v-col>
         <v-spacer />
-        <v-col cols="3" md="2">
+        <v-col cols="6" md="2">
           <base-input v-model.trim="project.sql.login" label="Логин" required />
         </v-col>
-        <v-col cols="3" md="2">
+        <v-col cols="6" md="2">
           <base-input v-model="project.sql.password" label="Пароль" />
         </v-col>
         <v-col cols="12">
-          <base-input-folder v-model="project.path.version" label="Каталог версии" required />
+          <base-input-folder v-model="project.path.version" label="Каталог версии" required :hide-details="!!project.path.version" />
         </v-col>
         <v-col cols="10" md="5">
           <base-input v-model="project.restartMaxCount" type="number">
