@@ -7,6 +7,8 @@ const axios = Axios.create({
 });
 
 const isDevelopment = import.meta.env.DEV;
+const logMessageSize = isDevelopment ? 100 : 1500;
+
 
 export default class Dispatcher {
   static token = null as string | null;
@@ -93,19 +95,19 @@ export default class Dispatcher {
     }
     const timeout = 60000;
     if (!isDevelopment) {
-      log.debug('dispatcher', 'req', JSON.stringify(request).substring(0, 100));
+      log.debug('dispatcher', 'req', JSON.stringify(request).substring(0, logMessageSize));
     }
     const result = await axios
       .post(URL, request, { headers, timeout })
       .then((response: any) => {
         if (!isDevelopment) {
-          log.debug('dispatcher', 'res', JSON.stringify(response.data).substring(0, 100));
+          log.debug('dispatcher', 'res', JSON.stringify(response.data).substring(0, logMessageSize));
         }
         return response.data;
       })
       .catch((error: any) => {
         if (!isDevelopment) {
-          log.error('dispatcher', 'err', JSON.stringify(error).substring(0, 100));
+          log.error('dispatcher', 'err', JSON.stringify(error).substring(0, logMessageSize));
         }
         if (error.response?.data) {
           return error.response.data;
