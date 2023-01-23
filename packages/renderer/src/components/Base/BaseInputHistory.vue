@@ -7,7 +7,21 @@
     :rules="inputRules"
     hide-no-data
     @update:search="onChange($event)"
-  />
+  >
+    <template #item="{ props, index }">
+      <v-list-item
+        density="compact"
+        v-bind="props"
+        :title="props.value"
+      >
+        <template #append>
+          <v-icon @click.stop="onDeleteItem(index)">
+            mdi-close
+          </v-icon>
+        </template>
+      </v-list-item>
+    </template>
+  </base-autocomplete>
 </template>
 
 <script setup lang="ts">
@@ -48,6 +62,10 @@ const onChange = (val: string | undefined) => {
       }
       emit('update:modelValue', val);
    }, 250);
+};
+
+const onDeleteItem = (index: number) => {
+   items.value.splice(index, 1);
 };
 
 onMounted(() => {
