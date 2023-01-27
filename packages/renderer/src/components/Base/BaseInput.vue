@@ -9,6 +9,9 @@
     clear-icon="mdi-close"
     density="compact" 
   >
+    <template v-if="$slots['default']" #default>
+      <slot name="default" />
+    </template>
     <template v-if="$slots['append']" #append>
       <slot name="append" />
     </template>
