@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.9](https://github.com/stonum/stack-manager/compare/v0.7.8...v0.7.9) (2023-01-31)
+
+
+### Features
+
+* удаление записей из истории ввода ([dcc6f0b](https://github.com/stonum/stack-manager/commit/dcc6f0bfc8c410a2a0a27085eaf8f991c0304d7a))
+
+
+### Bug Fixes
+
+* исправил сохранение истории ввода ([b1c2235](https://github.com/stonum/stack-manager/commit/b1c223560c05d972bcfd6fd3e839b9b3c32adfc9))
+* trustedServer по умолчанию ([bb78215](https://github.com/stonum/stack-manager/commit/bb78215c68af321743583ede545af731bbc37c8b))
+
 ### [0.7.8](https://github.com/stonum/stack-manager/compare/v0.7.7...v0.7.8) (2023-01-17)
 
 
