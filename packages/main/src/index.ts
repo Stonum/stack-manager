@@ -2,6 +2,7 @@ import { app, shell } from 'electron';
 
 import { restoreOrCreateWindow, createTrayMenu } from './mainWindow';
 import { registerListeners } from './listeners';
+import upgradeBeforeStart from './upgrade';
 import log from './log';
 
 /**
@@ -38,6 +39,7 @@ app.on('activate', restoreOrCreateWindow);
  */
 app
   .whenReady()
+  .then(upgradeBeforeStart)
   .then(createTrayMenu)
   .then(registerListeners)
   .then(restoreOrCreateWindow)
