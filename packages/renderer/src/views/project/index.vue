@@ -65,7 +65,7 @@ import AppsTab from './AppsTab.vue';
 import BaseInput from '@/components/Base/BaseInput.vue';
 
 const props = defineProps<{ projectid: string }>();
-const sourceId = +(router.currentRoute.value.query.from || 0) || null;
+const sourceId = !Number.isNaN(Number(router.currentRoute.value.query.from)) ? Number(router.currentRoute.value.query.from) : null;
 
 const formValid = ref(false);
 const tab = ref(null);

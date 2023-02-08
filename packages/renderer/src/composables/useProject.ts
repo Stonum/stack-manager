@@ -139,7 +139,7 @@ export function useProject(projectId: number, immediate = false, sourceId = null
     if (projectId >= 0) {
       get();
     } else {
-      if (sourceId) {
+      if (sourceId !== null) {
         copy();
       } else {
         init();
