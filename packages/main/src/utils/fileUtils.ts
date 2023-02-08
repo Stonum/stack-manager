@@ -91,13 +91,12 @@ export async function copyFiles(src: string, desc: string) {
   const files = await getFiles(src);
   return Promise.all(
     files.map(async (file) => {
-      const folder = path.dirname(file.replace(src, desc));
-      const fname = path.basename(file);
-
+      const newFile = path.join(desc, file.replace(src, ''));
+      const folder = path.dirname(newFile);
       if (!fs.existsSync(folder)) {
         await fsp.mkdir(folder, { recursive: true });
       }
-      return fsp.copyFile(file, path.join(folder, fname));
+      return fsp.copyFile(file, newFile);
     })
   );
 }
