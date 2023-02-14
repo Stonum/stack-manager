@@ -62,7 +62,7 @@ class SettingsStore extends Store {
       if (result && typeof result === 'string') {
         let url = result as string;
         if (url.indexOf('://') < 0) {
-          url = 'http://';// + result;
+          url = 'http://' + result;
         }
         url = url.replace('localhost', os.hostname()).replace('127.0.0.1', os.hostname());
         return url as SettingsType[Key];
