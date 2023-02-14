@@ -31,7 +31,8 @@ const emptyProject = {
 vi.mock('electron', () => {
   return {
     app: {
-      getPath: vi.fn().mockReturnValue('')
+      getPath: vi.fn().mockReturnValue(''),
+      getVersion: vi.fn().mockReturnValue('0.0.0')
     }
   };
 });
