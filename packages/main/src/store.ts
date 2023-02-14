@@ -1,6 +1,7 @@
 import Store from 'electron-store';
 import { app } from 'electron';
 import { join } from 'path';
+import os from 'os';
 
 const defSettings = {
   tasks: [
@@ -18,20 +19,60 @@ const defSettings = {
     { title: 'Расчеты с поставщиками', prefix: 'rsp', id: 279, selected: false, port: 11 },
   ] as Task[],
 
+  dispatcher_url: '',
+  dispatcher_folder: '',
+  dispatcher_password: '',
+  rabbitmq_url: '',
+  rabbitmq_login: '',
+  rabbitmq_password: '',
   refresh_interval: 20000,
+  share: '',
   share_name: '_share',
+  upload: '',
   upload_name: '_upload',
+  birt: '',
   birt_name: '_birt',
   birt_port: 20777,
+  dotnetcore: '',
   dotnetcore_name: '_dotnetcore',
   dotnetcore_port: 20001,
   colorBlindMode: false,
   workspacePath: join(app.getPath('userData'), 'workspaces'),
   staticPath: join(app.getPath('userData'), 'domains'),
+  stackversion: '',
+  bin: '',
+  jre: '',
+  fullLogging: false,
+  version: app.getVersion(),
   trustedServer: import.meta.env.VITE_TRUSTED_SERVER || '',
 };
 
-export const settings = new Store({ name: 'settings', cwd: 'config', defaults: defSettings });
+type SettingsType = typeof defSettings;
+
+class SettingsStore extends Store {
+
+  constructor(options: any) {
+    super(options);
+  }
+
+  get<Key extends keyof SettingsType>(key: Key, defaultValue?: unknown): SettingsType[Key] {
+    const result = super.get(key, defaultValue) as SettingsType[Key];
+    // обработка неполностью введенного урла
+    if (key === 'dispatcher_url' || key === 'rabbitmq_url') {
+      if (result && typeof result === 'string') {
+        let url = result as string;
+        if (url.indexOf('://') < 0) {
+          url = 'http://';// + result;
+        }
+        url = url.replace('localhost', os.hostname()).replace('127.0.0.1', os.hostname());
+        return url as SettingsType[Key];
+      }
+    }
+    return result;
+  }
+}
+
+export const settings = new SettingsStore({ name: 'settings', cwd: 'config', defaults: defSettings });
 class ProjectStore {
 
   private store;

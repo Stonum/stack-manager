@@ -25,12 +25,6 @@ export default class Dispatcher {
       throw new Error('Не указан пароль для диспетчера');
     }
 
-    if (url.indexOf('://') < 0) {
-      url = 'http://' + url;
-    }
-
-    url = url.replace('localhost', os.hostname()).replace('127.0.0.1', os.hostname());
-
     this.url = new URL(url);
     if (this.url.pathname === '/') {
       this.url.pathname = '/SetupDispatcher';

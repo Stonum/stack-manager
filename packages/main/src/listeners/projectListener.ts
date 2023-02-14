@@ -248,7 +248,9 @@ export default class ProjectListener extends CommonListener {
         if (!pathFolder || !fs.existsSync(pathFolder)) {
           throw new Error('Не указан каталог сервиса');
         }
-        const name = (await settings.get(payload.name + '_name')) as string;
+
+        const keyName = payload.name + '_name' as 'share_name' | 'upload_name';
+        const name = settings.get(keyName) as string;
         const webServer = getDispatcher().webServer();
         // удалим если уже есть с таким именем для пересоздания
         try {
