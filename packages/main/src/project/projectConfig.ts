@@ -176,6 +176,12 @@ export async function generateGatewaySettings(project: Project, pathnew: string)
     common.server.port = +project.gateway.port || common.server.port;
     common.stack.security.cors.allowedOrigins = helper.getAllowedOrigins([8080, 8081, project.port || 0]);
 
+    if (!common.stack.security.jwt) {
+      common.stack.security.jwt = [];
+    }
+    common.stack.security.jwt.accessToken = { expTimeInMinute: 720 };
+    common.stack.security.jwt.refreshToken = { expTimeInHour: 12 };
+
     common.stack.license = { trustedServer: settings.get('trustedServer') };
 
     const tasks = settings.get('tasks') as Task[];
@@ -241,6 +247,25 @@ export async function generateGatewaySettings(project: Project, pathnew: string)
     await writeSettingsFile(path.join(pathnew, 'application.yml'), dataYaml);
     return path.join(pathnew, 'application.yml');
   }
+  return null;
+}
+
+export async function generateBootstrapSettings(project: Project, pathnew: string) {
+  if (!project.gateway) {
+    return null;
+  }
+
+  const templateYaml = path.join(project.gateway.path, 'bootstrap.yml');
+  if (fs.existsSync(templateYaml)) {
+    const dataYaml = await readSettingsFile(templateYaml);
+    const common = dataYaml[0];
+
+    common.spring.cloud.consul.enabled = false;
+
+    await writeSettingsFile(path.join(pathnew, 'bootstrap.yml'), dataYaml);
+    return path.join(pathnew, 'bootstrap.yml');
+  }
+  return null;
 }
 
 async function getEnvConfig(project: Project, envPath: string) {

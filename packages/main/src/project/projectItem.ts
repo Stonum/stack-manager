@@ -219,14 +219,23 @@ export default class ProjectItem {
         const path_gateway = path.join(pathbin_new, 'StackGateway');
         await copyFiles(this.gateway.path, path_gateway);
         const gatewaySettingsPath = await config.generateGatewaySettings(this, path_gateway);
+        const bootstrapSettingsPath = await config.generateBootstrapSettings(this, path_gateway);
+
+        let cmdArgs = `-Xmx1024m -jar ${helper.getGatewayFileName(path_gateway)} `;
+        if (bootstrapSettingsPath) {
+          cmdArgs += ` --spring.cloud.bootstrap.location=${path.relative(path_gateway, bootstrapSettingsPath)}`;
+        }
+        if (gatewaySettingsPath) {
+          cmdArgs += ` --spring.config.location=classpath:/application.yml,classpath:file:${path.relative(path_gateway, gatewaySettingsPath)}`;
+        }
 
         await this.webServer.addItem(this.gateway.name, {
           IsActive: 1,
           cmd: path.join(settings.get('jre'), 'bin', 'javaw.exe'),
-          cmdArgs: `-Xmx1024m -jar ${helper.getGatewayFileName(path_gateway)} --spring.config.location=classpath:/application.yml,classpath:file:${gatewaySettingsPath}`,
+          cmdArgs,
           path: path_gateway,
           restart: 1,
-          restartMaxCount: 5,
+          restartMaxCount: this.restartMaxCount,
         });
         await this.webServer.startItem(this.gateway.name);
       }
