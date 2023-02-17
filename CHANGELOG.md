@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.11](https://github.com/stonum/stack-manager/compare/v0.7.10...v0.7.11) (2023-02-17)
+
+
+### Features
+
+* bootstrap config для stackgateway ([e66fed9](https://github.com/stonum/stack-manager/commit/e66fed95c47fea81fcd434d10eaab6b36c058218))
+
+
+### Bug Fixes
+
+* обработка URL адреса диспетчера ([2cfce7c](https://github.com/stonum/stack-manager/commit/2cfce7cf150ee7ea73576e7a663ea1665f9e1f75))
+
 ### [0.7.10](https://github.com/stonum/stack-manager/compare/v0.7.9...v0.7.10) (2023-02-13)
 
 
