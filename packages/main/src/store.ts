@@ -89,15 +89,20 @@ class ProjectStore {
     this.store.set('projects', projects);
   }
 
-  get(index: number): Project {
+  get(projectId: number): Project | undefined {
     const res = this.getAll();
-    return res[index];
+    return res.find(project => project.id === projectId);
   }
 
-  set(index: number, project: Project) {
+  set(projectId: number, project: Project) {
     const res = this.getAll();
-    res[index] = project;
-    this.setAll(res);
+    const index = res.findIndex(project => project.id === projectId);
+    if (index >= 0) {
+      res[index] = project;
+      this.setAll(res);
+    } else {
+      throw 'Не найден проект с id = ' + projectId;
+    }
   }
 
   add(project: Project) {
@@ -106,25 +111,30 @@ class ProjectStore {
     this.setAll(res);
   }
 
-  delete(index: number) {
+  delete(projectId: number) {
     const res = this.getAll();
-    res.splice(index, 1);
-    this.setAll(res);
+    const index = res.findIndex(project => project.id === projectId);
+    if (index >= 0) {
+      res.splice(index, 1);
+      this.setAll(res);
+    } else {
+      throw 'Не найден проект с id = ' + projectId;
+    }
   }
 
   setAppStatus(projectId: number, appName: string, status: boolean) {
-    const res = this.getAll();
 
-    if (res[projectId]) {
-
-      const project = res[projectId];
-
+    const project = this.get(projectId);
+    if (project) {
       project.apps.forEach((app, appId) => {
         if (app.name == appName) {
           this.store.set(`projects.${projectId}.apps.${appId}.active`, status);
         }
       });
+    } else {
+      throw 'Не найден проект с id = ' + projectId;
     }
+
   }
 }
 

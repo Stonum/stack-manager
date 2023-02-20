@@ -12,16 +12,16 @@ export default class ProjectFactory {
     return this.prepare(params || {});
   }
 
-  static create(projectId: number | null, params: ProjectOptions, withCheck = false): ProjectItem {
+  static create(params: ProjectOptions, withCheck = false): ProjectItem {
     const project = this.prepare(params);
     if (withCheck) {
-      this.check(projectId, project);
+      this.check(project);
     }
     return new ProjectItem(project);
   }
 
   static copy(params: ProjectOptions): ProjectItem {
-    const project = this.prepare({ ...params, name: params.name + '_copy' });
+    const project = this.prepare({ ...params, name: params.name + '_copy', id: undefined });
     project.apps.forEach(app => { app.name = project.name + '_' + app.id; app.port = null; });
     return new ProjectItem(project);
   }
@@ -33,6 +33,7 @@ export default class ProjectFactory {
   private static prepare(params: ProjectOptions) {
     const project = {} as Project;
 
+    project.id = params.id && params.id > 0 ? params.id : Date.now();
     project.name = params.name || '';
 
     project.port = params.port || 0;
@@ -87,11 +88,11 @@ export default class ProjectFactory {
     return project;
   }
 
-  private static check(projectId: number | null, project: Project) {
+  private static check(project: Project) {
     const allProjects = projects.getAll();
 
-    const indname = allProjects.findIndex((p: Project, id: number) => {
-      return p.name === project.name && id !== projectId;
+    const indname = allProjects.findIndex((p: Project) => {
+      return p.name === project.name && p.id !== project.id;
     });
     if (indname >= 0) {
       throw new Error(`Уже есть проект с таким именем`);
@@ -144,8 +145,8 @@ export default class ProjectFactory {
 
     ports.forEach((port: number | null | undefined) => {
       if (port) {
-        const res = allProjects.find((p: Project, id: number) => {
-          return id !== projectId && (p.gateway?.port === port || p.port === port);
+        const res = allProjects.find((p: Project) => {
+          return p.id !== project.id && (p.gateway?.port === port || p.port === port);
         });
         if (res) {
           throw new Error(`Указанный front порт ${port} уже используется в проекте ${res.name}`);

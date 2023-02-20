@@ -8,6 +8,7 @@
   <v-progress-linear v-if="loading" indeterminate />
 
   <v-form v-else v-model="formValid">
+    {{ projectid }}
     <v-tabs v-model="tab">
       <v-row class="mx-3" no-gutters>
         <v-col cols="12" sm="10" md="6">

@@ -41,6 +41,7 @@ export default class ProjectListener extends CommonListener {
         });
       }
       return {
+        id: project.id,
         name: project.name,
         port: project.port,
         sql: project.sql,
@@ -106,7 +107,7 @@ export default class ProjectListener extends CommonListener {
   }
 
   async add(payload: any) {
-    const project = ProjectFactory.create(null, payload.params, true);
+    const project = ProjectFactory.create(payload.params, true);
     projects.add(ProjectFactory.extractObject(project));
 
     this.sendInfoMessage(project.name, 'Сборка backend запущена');
@@ -117,7 +118,7 @@ export default class ProjectListener extends CommonListener {
   }
 
   async delete(payload: any) {
-    const project = ProjectFactory.create(payload.projectId, this.get(payload));
+    const project = ProjectFactory.create(this.get(payload));
 
     this.sendInfoMessage(project.name, 'удаление проекта');
     await project.delete();
@@ -133,10 +134,10 @@ export default class ProjectListener extends CommonListener {
   }
 
   async rebuild(payload: any) {
-    const project = ProjectFactory.create(payload.projectId, payload.params, true);
+    const project = ProjectFactory.create(payload.params, true);
 
     // получаем старый проект и удаляем приложения
-    const old_project = ProjectFactory.create(payload.projectId, this.get(payload));
+    const old_project = ProjectFactory.create(this.get(payload));
     this.sendInfoMessage(old_project.name, 'удаление приложений по задачам');
     await old_project.deleteApps();
 
@@ -168,25 +169,25 @@ export default class ProjectListener extends CommonListener {
   }
 
   async changeType(payload: any) {
-    const project = ProjectFactory.create(null, payload.params);
+    const project = ProjectFactory.create(payload.params);
     return { project: ProjectFactory.extractObject(project) };
   }
 
   async changeFolder(payload: any) {
-    const project = ProjectFactory.create(null, payload.params);
+    const project = ProjectFactory.create(payload.params);
     const iniFiles = await project.changeFolder();
     await project.changeIniFile();
     return { project: ProjectFactory.extractObject(project), iniFiles };
   }
 
   async changeIniFile(payload: any) {
-    const project = ProjectFactory.create(null, payload.params);
+    const project = ProjectFactory.create(payload.params);
     await project.changeIniFile();
     return { project: ProjectFactory.extractObject(project) };
   }
 
   async appStart(payload: any) {
-    const project = ProjectFactory.create(payload.projectId, this.get(payload));
+    const project = ProjectFactory.create(this.get(payload));
     await project.appStart(payload.params);
 
     projects.setAppStatus(payload.projectId, payload.params, true);
@@ -194,14 +195,14 @@ export default class ProjectListener extends CommonListener {
   }
 
   async appReStart(payload: any) {
-    const project = ProjectFactory.create(payload.projectId, this.get(payload));
+    const project = ProjectFactory.create(this.get(payload));
     await project.appReStart(payload.params);
 
     return true;
   }
 
   async appStop(payload: any) {
-    const project = ProjectFactory.create(payload.projectId, this.get(payload));
+    const project = ProjectFactory.create(this.get(payload));
     await project.appStop(payload.params);
 
     projects.setAppStatus(payload.projectId, payload.params, false);
@@ -209,7 +210,7 @@ export default class ProjectListener extends CommonListener {
   }
 
   async buildFront(payload: any) {
-    const project = ProjectFactory.create(payload.projectId, this.get(payload));
+    const project = ProjectFactory.create(this.get(payload));
 
     this.sendInfoMessage(project.name, 'Сборка frontend запущена');
     await project.buildFront();
@@ -344,14 +345,14 @@ export default class ProjectListener extends CommonListener {
 
   async gitPull(payload: any) {
 
-    const project = ProjectFactory.create(payload.projectId, this.get(payload));
+    const project = ProjectFactory.create(this.get(payload));
     await project.gitPull();
     return true;
   }
 
   async openWorkspace(payload: any) {
 
-    const project = ProjectFactory.create(payload.projectId, this.get(payload));
+    const project = ProjectFactory.create(this.get(payload));
     await project.openWorkspace();
     return true;
   }
@@ -383,7 +384,7 @@ async function fillProjects() {
         params.path.bin = bin;
         params.path.ini = pathini;
 
-        const project = ProjectFactory.create(null, params);
+        const project = ProjectFactory.create(params);
         const commonFolder = await project.changeIniFile();
 
         project.path.git = commonFolder || '';
