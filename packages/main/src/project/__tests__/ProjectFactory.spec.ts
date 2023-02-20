@@ -74,7 +74,6 @@ describe('ProjectFactory', () => {
 
   it('Normalize project item', () => {
     const project = ProjectFactory.create(emptyProject);
-    const extracted = ProjectFactory.extractObject(project);
     expect(ProjectFactory.extractObject(project)).toEqual(emptyProject);
   });
 
