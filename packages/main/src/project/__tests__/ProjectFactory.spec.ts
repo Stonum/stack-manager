@@ -3,6 +3,7 @@ import ProjectFactory from '../projectFactory';
 import ProjectItem from '../projectItem';
 
 const emptyProject = {
+  id: 999999,
   name: '',
   port: 0,
   type: 1,
@@ -54,6 +55,9 @@ describe('ProjectFactory', () => {
 
   it('Init empty project', () => {
     let project = ProjectFactory.init({ type: 1 });
+    expect(project.id).not.toBe(emptyProject.id);
+
+    project.id = emptyProject.id;
     expect(project).toEqual(emptyProject);
 
     project = ProjectFactory.init({ type: 0 });
@@ -64,12 +68,13 @@ describe('ProjectFactory', () => {
   });
 
   it('Create project item', () => {
-    const project = ProjectFactory.create(null, emptyProject);
+    const project = ProjectFactory.create(emptyProject);
     expect(project).toBeInstanceOf(ProjectItem);
   });
 
   it('Normalize project item', () => {
-    const project = ProjectFactory.create(null, emptyProject);
+    const project = ProjectFactory.create(emptyProject);
+    const extracted = ProjectFactory.extractObject(project);
     expect(ProjectFactory.extractObject(project)).toEqual(emptyProject);
   });
 
@@ -77,9 +82,9 @@ describe('ProjectFactory', () => {
     const projectWithApp = { ...emptyProject };
     projectWithApp.apps = [{ id: 123, name: 'test', port: 0, path: 'xxx', args: '', active: false }];
 
-    const copyedProject = { ...projectWithApp, name: '_copy' };
+    const copyedProject = { ...projectWithApp, name: '_copy', id: Date.now() };
     copyedProject.apps = [{ id: 123, name: '_copy_123', port: null, path: 'xxx', args: '', active: false }];
 
-    expect(ProjectFactory.copy(projectWithApp)).toEqual(ProjectFactory.create(null, copyedProject));
+    expect(ProjectFactory.copy(projectWithApp)).toEqual(ProjectFactory.create(copyedProject));
   });
 });

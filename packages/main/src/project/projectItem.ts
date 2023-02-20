@@ -14,6 +14,7 @@ import cmd from '@/cmd';
 
 export default class ProjectItem {
 
+  id: number;
   name: string;
   path: ProjectPaths;
   sql: ProjectSQLSettings;
@@ -30,6 +31,7 @@ export default class ProjectItem {
   verPath: string;
 
   constructor(project: Project) {
+    this.id = project.id;
     this.name = project.name;
     this.path = project.path;
     this.sql = project.sql;
