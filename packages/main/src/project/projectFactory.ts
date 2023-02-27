@@ -5,6 +5,7 @@ import { projects, settings } from '../store';
 
 import ProjectItem from './projectItem';
 import * as helper from './projectHelpers';
+import { checkPort } from '@/utils';
 
 export default class ProjectFactory {
 
@@ -21,7 +22,11 @@ export default class ProjectFactory {
   }
 
   static copy(params: ProjectOptions): ProjectItem {
-    const project = this.prepare({ ...params, name: params.name + '_copy', id: undefined });
+    const newParams: ProjectOptions = { name: params.name + '_copy', id: undefined, port: 0 };
+    if (params.type === helper.StackBackendType.apphost) {
+      newParams.gateway = { name: params.gateway?.name || '', path: params.gateway?.path || '', port: 0 };
+    }
+    const project = this.prepare({ ...params, ...newParams });
     project.apps.forEach(app => { app.name = project.name + '_' + app.id; app.port = null; });
     return new ProjectItem(project);
   }
@@ -36,7 +41,7 @@ export default class ProjectFactory {
     project.id = params.id && params.id > 0 ? params.id : Date.now();
     project.name = params.name || '';
 
-    project.port = params.port || 0;
+    project.port = params.port || ProjectFactory.getFreePort(8000);
     project.type = params.type || 0;
 
     let bindir = settings.get('bin') as string;
@@ -67,16 +72,18 @@ export default class ProjectFactory {
       project.gateway = {
         name: project.name + '_gateway',
         path: params.gateway?.path || '',
-        port: params.gateway?.port || 0,
+        port: params.gateway?.port || ProjectFactory.getFreePort(8100),
       };
     }
 
     project.apps = [];
     if (params.apps) {
+      let freeDebugPort = 3000;
       project.apps = params.apps.map((app) => {
+        freeDebugPort = app.port || ProjectFactory.getFreePort(freeDebugPort++);
         return {
           id: app.id,
-          port: app.port,
+          port: freeDebugPort,
           name: app.name || project.name + '_' + app.id,
           path: app.path,
           args: app.args,
@@ -156,5 +163,47 @@ export default class ProjectFactory {
 
   }
 
+  private static getBusyPorts(): number[] {
+    const busyPorts = [] as number[];
+
+    for (const project of projects.getAll()) {
+      if (project.port) {
+        busyPorts.push(project.port);
+      }
+      if (project.gateway?.port) {
+        busyPorts.push(project.gateway.port);
+      }
+      for (const app of project.apps) {
+        if (app.port) {
+          busyPorts.push(app.port);
+        }
+      }
+    }
+
+    return busyPorts;
+  }
+
+  private static getFreePort(startPort: number): number {
+    const busyPorts = ProjectFactory.getBusyPorts();
+    let freePort = startPort;
+    let portIsFree = false;
+
+    do {
+      freePort++;
+
+      if (busyPorts.find(port => port === freePort)) {
+        continue;
+      }
+
+      if (!checkPort(freePort)) {
+        continue;
+      }
+
+      portIsFree = true;
+
+    } while (!portIsFree);
+
+    return freePort;
+  }
 }
 
