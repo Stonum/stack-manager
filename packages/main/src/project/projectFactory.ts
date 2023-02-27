@@ -10,11 +10,11 @@ import { checkPort } from '@/utils';
 export default class ProjectFactory {
 
   static init(params?: ProjectOptions): Project {
-    return this.prepare(params || {});
+    return this.setDefaultPorts(this.prepare(params || {}));
   }
 
   static create(params: ProjectOptions, withCheck = false): ProjectItem {
-    const project = this.prepare(params);
+    const project = this.setDefaultPorts(this.prepare(params));
     if (withCheck) {
       this.check(project);
     }
@@ -26,8 +26,14 @@ export default class ProjectFactory {
     if (params.type === helper.StackBackendType.apphost) {
       newParams.gateway = { name: params.gateway?.name || '', path: params.gateway?.path || '', port: 0 };
     }
-    const project = this.prepare({ ...params, ...newParams });
-    project.apps.forEach(app => { app.name = project.name + '_' + app.id; app.port = null; });
+    if (params.apps) {
+      newParams.apps = [];
+      for (const app of params.apps) {
+        newParams.apps.push({ ...app, name: '', port: null });
+      }
+    }
+
+    const project = this.setDefaultPorts(this.prepare({ ...params, ...newParams }));
     return new ProjectItem(project);
   }
 
@@ -41,7 +47,7 @@ export default class ProjectFactory {
     project.id = params.id && params.id > 0 ? params.id : Date.now();
     project.name = params.name || '';
 
-    project.port = params.port || ProjectFactory.getFreePort(8000);
+    project.port = params.port || 0;
     project.type = params.type || 0;
 
     let bindir = settings.get('bin') as string;
@@ -72,18 +78,16 @@ export default class ProjectFactory {
       project.gateway = {
         name: project.name + '_gateway',
         path: params.gateway?.path || '',
-        port: params.gateway?.port || ProjectFactory.getFreePort(8100),
+        port: params.gateway?.port || 0,
       };
     }
 
     project.apps = [];
     if (params.apps) {
-      let freeDebugPort = 3000;
       project.apps = params.apps.map((app) => {
-        freeDebugPort = app.port || ProjectFactory.getFreePort(freeDebugPort++);
         return {
           id: app.id,
-          port: freeDebugPort,
+          port: app.port,
           name: app.name || project.name + '_' + app.id,
           path: app.path,
           args: app.args,
@@ -92,6 +96,23 @@ export default class ProjectFactory {
       });
     }
 
+    return project;
+  }
+
+  private static setDefaultPorts(project: Project) {
+    if (project.port === 0) {
+      project.port = ProjectFactory.getFreePort(8000);
+    }
+    if (project.gateway && project.gateway?.port === 0) {
+      project.gateway.port = ProjectFactory.getFreePort(8100);
+    }
+    if (project.apps) {
+      let freeDebugPort = 3000;
+      for (const app of project.apps) {
+        freeDebugPort = app.port || ProjectFactory.getFreePort(freeDebugPort++);
+        app.port = freeDebugPort;
+      }
+    }
     return project;
   }
 

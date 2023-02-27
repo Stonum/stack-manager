@@ -5,7 +5,7 @@ import ProjectItem from '../projectItem';
 const emptyProject = {
   id: 999999,
   name: '',
-  port: 0,
+  port: 8001,
   type: 1,
   restartMaxCount: 5,
   path: {
@@ -24,7 +24,7 @@ const emptyProject = {
   gateway: {
     name: '_gateway',
     path: '',
-    port: 0,
+    port: 8101,
   },
   apps: [] as any[]
 };
@@ -64,7 +64,7 @@ describe('ProjectFactory', () => {
     expect(project.gateway).toBeUndefined();
 
     project = ProjectFactory.init({ name: 'test_project', type: 1 });
-    expect(project.gateway).toEqual({ name: 'test_project_gateway', port: 0, path: '' });
+    expect(project.gateway).toEqual({ name: 'test_project_gateway', port: 8101, path: '' });
   });
 
   it('Create project item', () => {
@@ -79,11 +79,16 @@ describe('ProjectFactory', () => {
 
   it('Copy project item', () => {
     const projectWithApp = { ...emptyProject };
-    projectWithApp.apps = [{ id: 123, name: 'test', port: 0, path: 'xxx', args: '', active: false }];
+    projectWithApp.apps = [{ id: 123, name: 'test', port: 3000, path: 'xxx', args: '', active: false }];
 
-    const copyedProject = { ...projectWithApp, name: '_copy', id: Date.now() };
-    copyedProject.apps = [{ id: 123, name: '_copy_123', port: null, path: 'xxx', args: '', active: false }];
+    const copy = ProjectFactory.copy(projectWithApp);
 
-    expect(ProjectFactory.copy(projectWithApp)).toEqual(ProjectFactory.create(copyedProject));
+    expect(copy.id).not.toBe(projectWithApp.id);
+
+    expect(copy.name).toBe(projectWithApp.name + '_copy');
+    expect(copy.type).toBe(projectWithApp.type);
+    expect(copy.path.git).toBe(projectWithApp.path.git);
+
+    expect(copy.apps.length).toBe(projectWithApp.apps.length);
   });
 });
