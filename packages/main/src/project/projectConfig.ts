@@ -144,6 +144,7 @@ export async function generateTaskSettings(project: Project, app: ProjectApp) {
     tomlData.RabbitMQrpc.routing_key = os.hostname + '_' + project.name + '_' + taskid;
     tomlData.RabbitMQrpc.routing_key_asynch = os.hostname + '_' + project.name + '_' + taskid;
 
+    tomlData.RabbitMQService.exchange = os.hostname + '_' + project.name + '_service_exchange';
     tomlData.RabbitMQService.exchange_in = os.hostname + '_' + project.name + '_service_to_backend';
     tomlData.RabbitMQService.exchange_out = os.hostname + '_' + project.name + '_service_from_backend';
     tomlData.RabbitMQService.task = taskid;
@@ -202,6 +203,7 @@ export async function generateGatewaySettings(project: Project, pathnew: string)
       })
     );
 
+    common.stack.queue.service.exchange = os.hostname + '_' + project.name + '_service_exchange';
     common.stack.queue.service.exchangeIn = os.hostname + '_' + project.name + '_service_from_backend';
     common.stack.queue.service.exchangeOut = os.hostname + '_' + project.name + '_service_to_backend';
 
