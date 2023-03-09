@@ -48,6 +48,11 @@ export async function readIniFile(filePath: string) {
   strData = strData.replaceAll('PRG=', 'PRG[]=').replaceAll('DB=', 'DB[]=').replaceAll('RS=', 'RS[]=').replaceAll('RPT=', 'RPT[]=');
   let data = ini.parse(strData);
 
+  // удалим пустые ключи, парсер воспринимает строку пробелов как ключ { "": true }
+  for (const key of Object.keys(data)) {
+    delete data[key][''];
+  }
+
   if (data.Include) {
     const dataInc = await readIniFile(path.resolve(path.dirname(filePath), data.Include));
     data = Object.assign({}, data, dataInc);
