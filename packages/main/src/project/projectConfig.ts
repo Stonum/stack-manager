@@ -178,7 +178,7 @@ export async function generateGatewaySettings(project: Project, pathnew: string)
     common.stack.security.cors.allowedOrigins = helper.getAllowedOrigins([8080, 8081, project.port || 0]);
 
     if (!common.stack.security.jwt) {
-      common.stack.security.jwt = [];
+      common.stack.security.jwt = {};
     }
     common.stack.security.jwt.accessToken = { expTimeInMinute: 720 };
     common.stack.security.jwt.refreshToken = { expTimeInHour: 12 };
