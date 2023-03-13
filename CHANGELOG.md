@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.12](https://github.com/stonum/stack-manager/compare/v0.7.11...v0.7.12) (2023-03-13)
+
+
+### Features
+
+* автоматическое вычисление свободных портов для нового проекта ([4aa3843](https://github.com/stonum/stack-manager/commit/4aa38434555fd3cf17bc7d71ca81ad0efc95d8d2))
+* добавил поддержку единой сервисной очереди ([7f128fa](https://github.com/stonum/stack-manager/commit/7f128fac5541194032907955485a9ece9c3427d3))
+* добавлен уникальный id проекта ([b01dc06](https://github.com/stonum/stack-manager/commit/b01dc06763e7f08484ac7a74efcfbbd8d39ffd3f))
+
+
+### Bug Fixes
+
+* строка пробелов в ini файле преобразовывалась в "=true" ([689c31a](https://github.com/stonum/stack-manager/commit/689c31aed471f5ab613d1080f91593de7d7da935))
+* jwt секция в  application.yml ([e630c5e](https://github.com/stonum/stack-manager/commit/e630c5e7bee1639a38636aebee8044ce06f5115d))
+
 ### [0.7.11](https://github.com/stonum/stack-manager/compare/v0.7.10...v0.7.11) (2023-02-17)
 
 
