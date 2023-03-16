@@ -86,11 +86,13 @@ export default class ProjectItem {
 
     if (fs.existsSync(path.join(pathBin, '0', 'app_host.exe'))) {
       this.type = 1;
-      this.gateway = {
-        name: this.name + '_gateway',
-        path: '',
-        port: 0,
-      };
+      if (!this.gateway) {
+        this.gateway = {
+          name: this.name + '_gateway',
+          path: '',
+          port: 0,
+        };
+      }
       // поищем гейтвэй
       const pathGateWay = path.join(this.path.git, 'StackGateway');
       if (fs.existsSync(pathGateWay)) {
