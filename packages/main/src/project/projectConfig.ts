@@ -326,24 +326,32 @@ async function getEnvConfig(project: Project, envPath: string) {
 }
 
 export async function generateEnvLocal(project: Project) {
-  let envPath = path.join(project.path.front, '.env.local');
-  if (!fs.existsSync(envPath)) {
-    envPath = path.join(project.path.front, '.env');
-    if (!fs.existsSync(envPath)) {
-      envPath = path.join(project.path.front, '.env.example');
-      if (!fs.existsSync(envPath)) {
-        throw new Error('Не найден .env файл');
-      }
+
+  const envFiles = ['.env.local', '.env', '.env.example'];
+  let envPath = '';
+  for (const env of envFiles) {
+    if (fs.existsSync(path.join(project.path.front, env))) {
+      envPath = path.join(project.path.front, env);
+      break;
     }
+  }
+
+  if (!envPath) {
+    throw new Error('Не найден .env файл');
   }
 
   const config = await getEnvConfig(project, envPath);
 
-  await writeIniFile(path.join(project.path.front, '.env.local'), config);
+  await writeIniFile(path.join(project.path.front, `.env.${project.name}.local`), config);
+
+  // сохраним локальный env для dev режима
+  if (!fs.existsSync(path.join(project.path.front, '.env.local'))) {
+    await writeIniFile(path.join(project.path.front, `.env.local`), config);
+  }
 }
 
 export async function generateEnvJson(project: Project, envpath: string) {
-  const envPath = path.join(project.path.front, '.env.local');
+  const envPath = path.join(project.path.front, `.env.${project.name}.local`);
   if (!fs.existsSync(envPath)) {
     await generateEnvLocal(project);
   }

@@ -318,7 +318,8 @@ export default class ProjectItem {
       await cmd.exec('npm install --progress=false', this.path.front);
     }
 
-    await cmd.exec('npm run build', this.path.front);
+    await config.generateEnvLocal(this);
+    await cmd.exec(`npm run build -- --mode=${this.name}`, this.path.front);
 
     if (fs.existsSync(path.join(this.path.front, 'dist'))) {
       if (fs.existsSync(this.frontPath)) {
