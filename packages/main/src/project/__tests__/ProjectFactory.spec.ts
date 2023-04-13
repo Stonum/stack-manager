@@ -53,35 +53,35 @@ vi.mock('../../middleware/dispatcher.ts');
 
 describe('ProjectFactory', () => {
 
-  it('Init empty project', () => {
-    let project = ProjectFactory.init({ type: 1 });
+  it('Init empty project', async () => {
+    let project = await ProjectFactory.init({ type: 1 });
     expect(project.id).not.toBe(emptyProject.id);
 
     project.id = emptyProject.id;
     expect(project).toEqual(emptyProject);
 
-    project = ProjectFactory.init({ type: 0 });
+    project = await ProjectFactory.init({ type: 0 });
     expect(project.gateway).toBeUndefined();
 
-    project = ProjectFactory.init({ name: 'test_project', type: 1 });
+    project = await ProjectFactory.init({ name: 'test_project', type: 1 });
     expect(project.gateway).toEqual({ name: 'test_project_gateway', port: 8101, path: '' });
   });
 
-  it('Create project item', () => {
-    const project = ProjectFactory.create(emptyProject);
+  it('Create project item', async () => {
+    const project = await ProjectFactory.create(emptyProject);
     expect(project).toBeInstanceOf(ProjectItem);
   });
 
-  it('Normalize project item', () => {
-    const project = ProjectFactory.create(emptyProject);
-    expect(ProjectFactory.extractObject(project)).toEqual(emptyProject);
+  it('Normalize project item', async () => {
+    const project = await ProjectFactory.create(emptyProject);
+    expect(await ProjectFactory.extractObject(project)).toEqual(emptyProject);
   });
 
-  it('Copy project item', () => {
+  it('Copy project item', async () => {
     const projectWithApp = { ...emptyProject };
     projectWithApp.apps = [{ id: 123, name: 'test', port: 3000, path: 'xxx', args: '', active: false }];
 
-    const copy = ProjectFactory.copy(projectWithApp);
+    const copy = await ProjectFactory.copy(projectWithApp);
 
     expect(copy.id).not.toBe(projectWithApp.id);
 
