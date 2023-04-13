@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.13](https://github.com/stonum/stack-manager/compare/v0.7.12...v0.7.13) (2023-04-13)
+
+
+### Features
+
+* создание разных env.local файлов под разные проекты ([8fa5b70](https://github.com/stonum/stack-manager/commit/8fa5b702585ea1bf8d171a1991e880746bf1a52a))
+
+
+### Bug Fixes
+
+* инициализация порта gateway для нового проекта ([c43f4ef](https://github.com/stonum/stack-manager/commit/c43f4efbf89eabbd63119328c027dc26fc125bb5))
+* исправил обработку наличия уже занятых портов ([b40adb7](https://github.com/stonum/stack-manager/commit/b40adb738ef50d8d35b576a63d379f7fbda9741e))
+
 ### [0.7.12](https://github.com/stonum/stack-manager/compare/v0.7.11...v0.7.12) (2023-03-13)
 
 
