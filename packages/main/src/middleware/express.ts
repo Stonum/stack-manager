@@ -49,21 +49,32 @@ export default class StaticServer {
     return this.isStarted;
   }
 
-  listen() {
-    if (isDevelopment) {
-      log.debug(`Server ${this.name} is not started in development mode`);
-      return;
-    }
+  async listen() {
+    return new Promise((resolve, reject) => {
+      if (isDevelopment) {
+        log.debug(`Server ${this.name} is not started in development mode`);
+        // return;
+      }
 
-    log.debug(`Server ${this.name} is starting...`);
-    try {
-      this.server = this.app.listen(this.port, () => {
-        log.debug(`Server ${this.name} started on http://localhost:${this.port}`);
-      });
-      this.isStarted = true;
-    } catch (e: AnyException) {
-      throw new Error('Express server error ' + e.message);
-    }
+      log.debug(`Server ${this.name} is starting...`);
+
+      try {
+        this.server = this.app.listen(this.port, () => {
+          log.debug(`Server ${this.name} started on http://localhost:${this.port}`);
+          this.isStarted = true;
+          resolve(true);
+        });
+        this.server.once('error', (e: AnyException) => {
+          this.isStarted = false;
+          log.error('Express server error ' + e.message);
+          reject(e);
+        });
+      } catch (e: AnyException) {
+        this.isStarted = false;
+        log.error('Express server error ' + e.message);
+        reject(e);
+      }
+    });
   }
 
   close() {

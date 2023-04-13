@@ -9,19 +9,19 @@ import { checkPort } from '@/utils';
 
 export default class ProjectFactory {
 
-  static init(params?: ProjectOptions): Project {
-    return this.setDefaultPorts(this.prepare(params || {}));
+  static async init(params?: ProjectOptions): Promise<Project> {
+    return await this.setDefaultPorts(this.prepare(params || {}));
   }
 
-  static create(params: ProjectOptions, withCheck = false): ProjectItem {
-    const project = this.setDefaultPorts(this.prepare(params));
+  static async create(params: ProjectOptions, withCheck = false): Promise<ProjectItem> {
+    const project = await this.setDefaultPorts(this.prepare(params));
     if (withCheck) {
       this.check(project);
     }
     return new ProjectItem(project);
   }
 
-  static copy(params: ProjectOptions): ProjectItem {
+  static async copy(params: ProjectOptions): Promise<ProjectItem> {
     const newParams: ProjectOptions = { name: params.name + '_copy', id: undefined, port: 0 };
     if (params.type === helper.StackBackendType.apphost) {
       newParams.gateway = { name: params.gateway?.name || '', path: params.gateway?.path || '', port: 0 };
@@ -33,7 +33,7 @@ export default class ProjectFactory {
       }
     }
 
-    const project = this.setDefaultPorts(this.prepare({ ...params, ...newParams }));
+    const project = await this.setDefaultPorts(this.prepare({ ...params, ...newParams }));
     return new ProjectItem(project);
   }
 
@@ -99,17 +99,17 @@ export default class ProjectFactory {
     return project;
   }
 
-  private static setDefaultPorts(project: Project) {
+  private static async setDefaultPorts(project: Project) {
     if (project.port === 0) {
-      project.port = ProjectFactory.getFreePort(8000);
+      project.port = await ProjectFactory.getFreePort(8000);
     }
     if (project.gateway && project.gateway?.port === 0) {
-      project.gateway.port = ProjectFactory.getFreePort(8100);
+      project.gateway.port = await ProjectFactory.getFreePort(8100);
     }
     if (project.apps) {
       let freeDebugPort = 3000;
       for (const app of project.apps) {
-        freeDebugPort = app.port || ProjectFactory.getFreePort(freeDebugPort++);
+        freeDebugPort = app.port || await ProjectFactory.getFreePort(freeDebugPort++);
         app.port = freeDebugPort;
       }
     }
@@ -204,7 +204,7 @@ export default class ProjectFactory {
     return busyPorts;
   }
 
-  private static getFreePort(startPort: number): number {
+  private static async getFreePort(startPort: number): Promise<number> {
     const busyPorts = ProjectFactory.getBusyPorts();
     let freePort = startPort;
     let portIsFree = false;
@@ -216,7 +216,7 @@ export default class ProjectFactory {
         continue;
       }
 
-      if (!checkPort(freePort)) {
+      if (! await checkPort(freePort)) {
         continue;
       }
 

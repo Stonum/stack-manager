@@ -32,4 +32,9 @@ export default class CommonListener {
     const window = getMainWindow();
     window?.webContents.send('info', { title, message });
   }
+
+  sendErrorMessage(message: string) {
+    const window = getMainWindow();
+    window?.webContents.send('error', message);
+  }
 }
