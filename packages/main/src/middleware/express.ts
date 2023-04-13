@@ -53,7 +53,7 @@ export default class StaticServer {
     return new Promise((resolve, reject) => {
       if (isDevelopment) {
         log.debug(`Server ${this.name} is not started in development mode`);
-        // return;
+        return;
       }
 
       log.debug(`Server ${this.name} is starting...`);
