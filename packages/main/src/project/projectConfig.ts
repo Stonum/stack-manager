@@ -388,6 +388,17 @@ export async function generateWorkspaceFile(project: Project, wsPath: string, ve
     config.folders.push({ path: verPath, name: path.basename(verPath) });
   }
 
+  //каталог докер файлов, если есть
+  const dockerName = fs.readdirSync(project.path.git).find(fld => fld.toLowerCase() === 'docker');
+  if (dockerName) {
+    config.folders.push({ path: path.join(project.path.git, dockerName) });
+  }
+
+  const docsName = fs.readdirSync(project.path.git).find(fld => fld.toLowerCase() === 'stack.help');
+  if (docsName) {
+    config.folders.push({ path: path.join(project.path.git, docsName) });
+  }
+
   if (!config.settings) {
     config.settings = {
       'files.exclude': {
