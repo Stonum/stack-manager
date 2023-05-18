@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.14](https://github.com/stonum/stack-manager/compare/v0.7.13...v0.7.14) (2023-05-18)
+
+
+### Features
+
+* в воркспейс добавляются каталоги docker и stack.Help если есть в проекте ([53b6509](https://github.com/stonum/stack-manager/commit/53b65095ee3a053db3427033ef41ad3a3aa15ae9))
+
 ### [0.7.13](https://github.com/stonum/stack-manager/compare/v0.7.12...v0.7.13) (2023-04-13)
 
 
