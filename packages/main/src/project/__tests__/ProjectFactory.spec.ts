@@ -20,6 +20,7 @@ const emptyProject = {
     base: '',
     login: '',
     password: '',
+    pgbouncer: false,
   },
   gateway: {
     name: '_gateway',

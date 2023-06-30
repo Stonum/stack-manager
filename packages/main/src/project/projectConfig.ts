@@ -20,11 +20,14 @@ export async function generateStackIni(project: Project, pathini: string, binold
   data['SQL-mode'].Base = project.sql.base;
   data['SQL-mode'].Schema = project.type !== helper.StackBackendType.apphost ? project.sql.base + '.stack' : 'stack';
 
+  if (!data['PostgreSQL options']) {
+    data['PostgreSQL options'] = { AddConnectionString: 'port=5432 sslmode=disable' };
+  }
   if (sqlport) {
-    if (!data['PostgreSQL options']) {
-      data['PostgreSQL options'] = {};
-    }
     data['PostgreSQL options'].AddConnectionString = `port=${sqlport} sslmode=disable`;
+  }
+  if (project.sql.pgbouncer) {
+    data['PostgreSQL options'].AddConnectionString += ' onetimequery=yes';
   }
 
   // correct path of resources
@@ -241,7 +244,7 @@ export async function generateGatewaySettings(project: Project, pathnew: string)
 
     const [sqlserver, sqlport] = project.sql.server.split(':');
     profile.spring.datasource = {
-      url: `jdbc:postgresql://${sqlserver}:${sqlport || 5432}/${project.sql.base}`,
+      url: `jdbc:postgresql://${sqlserver}:${sqlport || 5432}/${project.sql.base}${project.sql.pgbouncer ? '?prepareThreshold=0' : ''}`,
       username: project.sql.login,
       password: project.sql.password,
     };

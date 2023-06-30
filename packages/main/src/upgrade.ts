@@ -25,6 +25,16 @@ export default async function upgradeBeforeStart() {
     projects.setAll(p);
   }
 
+  if (verToNumber(version) < verToNumber('0.7.15')) {
+    const p = projects.getAll();
+    for (const project of p) {
+      if (project.sql) {
+        project.sql.pgbouncer = false;
+      }
+    }
+    projects.setAll(p);
+  }
+
   if (version !== currentVer) {
     settings.set('version', currentVer);
   }

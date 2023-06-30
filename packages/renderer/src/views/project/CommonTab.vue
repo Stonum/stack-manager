@@ -2,22 +2,19 @@
   <v-container fluid>
     <v-row>
       <v-col cols="9">
-        <base-input-folder
-          v-model="project.path.git"
-          label="Каталог проекта в git"
-          :readonly="!isNewProject" 
-          required
-          @update:model-value="emit('update:projectFolder')"
-        />
+        <base-input-folder v-model="project.path.git" label="Каталог проекта в git" :readonly="!isNewProject" required @update:model-value="emit('update:projectFolder')" />
       </v-col>
       <v-col>
         <base-autocomplete
           v-model="project.type"
-          label="Тип проекта" 
-          :items="[{ title: 'stack', value: 0 }, { title: 'app_host', value: 1 }]"
+          label="Тип проекта"
+          :items="[
+            { title: 'stack', value: 0 },
+            { title: 'app_host', value: 1 },
+          ]"
           :return-object="false"
           no-filter
-          :readonly="!isNewProject" 
+          :readonly="!isNewProject"
           @update:model-value="emit('update:projectType')"
         />
       </v-col>
@@ -33,13 +30,7 @@
             no-filter
             @update:model-value="emit('update:iniFile')"
           />
-          <base-input-file
-            v-else 
-            v-model="project.path.ini"
-            label="Путь к stack.ini"
-            required
-            @update:model-value="emit('update:iniFile')"
-          />
+          <base-input-file v-else v-model="project.path.ini" label="Путь к stack.ini" required @update:model-value="emit('update:iniFile')" />
         </v-col>
         <template v-if="props.isAppHost && project.gateway">
           <v-col cols="9" md="10">
@@ -68,15 +59,16 @@
         <v-col cols="6" md="2">
           <base-input v-model="project.sql.password" label="Пароль" />
         </v-col>
+        <v-col v-if="props.isAppHost" cols="12">
+          <v-switch v-model="project.sql.pgbouncer" class="my-0" label="Подключение через pgbouncer" density="compact" hide-details />
+        </v-col>
         <v-col cols="12">
           <base-input-folder v-model="project.path.version" label="Каталог версии" required :hide-details="!!project.path.version" />
         </v-col>
         <v-col cols="10" md="5">
           <base-input v-model="project.restartMaxCount" type="number">
             <template #prepend>
-              <span class="text-subtitle-1 d-flex align-end">
-                Максимальное количество неуспешных перезапусков
-              </span>
+              <span class="text-subtitle-1 d-flex align-end"> Максимальное количество неуспешных перезапусков </span>
             </template>
           </base-input>
         </v-col>
@@ -89,19 +81,18 @@
 import { useVModel } from '@vueuse/core';
 
 const props = defineProps<{
-   modelValue: Project,
-   isNewProject: boolean,
-   isAppHost: boolean,
-   inifiles: Array<any>
+  modelValue: Project;
+  isNewProject: boolean;
+  isAppHost: boolean;
+  inifiles: Array<any>;
 }>();
 
 const emit = defineEmits<{
-   (e: 'update:modelValue', modelValue: Settings): void,
-   (e: 'update:iniFile'): void,
-   (e: 'update:projectFolder'): void,
-   (e: 'update:projectType'): void,
-}
->();
+  (e: 'update:modelValue', modelValue: Settings): void;
+  (e: 'update:iniFile'): void;
+  (e: 'update:projectFolder'): void;
+  (e: 'update:projectType'): void;
+}>();
 
 const project = useVModel(props, 'modelValue', emit);
 </script>

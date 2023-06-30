@@ -48,6 +48,8 @@ type ProjectSQLSettings = {
   base: string;
   login: string;
   password: string;
+  /** use pgbounser or not */
+  pgbouncer: boolean;
 }
 
 type ProjectPaths = {

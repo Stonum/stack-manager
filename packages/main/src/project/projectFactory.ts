@@ -72,6 +72,7 @@ export default class ProjectFactory {
       base: params.sql?.base || '',
       login: params.sql?.login || '',
       password: params.sql?.password || '',
+      pgbouncer: params.sql?.pgbouncer || false,
     };
 
     if (project.type === helper.StackBackendType.apphost) {
