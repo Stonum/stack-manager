@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.15](https://github.com/stonum/stack-manager/compare/v0.7.14...v0.7.15) (2023-06-30)
+
+
+### Features
+
+* переключатель для применения настроек pgbouncer ([b88b466](https://github.com/stonum/stack-manager/commit/b88b4667d5bbe1c438eacf399c9e890741bc51a0))
+
 ### [0.7.14](https://github.com/stonum/stack-manager/compare/v0.7.13...v0.7.14) (2023-05-18)
 
 
