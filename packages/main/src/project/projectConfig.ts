@@ -427,7 +427,7 @@ export async function generateWorkspaceFile(project: Project, wsPath: string, ve
   for (const app of project.apps) {
     if (app.port) {
       debugs.push({
-        type: 'stack',
+        type: 'node',
         request: 'attach',
         name: app.name,
         address: 'localhost',
