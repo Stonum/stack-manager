@@ -359,11 +359,14 @@ export default class ProjectItem {
       throw new Error(`Не задан каталог git`);
     }
 
-    await cmd.exec('git pull', this.path.git);
+    const promises = [];  
+    promises.push(cmd.exec('git pull', this.path.git));
     // если фронт лежит не в папке проекта, обновим гит отдельно
     if (this.path.front && path.resolve(path.dirname(this.path.front)) !== path.resolve(this.path.git)) {
-      await cmd.exec('git pull', this.path.front);
+      promises.push(cmd.exec('git pull', this.path.front));
     }
+
+    await Promise.all(promises);
   }
 
   async openWorkspace() {
