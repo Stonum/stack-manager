@@ -86,6 +86,8 @@ type Project = {
   gateway?: ProjectGateway;
   /** max count auto restart apps in project */
   restartMaxCount: number;
+  /** generate env file for settings */
+  useEnvSettings: any;
 }
 
 type ProjectOptions = Partial<Project>;

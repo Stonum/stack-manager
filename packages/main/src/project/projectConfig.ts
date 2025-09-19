@@ -6,6 +6,7 @@ import os from 'os';
 import { readSettingsFile, writeSettingsFile, writeIniFile, readIniFile } from '../utils';
 import { settings } from '@/store';
 import * as helper from './projectHelpers';
+import { getIpAddresses } from './projectHelpers';
 
 export async function generateStackIni(project: Project, pathini: string, binold: string, binnew: string, version: string) {
   const data = (await readSettingsFile(pathini)) as StackIniFile;
@@ -271,6 +272,65 @@ export async function generateBootstrapSettings(project: Project, pathnew: strin
     return path.join(pathnew, 'bootstrap.yml');
   }
   return null;
+}
+
+export async function generateEnvSettings(project: Project, pathnew: string) {
+   const config = {} as any;
+
+   config.COMPOSE_PROJECT_NAME = os.hostname + '_' + project.name;
+   config.IP_ADDR = getIpAddresses().shift();
+   config.GROUP = 'default';
+   config.HOSTNAME = '${IP_ADDR}';
+   config.APPHOST_HOSTNAME = '${IP_ADDR}';
+
+   const [consul_host, consul_port] = settings.get('consul').split(':');
+   config.CONSUL = consul_host && consul_port;
+   config.CONSUL_HOST = consul_host;
+   config.CONSUL_PORT = consul_port;
+
+   const trustedServer = settings.get('trustedServer');
+   config.TRUSTED = !!trustedServer;
+   config.LICENSE_SERVER = trustedServer;
+
+   const [sqlserver, sqlport] = project.sql.server.split(':');
+   config.POSTGRES_HOST = sqlserver;
+   config.POSTGRES_PORT = sqlport || 5432;
+
+   config.DATABASE_NAME = project.sql.base;
+   config.DATABASE_LOGIN = project.sql.login;
+   config.DATABASE_PASSWORD = project.sql.password;
+
+   config.WORKSPACE_DIR = project.path.git;
+
+   config.SITE_NAME = `http://${os.hostname().toLowerCase()}`;
+   config.NGINX_PORT = project.port;
+
+   config.LOG_LVL = 'info';
+
+   const rabbithost = new URL(settings.get('rabbitmq_url'));
+   config.RABBITMQ_HOST = rabbithost.hostname;
+   config.RABBITMQ_PORT = +rabbithost.port;
+
+   config.APPHOST_LOG_DIR = `${project.path.bin}\\Logs`;
+   config.GATEWAY_LOG_DIR = `${project.path.bin}\\Logs`;
+
+   config.GATEWAY_PORT = project.gateway?.port;
+   config.GATEWAY_HTTP_SHARE_DIR = settings.get('share');
+   config.GATEWAY_HTTP_UPLOAD_DIR = settings.get('upload');
+
+   config.PUBLIC_FILES_DIR = settings.get('share');
+   config.UPLOAD_FILES_DIR = settings.get('upload');
+
+   config.DOTNETCORE_HOST = 'localhost';
+   config.DOTNETCORE_PORT = settings.get('dotnetcore_port');
+   config.APPHOST_DOTNETCORE_PUBLIC_PATH = `${project.path.bin}\\DotNetCore`;
+
+   config.BIRT_HOST = 'localhost';
+   config.BIRT_PORT = settings.get('birt_port');
+
+   await writeIniFile(path.join(pathnew, `settings.env`), config);
+
+   return `settings.env`;
 }
 
 async function getEnvConfig(project: Project, envPath: string) {

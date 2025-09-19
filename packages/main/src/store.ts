@@ -45,6 +45,7 @@ const defSettings = {
   fullLogging: false,
   version: app.getVersion(),
   trustedServer: import.meta.env.VITE_TRUSTED_SERVER || '',
+  consul: import.meta.env.VITE_CONSUL || '',
 };
 
 type SettingsType = typeof defSettings;

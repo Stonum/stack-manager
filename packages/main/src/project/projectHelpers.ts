@@ -28,8 +28,14 @@ export function getAllowedOrigins(ports: number[]) {
 
   push('localhost');
   push(os.hostname());
-  Object.values(os.networkInterfaces()).forEach((ni: any) => {
-    ni.filter((el: any) => el.family === 'IPv4').forEach((el: any) => push(el.address));
-  });
+  getIpAddresses().forEach((el: any) => push(el.address)); 
   return result;
+}
+
+export function getIpAddresses(): string[] {
+   const addr: string[] = [];
+   Object.values(os.networkInterfaces()).forEach((ni: any) => {
+      ni.filter((el: any) => el.family === 'IPv4').forEach((el: any) => addr.push(String(el.address)));
+   });
+   return addr;
 }

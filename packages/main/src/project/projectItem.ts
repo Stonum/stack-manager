@@ -29,6 +29,7 @@ export default class ProjectItem {
   frontPath: string;
   wsPath: string;
   verPath: string;
+  useEnvSettings: any;
 
   constructor(project: Project) {
     this.id = project.id;
@@ -40,6 +41,7 @@ export default class ProjectItem {
     this.type = project.type;
     this.restartMaxCount = project.restartMaxCount;
     this.gateway = project.gateway;
+    this.useEnvSettings = project.useEnvSettings; 
 
     this.frontPath = path.join(settings.get('staticPath'), project.name);
     this.wsPath = path.join(settings.get('workspacePath'), `${this.name}.code-workspace`);
@@ -186,7 +188,8 @@ export default class ProjectItem {
   }
 
   async build() {
-    const apphost_project = this.type === helper.StackBackendType.apphost;
+     const apphost_project = this.type === helper.StackBackendType.apphost;
+     const useEnvSettings = this.useEnvSettings;
 
     // копируем каталог версии если его нет
     if (!fs.existsSync(this.verPath)) {
@@ -211,12 +214,19 @@ export default class ProjectItem {
     }
 
     // редактируем stack.ini и создаем в целевом каталоге
-    if (fs.existsSync(pathini)) {
+    if (!useEnvSettings && fs.existsSync(pathini)) {
       config.generateStackIni(this, pathini, pathbin_old, pathbin_new, this.verPath);
-    }
+     }
+     
+     let envSettingsPath = null;
+     if (useEnvSettings) {
+        envSettingsPath = await config.generateEnvSettings(this, pathbin_new);
+     }
 
     if (apphost_project) {
-      await config.generateCredentials(this, pathbin_new);
+      if (!useEnvSettings) {
+         await config.generateCredentials(this, pathbin_new);
+       }
 
       // деплоим гейтвэй
       if (this.gateway?.name) {
@@ -230,7 +240,13 @@ export default class ProjectItem {
           cmdArgs += ` --spring.cloud.bootstrap.location=${path.relative(path_gateway, bootstrapSettingsPath)}`;
         }
         if (gatewaySettingsPath) {
-          cmdArgs += ` --spring.config.location=classpath:/application.yml,classpath:file:${path.relative(path_gateway, gatewaySettingsPath)}`;
+          cmdArgs += ` --spring.config.location=classpath:/application.yml`;
+        }
+        if (!useEnvSettings) {
+          cmdArgs += `,classpath:file:${path.relative(path_gateway, gatewaySettingsPath)}`;
+        }
+        if (useEnvSettings) {
+          cmdArgs += ` --e="../${envSettingsPath}"`;
         }
 
         await this.webServer.addItem(this.gateway.name, {
@@ -281,7 +297,11 @@ export default class ProjectItem {
         const expression = `ЗапуститьОчередьСообщений(@{количествоПотоков:${syncThreadCount},количествоАсинхронныхПотоков:${asyncThreadCount},количествоАсинхронныхРабот:${asyncTaskCount}${addParams}})`;
         const rabbitsettings = `settings_${task?.prefix || app.id}.toml`;
         const inspect = app.port ? `--inspect=${app.port}` : '';
-        const cmdArgs = `--task=${app.id} ${inspect} -r ${trustedServer} -i "stack.ini" -c "credentials.ini" --rabbit="${rabbitsettings}" -f "${expression}"`;
+
+        let cmdArgs = `--task=${app.id} ${inspect} -r ${trustedServer} -i "stack.ini" -c "credentials.ini" --rabbit="${rabbitsettings}" -f "${expression}"`;
+        if (useEnvSettings) {
+           cmdArgs = `${inspect} -e "${envSettingsPath}" -e "TASK_NAME=${task?.prefix}" -f "${expression}"`;
+        }
 
         await this.webServer.addItem(app.name, {
           IsActive: app.active ? 1 : 0,

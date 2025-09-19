@@ -8,6 +8,11 @@
         <base-input v-model="settings.trustedServer" label="Доверенный сервер лицензий" placeholder="<server>:<port>" required />
       </v-col>
     </v-row>
+    <v-row>
+      <v-col cols="6">
+        <base-input v-model="settings.consul" label="Сервер consul" placeholder="<server>:<port>" />
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 

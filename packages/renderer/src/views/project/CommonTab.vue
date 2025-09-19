@@ -62,6 +62,9 @@
         <v-col v-if="props.isAppHost" cols="12">
           <v-switch v-model="project.sql.pgbouncer" class="my-0" label="Подключение через pgbouncer" density="compact" hide-details />
         </v-col>
+        <v-col v-if="props.isAppHost" cols="12">
+          <v-switch v-model="project.useEnvSettings" class="my-0" label="Использовать env файл настроек" density="compact" hide-details />
+        </v-col>
         <v-col cols="12">
           <base-input-folder v-model="project.path.version" label="Каталог версии" required :hide-details="!!project.path.version" />
         </v-col>
