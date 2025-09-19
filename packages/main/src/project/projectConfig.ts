@@ -277,14 +277,14 @@ export async function generateBootstrapSettings(project: Project, pathnew: strin
 export async function generateEnvSettings(project: Project, pathnew: string) {
    const config = {} as any;
 
-   config.COMPOSE_PROJECT_NAME = os.hostname + '_' + project.name;
+   config.COMPOSE_PROJECT_NAME = os.hostname + '-' + project.name;
    config.IP_ADDR = getIpAddresses().shift();
    config.GROUP = 'default';
    config.HOSTNAME = '${IP_ADDR}';
    config.APPHOST_HOSTNAME = '${IP_ADDR}';
 
    const [consul_host, consul_port] = settings.get('consul').split(':');
-   config.CONSUL = consul_host && consul_port;
+   config.CONSUL = !!(consul_host && consul_port);
    config.CONSUL_HOST = consul_host;
    config.CONSUL_PORT = consul_port;
 
@@ -327,6 +327,9 @@ export async function generateEnvSettings(project: Project, pathnew: string) {
 
    config.BIRT_HOST = 'localhost';
    config.BIRT_PORT = settings.get('birt_port');
+
+   config.ACCESS_TOKEN_MINUTE = 720;
+   config.REFRESH_TOKEN_HOUR = 24;
 
    await writeIniFile(path.join(pathnew, `settings.env`), config);
 
