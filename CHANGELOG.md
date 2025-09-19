@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.18](https://github.com/Stonum/stack-manager/compare/v0.7.17...v0.7.18) (2025-09-19)
+
+
+### Bug Fixes
+
+* исправлен конфиг для запуска ([dc155ca](https://github.com/Stonum/stack-manager/commit/dc155ca9530dd8b43a2d57738e3bf4d493a73662))
+
 ### [0.7.17](https://github.com/Stonum/stack-manager/compare/v0.7.16...v0.7.17) (2025-09-19)
 
 
