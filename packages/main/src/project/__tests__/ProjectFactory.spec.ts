@@ -8,6 +8,7 @@ const emptyProject = {
   port: 8001,
   type: 1,
   restartMaxCount: 5,
+  useEnvSettings: false,
   path: {
     version: '',
     bin: '',
