@@ -342,7 +342,7 @@ async function getEnvConfig(project: Project, envPath: string) {
   const config = await readIniFile(envPath);
 
   // чистим лишние ключи из конфига
-  const keys = ['BACKEND_STATE_INTERVAL', 'ASYNC_JOBS_INTERVAL', 'CLIENT_DIR', 'API_HOST_TIMEOUT'];
+  const keys = ['BACKEND_STATE_INTERVAL', 'ASYNC_JOBS_INTERVAL', 'CLIENT_DIR', 'API_HOST_TIMEOUT', 'BUILD_CONCURRENCY','BUNDLES_VUE3'];
   for (const key of Object.keys(config)) {
     if (keys.indexOf(key) === -1) {
       delete config[key];
