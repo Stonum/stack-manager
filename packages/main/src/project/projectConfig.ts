@@ -275,7 +275,8 @@ export async function generateBootstrapSettings(project: Project, pathnew: strin
 }
 
 export async function generateEnvSettings(project: Project, pathnew: string) {
-   const config = {} as any;
+   const settings_path = path.join(pathnew, `settings.env`);
+   const config = fs.existsSync(settings_path) ? await readIniFile(settings_path) : {};
 
    config.COMPOSE_PROJECT_NAME = os.hostname + '-' + project.name;
    config.IP_ADDR = getIpAddresses().shift();
@@ -331,7 +332,7 @@ export async function generateEnvSettings(project: Project, pathnew: string) {
    config.ACCESS_TOKEN_MINUTE = 720;
    config.REFRESH_TOKEN_HOUR = 24;
 
-   await writeIniFile(path.join(pathnew, `settings.env`), config);
+   await writeIniFile(settings_path, config);
 
    return `settings.env`;
 }
