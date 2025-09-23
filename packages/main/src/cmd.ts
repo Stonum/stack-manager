@@ -17,9 +17,10 @@ const execSudo = function (cmd: string) {
   });
 };
 
-const exec = function (cmd: string, path?: string) {
-  return new Promise((resolve, reject) => {
-    child.exec(cmd, { cwd: path || process.cwd() }, function (error, stdout) {
+const exec = function (cmd: string, path?: string, env: Object = {}) {
+   return new Promise((resolve, reject) => {
+      const options = { cwd: path || process.cwd(), env: { ...process.env, ...env } };
+      child.exec(cmd, options, function (error, stdout) {
       if (error) {
         reject(error);
       }
@@ -27,5 +28,6 @@ const exec = function (cmd: string, path?: string) {
     });
   });
 };
+
 
 export default { execSudo, exec };
