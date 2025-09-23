@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.19](https://github.com/Stonum/stack-manager/compare/v0.7.18...v0.7.19) (2025-09-23)
+
+
+### Features
+
+*  перед генерацией settings.env пробуем его прочитать ([e0ec3ef](https://github.com/Stonum/stack-manager/commit/e0ec3ef2f6cad24e684cece94cec9d812f2fe2c9))
+
+
+### Bug Fixes
+
+* сборка фронта для мастер версии ([4b61009](https://github.com/Stonum/stack-manager/commit/4b610098a7d746b29b8dc64e8df27b9655757b0f))
+
 ### [0.7.18](https://github.com/Stonum/stack-manager/compare/v0.7.17...v0.7.18) (2025-09-19)
 
 
